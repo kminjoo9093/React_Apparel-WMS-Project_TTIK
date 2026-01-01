@@ -1,0 +1,113 @@
+/* 변수 (컬러, 폰트사이즈) */
+:root {
+    /* 컬러 */
+  /* --primary-color: ;
+  --secondary-color: ;
+  --base-color: ;
+ */
+
+}
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 폰트 초기화 */
+/* 10px -> 1rem 으로 계산 */
+html{
+  font-size: 62.5%; 
+}
+
+body {
+  font-family: Arial, sans-serif; /* 폰트 결정 후 수정 */
+  font-weight: 400;
+  font-size: 1.5rem;
+  /* line-height: 1em; */
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6{
+  margin: 0;
+}
+
+ul {
+  list-style: none;
+}
+
+/* 링크 초기화 */
+a{
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button {
+/* border-radius, width, padding 등 설정 */
+}
+
+button:hover {
+}
+
+button:active {
+}
+
+/* 컨텐츠 너비, 마진 */
+/* PC 버전 너비 */
+.container {
+  width: 70%;
+  max-width: 128rem;
+  /* min-width: 78rem; */
+  margin: 0 auto;
+  padding: 5rem 2rem;
+  
+}
+
+.contentTopPosition{
+  margin-top: 15rem; /*header+menubar height*/
+}
+
+/* 컨텐츠 box 스타일 */
+.contentBox{
+    border-radius: 10px;
+    box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+}
+
+/* 제목 */
+.heading{
+    font-size: 3rem;
+}
+.contentHeading{
+    font-size: 2.4rem;
+    margin-block: 1.2rem;
+}
+
+/* 태블릿 세로 */
+@media (max-width: 1023px){ 
+    .container {
+        width: 80%;
+        max-width: 100%;
+    }
+    .contentTopPosition {
+      margin-top: 7rem;
+    }
+}
+
+/* 모바일 세로, 가로 */
+@media (max-width: 767px){
+    html{
+        font-size: 56.25%; /* 9px = 1rem */
+    }
+    .container {
+        width: 95%;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 4rem 1rem;
+    }
+    .contentTopPosition {
+      margin-top: 7rem;
+    }
+}
