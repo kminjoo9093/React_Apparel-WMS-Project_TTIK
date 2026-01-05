@@ -1,9 +1,8 @@
-/* Root & Layout Container 전체적인 대시보드 틀과 애니메이션을 설정합니다. */
 .modernDashboard {
   max-width: 120rem;
   margin: 0 auto;
   padding: 2rem 0;
-  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); /* 부드러운 가속도 추가 */
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
 }
 
 @keyframes fadeIn {
@@ -166,3 +165,68 @@
 .itemQty { font-size: 16px; font-weight: 700; }
 .itemQtyPlus  { font-size: 16px; font-weight: 700; color: #2563eb; }
 .itemQtyMinus { font-size: 16px; font-weight: 700; color: #ef4444; }
+
+/* 모바일 및 태블릿 반응형 스타일 */
+
+/* 1. 태블릿 사이즈 (최대 1024px) */
+@media (max-width: 1024px) {
+  .modernDashboard {
+    padding: 2rem; /* 좌우 여백 확보 */
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr); /* 3열에서 2열로 변경 */
+    gap: 2rem;
+  }
+}
+
+/* 2. 모바일 사이즈 (최대 768px) */
+@media (max-width: 768px) {
+  .welcomeSection h1 {
+    font-size: 24px; /* 타이틀 크기 축소 */
+  }
+
+  /* 통계 카드를 한 줄에 하나씩 배치 */
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: 1.6rem;
+    margin-bottom: 3.2rem;
+  }
+
+  /* 하단 입출고 패널을 한 줄에 하나씩 배치 */
+  .contentGrid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .modernCard, .dataPanel {
+    padding: 2rem; /* 내부 패딩 축소 */
+  }
+
+  .cardValue {
+    font-size: 28px; /* 숫자 크기 조절 */
+  }
+
+  .panelHeader h3 {
+    font-size: 16px;
+  }
+}
+
+/* 초소형 모바일 */
+@media (max-width: 48rem) {
+  .welcomeSection {
+    margin-bottom: 2.4rem;
+  }
+
+  .listItem {
+    padding: 1.6rem 0;
+  }
+
+  .itemName {
+    font-size: 14px;
+    max-width: 15rem; /* 텍스트가 너무 길면 생략 처리하기 위함 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
