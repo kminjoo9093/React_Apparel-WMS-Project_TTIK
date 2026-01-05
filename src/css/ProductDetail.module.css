@@ -1,0 +1,76 @@
+/* 컨테이너: 카드들이 쌓일 공간 */
+.card-stack-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 800px;
+  display: flex;
+  justify-content: center;
+  padding-top: 50px;
+}
+
+/* 개별 카드 스타일 */
+.detail-card {
+  position: absolute;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+}
+
+/* 상단 스테퍼 UI */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.step-badge {
+  background: #0d1b3e;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* 정보 그리드 레이아웃 */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.info-item {
+  border-bottom: 1px solid #ececec;
+  padding-bottom: 8px;
+}
+
+.info-label {
+  font-size: 11px;
+  color: #999;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.info-value {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 하단 버튼 */
+.continue-btn {
+  width: 100%;
+  background: #00875a;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-top: 32px;
+  cursor: pointer;
+}
