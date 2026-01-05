@@ -21,9 +21,9 @@ const Layout = ({ children }) => {
           <div className={styleLayout.logoSub}>Tap To Inventory Keeping</div>
         </div>
       <div className={styleLayout.sidebarProfile}>
-        <div className={styleLayout.srofileInfo}>
+        <div className={styleLayout.profileInfo}>
           <span style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>System Admin</span>
-          <span className={styleLayout.srofileName}>관리자님, 환영합니다</span>
+          <span className={styleLayout.profileName}>관리자님, 환영합니다</span>
         </div>
       </div>
 
