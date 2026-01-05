@@ -21,13 +21,13 @@ function Ttik() {
       </Routes>
     ) : (
       /* 레이아웃이 필요한 페이지들 */
-      <Layout>
+      // <Layout>
         <Routes>
           <Route path="/" element={<Navigate to="/main" replace />} />
           <Route path="/main" element={<MainDashboard />} />
           {/* 상품관리, 입출고 등 다른 페이지들도 여기에 추가 */}
         </Routes>
-      </Layout>
+      // </Layout>
     )}
   </div>
 );
