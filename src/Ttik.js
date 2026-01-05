@@ -24,7 +24,7 @@ function Ttik() {
       <Layout>
         <Routes>
           <Route path="/" element={<Navigate to="/main" replace />} />
-          <Route path="/main" element={<MainDashboard />} />
+          <Route path="/ttik" element={<MainDashboard />} />
           {/* 상품관리, 입출고 등 다른 페이지들도 여기에 추가 */}
         </Routes>
       </Layout>

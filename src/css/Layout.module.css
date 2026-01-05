@@ -1,0 +1,203 @@
+.appContainer {
+  display: flex; 
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 26rem;
+  min-width: 26rem;
+  background-color: #1e293b;
+  display: flex;
+  flex-direction: column;
+}
+
+.mainContent {
+  flex: 1; 
+  display: flex;
+  flex-direction: column; 
+  overflow: hidden;
+  background-color: #f8fafc;
+}
+
+.scrollArea {
+  flex: 1;
+  overflow-y: auto; 
+  padding: 40px; 
+}
+
+/* 사이드바 로고와 프로필 사이의 구분선 및 여백 */
+.sidebarLogo {
+  padding: 4rem 2.4rem 3rem;
+}
+.logoMain {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: 0.2rem;
+}
+
+.logoSub {
+  font-size: 1.3rem;
+  color: #94a3b8;
+  margin-top: 0.4rem;
+  font-weight: 600;
+}
+
+/* 프로필 영역 */
+.sidebarProfile {
+  padding: 2.4rem;
+  margin: 1rem 1.6rem 2rem 1.6rem; 
+  background: rgba(255, 255, 255, 0.05); 
+  border-radius: 1.6rem; 
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.profileName {
+  color: #f8fafc;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* '관리자'라는 텍스트 앞에 작은 포인트를 주어 시각적 여유 제공 */
+.profileName::before {
+  content: '●';
+  color: #10b981; 
+  font-size: 1rem;
+  margin-right: 0.8rem;
+  vertical-align: middle;
+}
+
+/* 하단 메뉴와의 간격 확보 */
+.sidebarNav {
+  margin-top: 1rem;
+  padding: 0 0.8rem;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  padding: 1.4rem 2rem;
+  color: #94a3b8;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.navItem.active {
+  background-color: #2563eb;
+  color: white;
+}
+
+/* 상단바 전체 레이아웃 */
+.topBar {
+  height: 8rem; 
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(1rem); 
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* 검색창 디자인 */
+.searchBox {
+  position: relative;
+  margin-right: 3rem;
+}
+
+.searchBox input {
+  width: 300px;
+  padding: 1rem 1.5rem 1rem 4rem;
+  border-radius: 1.2rem;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.searchBox input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  width: 35rem; 
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  opacity: 0.5;
+}
+
+/* 알림 및 상태창 */
+.topBarRight {
+  display: flex;
+  align-items: center;
+}
+
+.statusGroup {
+  display: flex;
+  align-items: center;
+  gap: 2.4rem;
+  margin-right: 3rem;
+  padding-right: 3rem;
+  border-right: 1px solid #e2e8f0;
+}
+
+.notificationBell {
+  position: relative;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.bellBadge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 5px;
+  border-radius: 2rem;
+  border: 2px solid #ffffff;
+}
+
+/* 로그아웃 버튼 */
+.logoutBtn {
+  background: none;
+  border: 1px solid #e2e8f0;
+  padding: 0.8rem 1.6rem;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+  background: #fff1f2;
+  color: #ef4444;
+  border-color: #fecdd3;
+}
+.profileName{
+  color : white;
+}
+
+
