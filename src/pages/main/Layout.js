@@ -58,12 +58,12 @@ const Layout = ({ children }) => {
         <header className={styleLayout.topBar}>
           <div className={styleLayout.topBarLeft} style={{ display: 'flex', alignItems: 'center' }}>
             {/* 모바일용 햄버거 버튼 추가 */}
-            {/* <button 
+            <button 
               className={styleLayout.menuToggle} 
               onClick={() => setIsSidebarOpen(true)}
             >
               ☰
-            </button> */}
+            </button>
             <h2 className={styleLayout.sageTitle}>
               {menus.find(m => m.path === location.pathname)?.name || "시스템"}
             </h2>

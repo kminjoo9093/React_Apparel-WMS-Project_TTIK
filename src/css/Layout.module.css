@@ -200,4 +200,76 @@
   color : white;
 }
 
+/* 모바일 반응형 UI */
+@media (max-width : 76.8rem){
+    .appContainer{
+        flex-direction: column;
+    }
+    /* 사이드바: 평소에는 왼쪽으로 숨김 */
+    .sidebar {
+        position: fixed;
+        left: -26rem; /* 숨김 */
+        top: 0;
+        bottom: 0;
+        z-index: 999;
+        transition: left 0.3s ease;
+        box-shadow: 10px 0 20px rgba(0,0,0,0.2);
+    }
 
+    /* 사이드바가 열렸을 때 클래스 */
+    .sidebarActive {
+        left: 0 !important;
+    }
+
+    /* 상단바: 모바일 대응 */
+    .topBar {
+        padding: 0 2rem;
+        height: 6rem;
+    }
+
+    /* 검색창: 모바일에서는 숨기거나 크기 고정 */
+    .searchBox {
+        display: none; 
+    }
+
+    .statusGroup {
+        gap: 1.5rem;
+        margin-right: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    /* 메인 콘텐츠 여백 조절 */
+    .scrollArea {
+        padding: 2rem;
+    }
+
+    /* 모바일용 버튼 스타일 */
+    .menuToggle {
+        display: block !important;
+        background: none;
+        border: none;
+        font-size: 2.4rem;
+        cursor: pointer;
+        margin-right: 1.5rem;
+    }
+}
+
+/* 데스크톱에서는 햄버거 버튼 숨김 */
+.menuToggle {
+  display: none;
+}
+
+/* 사이드바가 열렸을 때 배경 어둡게 처리 */
+.overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .overlayActive {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+  }
+}
