@@ -1,11 +1,23 @@
 /* 변수 (컬러, 폰트사이즈) */
 :root {
-    /* 컬러 */
-  /* --primary-color: ;
-  --secondary-color: ;
-  --base-color: ;
- */
 
+  /* 메인 컬러 - 배경, 폰트 공통 적용 */
+  --primary-color: #2563eb;
+  --secondary-color: #1e293b;
+  --base-Color: #f8fafc;
+
+ /* 경고 */
+  --red-a8: #a8071a;
+  --red-cf: #cf1322;
+  --red-ff: #ff4d4f;
+
+  /* 버튼 배경 */
+  --gray-f1: #f1f5f9; /*배경*/
+
+  /* 폰트 */
+  --gray-47: #475569;
+  --gray-64: #64748b;
+  --green-10: #10b981;
 }
 
 
@@ -57,16 +69,11 @@ button:active {
 /* 컨텐츠 너비, 마진 */
 /* PC 버전 너비 */
 .container {
-  width: 70%;
-  max-width: 128rem;
-  /* min-width: 78rem; */
+  /* width: 90%; */
+  max-width: 110rem;
   margin: 0 auto;
   padding: 5rem 2rem;
   
-}
-
-.contentTopPosition{
-  margin-top: 15rem; /*header+menubar height*/
 }
 
 /* 컨텐츠 box 스타일 */
@@ -79,20 +86,14 @@ button:active {
 /* 제목 */
 .heading{
     font-size: 3rem;
-}
-.contentHeading{
-    font-size: 2.4rem;
-    margin-block: 1.2rem;
+    text-align: center;
+    margin-bottom: 6rem;
 }
 
 /* 태블릿 세로 */
 @media (max-width: 1023px){ 
     .container {
-        width: 80%;
         max-width: 100%;
-    }
-    .contentTopPosition {
-      margin-top: 7rem;
     }
 }
 
@@ -106,8 +107,5 @@ button:active {
         max-width: 100%;
         margin: 0 auto;
         padding: 4rem 1rem;
-    }
-    .contentTopPosition {
-      margin-top: 7rem;
     }
 }
