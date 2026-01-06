@@ -42,10 +42,10 @@ jobs:
 
       # --------------------------------------
       # 3. 의존성 설치
-      # - package-lock.json 기준
+      # 의존성 고정을 위한 package-lock.json을 저장소에 포함하지 않기 때문에 CI 환경에서는 npm install 사용
       # --------------------------------------
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       # --------------------------------------
       # 4. React 빌드
