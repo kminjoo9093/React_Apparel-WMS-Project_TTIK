@@ -4,6 +4,7 @@ import Layout from "../src/pages/main/Layout";
 import MainDashboard from "../src/pages/main/MainDashBoard";
 import Login from "../src/pages/main/Login";
 import Error404Page from "./Error404Page";
+import RegisterAdmin from "./pages/main/RegisterAdmin";
 
 function Ttik() {
   const location = useLocation();
@@ -57,6 +58,7 @@ function Ttik() {
               <Route path="/" element={<Navigate to="/ttik" replace />} />
               {/* 추가할 메뉴들 */}
               <Route path="/products" element={<div>상품관리 페이지</div>} />
+              <Route path="/register-admin" element={<RegisterAdmin />} />
               <Route path="*" element={<Error404Page />} />
             </Routes>
           </Layout>
