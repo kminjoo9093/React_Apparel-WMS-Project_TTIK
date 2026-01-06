@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import styleLogin from '../../css/Login.module.css';
 import Modal from '../../components/Modal';
+import serverUrl from "../../db/server.json"
 
 const Login = ({ setUser, setIsLoggedIn }) => {
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
@@ -9,6 +10,7 @@ const Login = ({ setUser, setIsLoggedIn }) => {
   const [formData, setFormData] = useState({ id: '', password: '' });
   const [isAltSlogan, setIsAltSlogan] = useState(false);
   const navigate = useNavigate(); 
+  const SERVER_URL = serverUrl.SERVER_URL;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,7 +29,7 @@ const Login = ({ setUser, setIsLoggedIn }) => {
   params.append('mngrPswd', formData.password);
 
   try {
-    const response = await fetch('http://localhost:3001/ttik/login', {
+    const response = await fetch(`${SERVER_URL}/ttik/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -37,7 +39,7 @@ const Login = ({ setUser, setIsLoggedIn }) => {
     });
 
     if (response.ok) {
-      const meResponse = await fetch('http://localhost:3001/ttik/me', {
+      const meResponse = await fetch(`${SERVER_URL}/ttik/me`, {
         method: 'GET',
         credentials: 'include',
       });

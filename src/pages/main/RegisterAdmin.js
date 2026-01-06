@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import style from '../../css/Register.module.css';
 import Modal from '../../components/Modal';
 import { useNavigate } from 'react-router-dom';
+import serverUrl from "../../db/server.json"
 
 const RegisterAdmin = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +17,8 @@ const RegisterAdmin = () => {
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
   const closeModal = () => setModal({ ...modal, isOpen: false });
   const navigate = useNavigate();
+  const SERVER_URL = serverUrl.SERVER_URL;
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,7 +35,6 @@ const RegisterAdmin = () => {
       newStorage = newStorage.filter((item) => item !== value); 
     }
     
-    // 번호 순서대로 정렬 (옵션)
     newStorage.sort();
     setFormData({ ...formData, storage: newStorage });
   };
@@ -40,7 +42,7 @@ const RegisterAdmin = () => {
   const handleRegister = async (e) => {
   e.preventDefault();
 
-  // 1. 비밀번호 일치 확인
+  // 비밀번호 일치 확인
   if (formData.password !== formData.confirmPassword) {
     setModal({
       isOpen: true,
@@ -51,7 +53,7 @@ const RegisterAdmin = () => {
     return;
   }
 
-  // 2. 창고 선택 여부 확인
+  // 창고 선택 여부 확인
   if (formData.storage.length === 0) {
     setModal({
       isOpen: true,
@@ -62,16 +64,16 @@ const RegisterAdmin = () => {
     return;
   }
 
-  // 3. 백엔드 엔티티 구조에 맞게 데이터 변환
+  // 백엔드 엔티티 구조에 맞게 데이터 변환
   const submitData = {
-    mngrId: formData.id,                // 엔티티의 mngrId
-    mngrPswd: formData.password,        // 엔티티의 mngrPswd
-    nickname: formData.nickname,        // 엔티티의 nickname
-    tkcgStorage: formData.storage.join(', ') // 엔티티의 tkcgStorage (예: "1, 2")
+    mngrId: formData.id,                
+    mngrPswd: formData.password,        
+    nickname: formData.nickname,        
+    tkcgStorage: formData.storage.join(', ') 
   };
 
   try {
-    const response = await fetch('http://localhost:3001/ttik/join', {
+    const response = await fetch(`${SERVER_URL}/ttik/join`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
