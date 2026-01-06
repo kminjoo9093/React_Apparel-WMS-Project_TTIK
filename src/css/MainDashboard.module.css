@@ -1,0 +1,232 @@
+.modernDashboard {
+  max-width: 120rem;
+  margin: 0 auto;
+  padding: 2rem 0;
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(2rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Welcome Section 페이지 최상단 타이틀 영역입니다. */
+.welcomeSection {
+  margin-bottom: 4.8rem;
+}
+
+.welcomeSection h1 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -1px;
+  margin-bottom: 0.8rem;
+}
+
+.welcomeSection p {
+  font-size: 15px;
+  color: #64748b;
+  font-weight: 400;
+}
+
+/* Stats Grid 요약 정보 카드들이 가로로 배치되는 영역입니다. */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3.2rem;
+  margin-bottom: 5.6rem;
+}
+
+.modernCard {
+  position: relative;
+  background: #ffffff;
+  padding: 3.2rem;
+  border-radius: 2.4rem;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 0.4rem 2.4rem rgba(0, 0, 0, 0.02);
+  transition: all 0.4s ease;
+  overflow: hidden;
+}
+
+.modernCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 1.2rem 3.2rem rgba(0, 0, 0, 0.06);
+  border-color: #cbd5e1;
+}
+
+/* 카드 내부 요소 */
+.cardLabel { font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+.cardValue { font-size: 36px; font-weight: 800; color: #1e293b; margin: 1.2rem 0; }
+.cardUnit  { font-size: 18px; font-weight: 500; margin-left: 0.6rem; color: #94a3b8; }
+
+/* 트렌드 표시 (전월 대비) */
+.cardFooter { display: flex; align-items: center; gap: 0.8rem; }
+.trend { font-size: 13px; font-weight: 700; }
+.trend.up   { color: #10b981; }
+.trend.down { color: #ef4444; }
+.trendLabel { font-size: 13px; color: #94a3b8; }
+
+@keyframes urgentPulse {
+  0% {
+    box-shadow: 0 0.4rem 2.4rem rgba(255, 77, 79, 0.1);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 1.2rem 4rem rgba(255, 77, 79, 0.25);
+    transform: scale(1.02); 
+    border-color: #ff7875;
+  }
+  100% {
+    box-shadow: 0 0.4rem 2.4rem rgba(255, 77, 79, 0.1);
+    transform: scale(1); 
+  }
+}
+/* 재고 부족 강조 */
+.modernCard.warning {
+  background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
+  border: 2px solid #ff4d4f; 
+  box-shadow: 0 1rem 3rem rgba(255, 77, 79, 0.15); 
+  animation: urgentPulse 2s infinite ease-in-out; /* 긴급 애니메이션 */
+}
+.modernCard.warning .cardLabel {
+  color: #cf1322; 
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.modernCard.warning .cardValue {
+  color: #a8071a; 
+}
+
+.warningGlow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10rem;
+  height: 10rem;
+  background: radial-gradient(circle at top right, rgba(255, 77, 79, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Content Grid 최근 입출고 리스트가 담기는 영역입니다. */
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.2rem;
+}
+
+.dataPanel {
+  background: #ffffff;
+  padding: 3.2rem;
+  border-radius: 2.4rem;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 0.4rem 2.4rem rgba(0, 0, 0, 0.02);
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.4rem;
+}
+
+.panelHeader h3 { font-size: 18px; font-weight: 700; color: #1e293b; }
+
+.viewAll {
+  background-color: #f1f5f9;
+  border: none;
+  padding: 0.8rem 1.6rem;
+  border-radius: 1rem;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.viewAll:hover { background: #e2e8f0; }
+
+/* List Items Style 패널 내부의 개별 리스트 항목입니다. */
+.listItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.listItem:last-child { border-bottom: none; }
+
+.itemInfo { display: flex; flex-direction: column; gap: 0.6rem; }
+.itemName { font-size: 15px; font-weight: 600; color: #334155; }
+.itemDate { font-size: 12px; color: #94a3b8; }
+
+.itemQty { font-size: 16px; font-weight: 700; }
+.itemQtyPlus  { font-size: 16px; font-weight: 700; color: #2563eb; }
+.itemQtyMinus { font-size: 16px; font-weight: 700; color: #ef4444; }
+
+/* 모바일 및 태블릿 반응형 스타일 */
+
+/* 1. 태블릿 사이즈 (최대 1024px) */
+@media (max-width: 1024px) {
+  .modernDashboard {
+    padding: 2rem; /* 좌우 여백 확보 */
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr); /* 3열에서 2열로 변경 */
+    gap: 2rem;
+  }
+}
+
+/* 2. 모바일 사이즈 (최대 768px) */
+@media (max-width: 768px) {
+  .welcomeSection h1 {
+    font-size: 24px; /* 타이틀 크기 축소 */
+  }
+
+  /* 통계 카드를 한 줄에 하나씩 배치 */
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: 1.6rem;
+    margin-bottom: 3.2rem;
+  }
+
+  /* 하단 입출고 패널을 한 줄에 하나씩 배치 */
+  .contentGrid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .modernCard, .dataPanel {
+    padding: 2rem; /* 내부 패딩 축소 */
+  }
+
+  .cardValue {
+    font-size: 28px; /* 숫자 크기 조절 */
+  }
+
+  .panelHeader h3 {
+    font-size: 16px;
+  }
+}
+
+/* 초소형 모바일 */
+@media (max-width: 48rem) {
+  .welcomeSection {
+    margin-bottom: 2.4rem;
+  }
+
+  .listItem {
+    padding: 1.6rem 0;
+  }
+
+  .itemName {
+    font-size: 14px;
+    max-width: 15rem; /* 텍스트가 너무 길면 생략 처리하기 위함 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
