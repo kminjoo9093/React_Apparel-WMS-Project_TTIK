@@ -55,7 +55,8 @@ jobs:
               rmdir /s /q "%DEPLOY_ROOT%\current"
           )
           mkdir "%DEPLOY_ROOT%\current"
-          robocopy "%RELEASE_DIR%\build" "%DEPLOY_ROOT%\current" /MIR /MT:4 /R:2 /W:2 exit /b 0
+          robocopy "%RELEASE_DIR%\build" "%DEPLOY_ROOT%\current" /MIR /MT:4 /R:2 /W:2
+          exit /b 0
           echo Current folder updated!
 
       - name: Ensure React server is running
