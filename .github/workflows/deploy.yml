@@ -1,4 +1,4 @@
-name: Deploy Frontend (With Auto-Restart)
+name: Deploy Frontend (Stable)
 
 on:
   push:
@@ -14,11 +14,9 @@ jobs:
       PORT: 3000
 
     steps:
-      # 1️⃣ 소스 체크아웃
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # 2️⃣ npm 캐시
       - name: Cache npm
         uses: actions/cache@v4
         with:
@@ -28,57 +26,39 @@ jobs:
           restore-keys: |
             npm-${{ runner.os }}-
 
-      # 3️⃣ Node.js 설정
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      # 4️⃣ 의존성 설치
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      # 5️⃣ React 빌드
       - name: Build React
         run: npm run build
 
-      # 6️⃣ release 디렉토리 생성
       - name: Create release directory
         shell: cmd
         run: |
           if not exist "%RELEASE_DIR%" mkdir "%RELEASE_DIR%"
 
-      # 7️⃣ build 결과 release로 복사
-      - name: Copy build output to release
+      - name: Copy build to release
         shell: cmd
         run: |
           xcopy build "%RELEASE_DIR%\build" /E /I /Y
 
-      # 8️⃣ current 폴더 업데이트
       - name: Update current folder
         shell: cmd
         run: |
           echo Updating current folder...
-          if exist "%DEPLOY_ROOT%\current" (
+          IF EXIST "%DEPLOY_ROOT%\current" (
               rmdir /s /q "%DEPLOY_ROOT%\current"
           )
           mkdir "%DEPLOY_ROOT%\current"
-          xcopy "%RELEASE_DIR%\build" "%DEPLOY_ROOT%\current" /E /I /Y
+          robocopy "%RELEASE_DIR%\build" "%DEPLOY_ROOT%\current" /MIR /MT:4 /R:2 /W:2
           echo Current folder updated!
 
-      # 9️⃣ React 서버 자동 실행 (서버가 죽어있으면)
       - name: Ensure React server is running
-        shell: powershell
+        shell: cmd
         run: |
-          $port = $env:PORT
-          $serve = $env:SERVE_CMD
-          $buildDir = "$env:DEPLOY_ROOT\current"
-          $logFile = "$env:DEPLOY_ROOT\serve.log"
-
-          $exists = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
-          if (-not $exists) {
-              Write-Host "React server not running. Starting in background..."
-              Start-Process $serve -ArgumentList "-s `"$buildDir`" -l $port" -WindowStyle Hidden -RedirectStandardOutput $logFile -RedirectStandardError $logFile
-          } else {
-              Write-Host "React server already running on port $port."
-          }
+          C:\deploy\frontend\restart-frontend.bat
