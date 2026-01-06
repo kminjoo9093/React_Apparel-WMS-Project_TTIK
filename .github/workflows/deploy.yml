@@ -1,4 +1,4 @@
-name: Deploy Frontend
+name: Deploy Frontend (With Auto-Restart)
 
 on:
   push:
@@ -10,6 +10,8 @@ jobs:
     env:
       DEPLOY_ROOT: C:\deploy\frontend
       RELEASE_DIR: C:\deploy\frontend\releases\${{ github.run_id }}
+      SERVE_CMD: C:\Users\user\AppData\Roaming\npm\serve.cmd
+      PORT: 3000
 
     steps:
       # 1️⃣ 소스 체크아웃
@@ -52,8 +54,31 @@ jobs:
         run: |
           xcopy build "%RELEASE_DIR%\build" /E /I /Y
 
-      # 8️⃣ 프론트엔드 서버 재시작 (restart-frontend.bat)
-      - name: Restart frontend server
+      # 8️⃣ current 폴더 업데이트
+      - name: Update current folder
         shell: cmd
         run: |
-          call C:\deploy\scripts\restart-frontend.bat
+          echo Updating current folder...
+          if exist "%DEPLOY_ROOT%\current" (
+              rmdir /s /q "%DEPLOY_ROOT%\current"
+          )
+          mkdir "%DEPLOY_ROOT%\current"
+          xcopy "%RELEASE_DIR%\build" "%DEPLOY_ROOT%\current" /E /I /Y
+          echo Current folder updated!
+
+      # 9️⃣ React 서버 자동 실행 (서버가 죽어있으면)
+      - name: Ensure React server is running
+        shell: powershell
+        run: |
+          $port = $env:PORT
+          $serve = $env:SERVE_CMD
+          $buildDir = "$env:DEPLOY_ROOT\current"
+          $logFile = "$env:DEPLOY_ROOT\serve.log"
+
+          $exists = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
+          if (-not $exists) {
+              Write-Host "React server not running. Starting in background..."
+              Start-Process $serve -ArgumentList "-s `"$buildDir`" -l $port" -WindowStyle Hidden -RedirectStandardOutput $logFile -RedirectStandardError $logFile
+          } else {
+              Write-Host "React server already running on port $port."
+          }
