@@ -32,8 +32,6 @@ jobs:
 
       # --------------------------------------
       # 2. Node.js 18 LTS 설정
-      # - 개발은 Node 24
-      # - CI/배포는 안정적인 LTS 사용
       # --------------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -42,37 +40,39 @@ jobs:
 
       # --------------------------------------
       # 3. 의존성 설치
-      # 의존성 고정을 위한 package-lock.json을 저장소에 포함하지 않기 때문에 CI 환경에서는 npm install 사용
+      # package-lock.json을 커밋하지 않기 때문에
+      # CI 환경에서는 npm install 사용
       # --------------------------------------
       - name: Install dependencies
         run: npm install
 
       # --------------------------------------
       # 4. React 빌드
-      # - 정적 파일(build) 생성
       # --------------------------------------
       - name: Build React
         run: npm run build
 
       # --------------------------------------
-      # 5. release 디렉토리 생성
+      # 5. release 디렉토리 생성 (CMD)
       # --------------------------------------
       - name: Create release directory
+        shell: cmd
         run: |
           mkdir "%RELEASE_DIR%"
 
       # --------------------------------------
-      # 6. build 결과물을 release로 복사
+      # 6. build 결과물을 release로 복사 (CMD)
       # --------------------------------------
       - name: Copy build output to release
+        shell: cmd
         run: |
           xcopy build "%RELEASE_DIR%\build" /E /I /Y
 
       # --------------------------------------
-      # 7. current 디렉토리 교체
-      # - pm2/serve가 바라보는 실제 서비스 경로
+      # 7. current 디렉토리 교체 (CMD)
       # --------------------------------------
       - name: Switch current directory
+        shell: cmd
         run: |
           if exist "%DEPLOY_ROOT%\current" (
             rmdir /s /q "%DEPLOY_ROOT%\current"
@@ -82,8 +82,8 @@ jobs:
 
       # --------------------------------------
       # 8. 프론트엔드 서버 재시작
-      # - pm2 기반 정적 서버 재기동
       # --------------------------------------
       - name: Restart frontend server
+        shell: cmd
         run: |
           C:\deploy\scripts\restart-frontend.bat
