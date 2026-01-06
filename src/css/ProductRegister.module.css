@@ -1,0 +1,12 @@
+.content{
+    border: 1px solid red;
+    height: 50rem; /*임시*/
+    /* padding: 4rem 8rem; */
+}
+.required::before{
+    content: "*";
+    color: inherit;
+    display: inline-block;
+    width: 1rem;
+    height: inherit;
+}

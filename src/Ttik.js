@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Layout from "../src/pages/main/Layout"
 import MainDashboard from "../src/pages/main/MainDashBoard"
 import Login from "../src/pages/main/Login"
+import ProductRegister from "./pages/product/ProductRegister";
 
 function Ttik() {
   const location = useLocation();
@@ -21,13 +22,14 @@ function Ttik() {
       </Routes>
     ) : (
       /* 레이아웃이 필요한 페이지들 */
-      // <Layout>
+      <Layout>
         <Routes>
           <Route path="/" element={<Navigate to="/main" replace />} />
           <Route path="/ttik" element={<MainDashboard />} />
           {/* 상품관리, 입출고 등 다른 페이지들도 여기에 추가 */}
+          <Route path="/register" element={<ProductRegister/>}/>
         </Routes>
-      // </Layout>
+      </Layout>
     )}
   </div>
 );
