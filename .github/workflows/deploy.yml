@@ -56,6 +56,7 @@ jobs:
       # 5. release 디렉토리 생성 (CMD)
       # --------------------------------------
       - name: Create release directory
+        shell: cmd
         run: |
           if not exist "%RELEASE_DIR%" (
             mkdir "%RELEASE_DIR%"
