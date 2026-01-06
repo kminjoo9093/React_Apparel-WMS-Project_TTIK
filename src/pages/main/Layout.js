@@ -1,10 +1,51 @@
-import { useState } from 'react'; // useState 추가
-import { Link, useLocation} from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import styleLayout from '../../css/Layout.module.css';
+import Modal from '../../components/Modal';
 
-const Layout = ({ children }) => {
+const Layout = ({ children, user }) => {
   const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // 사이드바 상태
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  const [modal, setModal] = useState({ 
+    isOpen: false, 
+    title: '', 
+    message: '', 
+    onConfirm: null 
+  });
+
+  const closeModal = () => setModal({ ...modal, isOpen: false });
+
+  const handleLogout = () => {
+    setModal({
+      isOpen: true,
+      title: 'Logout',
+      message: '정말 로그아웃 하시겠습니까?',
+      onConfirm: async () => {
+        try {
+          const response = await fetch('http://localhost:3001/logout', {
+            method: 'POST', 
+            credentials: 'include',
+          });
+
+          if (response.ok) {
+            closeModal();
+            // 페이지 전체를 새로고침하며 로그인으로 이동
+            window.location.href = '/login'; 
+          }
+        } catch (error) {
+          console.error("로그아웃 실패:", error);
+          setModal({
+            isOpen: true,
+            title: 'Error',
+            message: '로그아웃 중 오류가 발생했습니다.',
+            onConfirm: closeModal
+          });
+        }
+      },
+      onCancel: closeModal 
+    });
+  };
 
   const menus = [
     { path: '/ttik', name: '대시보드', icon: '📊' },
@@ -12,29 +53,40 @@ const Layout = ({ children }) => {
     { path: '/inventory', name: '입출고 관리', icon: '🔄' },
     { path: '/register', name: '등록하기', icon: '➕' },
     { path: '/history', name: '이력 조회', icon: '📜' },
+    { path: '/brand', name: '브랜드', icon: '🏷️' },
   ];
 
-  // 메뉴 클릭 시 사이드바 닫기 (모바일용)
   const closeSidebar = () => setIsSidebarOpen(false);
- 
+  
   return (
     <div className={styleLayout.appContainer}>
-      {/* 모바일용 배경 어둡게 처리 */}
+      <Modal 
+        isOpen={modal.isOpen} 
+        title={modal.title} 
+        message={modal.message} 
+        onConfirm={modal.onConfirm}
+        onCancel={modal.onCancel} 
+      />
+
       <div 
         className={`${isSidebarOpen ? styleLayout.overlayActive : ''}`} 
         onClick={closeSidebar}
       ></div>
 
-      {/* 사이드바 */}
       <aside className={`${styleLayout.sidebar} ${isSidebarOpen ? styleLayout.sidebarActive : ''}`}>
         <div className={styleLayout.sidebarLogo}>
-          <div className={styleLayout.logoMain}> <Link to = "/ttik">TTIK</Link></div>
+          <div className={styleLayout.logoMain}> <Link to="/ttik">TTIK</Link></div>
           <div className={styleLayout.logoSub}>Tap To Inventory Keeping</div>
         </div>
+        
         <div className={styleLayout.sidebarProfile}>
           <div className={styleLayout.profileInfo}>
-            <span style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>System Admin</span>
-            <span className={styleLayout.profileName}>관리자님, 환영합니다</span>
+            <span style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>
+              Warehouse Admin
+            </span>
+            <span className={styleLayout.profileName}>
+              {user?.nickname || '관리자'}
+            </span> 
           </div>
         </div>
 
@@ -53,17 +105,10 @@ const Layout = ({ children }) => {
         </nav>
       </aside>
 
-      {/* 메인 콘텐츠 영역 */}
       <div className={styleLayout.mainContent}>
         <header className={styleLayout.topBar}>
           <div className={styleLayout.topBarLeft} style={{ display: 'flex', alignItems: 'center' }}>
-            {/* 모바일용 햄버거 버튼 추가 */}
-            <button 
-              className={styleLayout.menuToggle} 
-              onClick={() => setIsSidebarOpen(true)}
-            >
-              ☰
-            </button>
+            <button className={styleLayout.menuToggle} onClick={() => setIsSidebarOpen(true)}>☰</button>
             <h2 className={styleLayout.sageTitle}>
               {menus.find(m => m.path === location.pathname)?.name || "시스템"}
             </h2>
@@ -84,7 +129,7 @@ const Layout = ({ children }) => {
                 <span className={styleLayout.statusText}>Live</span>
               </div>
             </div>
-            <button className={styleLayout.logoutBtn}>로그아웃</button>
+            <button className={styleLayout.logoutBtn} onClick={handleLogout}>로그아웃</button>
           </div>
         </header>
 
