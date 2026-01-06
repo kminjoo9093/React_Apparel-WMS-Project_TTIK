@@ -1,7 +1,3 @@
-# ==========================================
-# React Frontend CI/CD 파이프라인 (안정화)
-# ==========================================
-
 name: Deploy Frontend
 
 on:
@@ -56,26 +52,8 @@ jobs:
         run: |
           xcopy build "%RELEASE_DIR%\build" /E /I /Y
 
-      # 8️⃣ 서버 종료 (current 폴더 사용 중이면 삭제 불가 방지)
-      - name: Stop frontend server
-        shell: cmd
-        run: |
-          echo Stopping existing React server...
-          taskkill /F /IM node.exe /FI "WINDOWTITLE eq ReactServe*" >nul 2>&1
-
-      # 9️⃣ current 디렉토리 교체 (안정화)
-      - name: Switch current directory
-        shell: cmd
-        run: |
-          echo Removing old current folder...
-          if exist "%DEPLOY_ROOT%\current" (
-            rmdir /s /q "%DEPLOY_ROOT%\current"
-          )
-          mkdir "%DEPLOY_ROOT%\current"
-          xcopy "%RELEASE_DIR%\build" "%DEPLOY_ROOT%\current" /E /I /Y
-
-      # 🔟 프론트엔드 서버 재시작
+      # 8️⃣ 프론트엔드 서버 재시작 (restart-frontend.bat)
       - name: Restart frontend server
         shell: cmd
         run: |
-          C:\deploy\scripts\restart-frontend.bat
+          call C:\deploy\scripts\restart-frontend.bat
