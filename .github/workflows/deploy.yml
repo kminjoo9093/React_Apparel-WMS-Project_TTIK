@@ -62,4 +62,4 @@ jobs:
       - name: Ensure React server is running
         shell: cmd
         run: |
-          C:\deploy\frontend\restart-frontend.bat
+          C:\deploy\scripts\restart-frontend.bat
