@@ -54,6 +54,7 @@ const Layout = ({ children, user }) => {
     { path: '/register', name: '등록하기', icon: '➕' },
     { path: '/history', name: '이력 조회', icon: '📜' },
     { path: '/brand', name: '브랜드', icon: '🏷️' },
+    { path: '/register-admin', name: '관리자 등록', icon: '👤' }
   ];
 
   const closeSidebar = () => setIsSidebarOpen(false);
