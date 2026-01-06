@@ -47,14 +47,10 @@ jobs:
         run: |
           xcopy build "%RELEASE_DIR%\build" /E /I /Y
 
-      - name: Update current folder
+      - name: Update current folder safely
         shell: cmd
         run: |
-          echo Updating current folder...
-          IF EXIST "%DEPLOY_ROOT%\current" (
-              rmdir /s /q "%DEPLOY_ROOT%\current"
-          )
-          mkdir "%DEPLOY_ROOT%\current"
+          echo Updating current folder safely...
           robocopy "%RELEASE_DIR%\build" "%DEPLOY_ROOT%\current" /MIR /MT:4 /R:2 /W:2
           exit /b 0
           echo Current folder updated!
@@ -62,4 +58,4 @@ jobs:
       - name: Ensure React server is running
         shell: cmd
         run: |
-          C:\deploy\scripts\restart-frontend.bat
+          "C:\deploy\scripts\restart-frontend.bat"
