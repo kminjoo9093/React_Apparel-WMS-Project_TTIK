@@ -1,10 +1,12 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+
 import { useEffect, useState } from "react";
 import Layout from "../src/pages/main/Layout";
 import MainDashboard from "../src/pages/main/MainDashBoard";
 import Login from "../src/pages/main/Login";
 import Error404Page from "./Error404Page";
 import RegisterAdmin from "./pages/main/RegisterAdmin";
+import ProductRegister from "./pages/product/ProductRegister";
 
 function Ttik() {
   const location = useLocation();
@@ -57,6 +59,7 @@ function Ttik() {
               <Route path="/ttik" element={<MainDashboard user={user} />} />
               <Route path="/" element={<Navigate to="/ttik" replace />} />
               {/* 추가할 메뉴들 */}
+              <Route path="/register" element={<ProductRegister/>}/>
               <Route path="/products" element={<div>상품관리 페이지</div>} />
               <Route path="/register-admin" element={<RegisterAdmin />} />
               <Route path="*" element={<Error404Page />} />
@@ -68,6 +71,8 @@ function Ttik() {
         )
       ) : (
         <Routes>
+          <Route path="/" element={<Navigate to="/main" replace />} />
+          <Route path="/ttik" element={<MainDashboard />} />
           {/* Login 컴포넌트에 상태 변경 함수 전달 */}
           <Route 
             path="/login" 
