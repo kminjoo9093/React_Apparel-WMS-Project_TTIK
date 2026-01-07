@@ -5,6 +5,7 @@ import Layout from "../src/pages/main/Layout";
 import MainDashboard from "../src/pages/main/MainDashBoard";
 import Login from "../src/pages/main/Login";
 import Error404Page from "./Error404Page";
+import serverUrl from "./db/server.json"
 import RegisterAdmin from "./pages/main/RegisterAdmin";
 import ProductRegister from "./pages/product/ProductRegister";
 import Brand from "../src/pages/Brand/BrandList";
@@ -14,17 +15,15 @@ function Ttik() {
   const hideLayoutRoutes = ["/login"];
   const hideLayout = hideLayoutRoutes.includes(location.pathname);
 
-  // 로그인 상태 정의
   const [user, setUser] = useState(null); 
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [isInitialized, setIsInitialized] = useState(false); 
+  const SERVER_URL = serverUrl.SERVER_URL;
 
-  // 앱 시작 시 로그인 상태 확인
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        // 백엔드 세션 확인 API 호출
-        const response = await fetch('http://localhost:3001/ttik/me', {
+        const response = await fetch(`${SERVER_URL}/ttik/me`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -61,6 +60,7 @@ function Ttik() {
               <Route path="/" element={<Navigate to="/ttik" replace />} />
               <Route path="/brand" element={ <Brand /> } />
               {/* 추가할 메뉴들 */}
+              <Route path="/register" element={<ProductRegister/>}/>
               <Route path="/products" element={<div>상품관리 페이지</div>} />
               <Route path="/register-admin" element={<RegisterAdmin />} />
               <Route path="/register" element={<ProductRegister/>}/>

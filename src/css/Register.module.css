@@ -24,12 +24,12 @@
 }
 
 .header {
-  margin-bottom: 5rem; /* 헤더와 폼 사이 간격 확대 */
+  margin-bottom: 5rem; 
   text-align: left;
 }
 
 .header h2 {
-  font-size: 3.5rem; /* 타이틀 더 크게 */
+  font-size: 3.5rem; 
   font-weight: 900;
   color: #0f172a;
   letter-spacing: -0.08em;
@@ -45,7 +45,6 @@
 .form {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  /* 세로 줄 간격을 4rem으로 대폭 늘림 */
   column-gap: 4rem;
   row-gap: 4rem; 
 }
@@ -53,19 +52,18 @@
 .inputGroup {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem; /* 라벨과 인풋 사이 간격 */
+  gap: 1.2rem; 
 }
 
 .inputGroup label {
   font-size: 1.35rem;
   font-weight: 800;
   color: #334155;
-  text-transform: uppercase; /* 소문자여도 강조된 느낌 */
+  text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .inputGroup input {
-  /* 입력창 세로 높이를 아주 시원하게 */
   padding: 1.8rem 2rem; 
   border-radius: 1.5rem;
   border: 2px solid #e2e8f0;
@@ -76,17 +74,17 @@
 
 .inputGroup input:focus {
   background-color: white;
-  border-color: #2563eb;
+  border-color: var(--primary-color);
   box-shadow: 0 10px 30px rgba(37, 99, 235, 0.15);
   transform: translateY(-2px);
 }
 
 .submitBtn {
   grid-column: span 2; 
-  margin-top: 4rem; /* 버튼 위쪽 여백 확보 */
-  background: #0f172a;
+  margin-top: 4rem; 
+  background: var(--secondary-color);
   color: white;
-  padding: 2rem; /* 버튼 높이 대폭 확대 */
+  padding: 2rem; 
   border-radius: 2rem;
   font-size: 1.5rem;
   font-weight: 900;
@@ -96,7 +94,7 @@
 }
 
 .submitBtn:hover {
-  background: #2563eb;
+  background: var(--primary-color);
   transform: scale(1.02);
   box-shadow: 0 20px 40px rgba(37, 99, 235, 0.3);
 }
@@ -126,14 +124,14 @@
 }
 
 .checkboxLabel:hover {
-  color: #2563eb;
+  color: var(--primary-color);;
 }
 
 .checkboxLabel input[type="checkbox"] {
   width: 1.5rem;
   height: 1.5rem;
   cursor: pointer;
-  accent-color: #2563eb; /* 체크박스 포인트 컬러 */
+  accent-color: var(--primary-color);; 
 }
 
 /* 모바일 대응 */
