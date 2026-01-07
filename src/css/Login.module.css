@@ -164,9 +164,11 @@
   flex: 1;
   padding: 8rem 6rem;
   background: white;
+  justify-content: center;
 }
 
 .formHeader h3 {
+  padding-top : 5rem;
   font-size: 32px;
   font-weight: 800;
   color: #1e293b;
@@ -216,4 +218,67 @@
 .loginSubmitBtn:hover {
   background: #334155;
   transform: scale(1.02);
+}
+
+@media (max-width: 1024px) {
+  .loginGlassCard {
+    flex-direction: column; 
+    width: 90%;           
+    height: auto;          
+    max-height: 95vh;      
+    overflow-y: auto;     
+  }
+
+  .loginBrandSection {
+    flex: none;
+    padding: 4rem 3rem;     
+    align-items: center;    
+    text-align: center;
+  }
+
+  .brandLogoLarge {
+    font-size: 7rem;       
+    margin-bottom: 2rem;
+  }
+
+  .sloganItem {
+    justify-content: center; 
+  }
+
+  .visualElements {
+    display: none;          
+  }
+
+  .loginFormSection {
+    flex: none;
+    padding: 4rem 3rem;
+  }
+
+  .formHeader h3 {
+    text-align: center;
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .loginGlassCard {
+    width: 95%;
+    border-radius: 30px;   
+  }
+
+  .brandLogoLarge {
+    font-size: 5rem;        
+  }
+
+  .loginBrandSection {
+    padding: 3rem 2rem;
+  }
+
+  .loginFormSection {
+    padding: 3rem 2rem;
+  }
+
+  .inputField input {
+    padding: 1.4rem;        
+  }
 }

@@ -108,7 +108,7 @@ const Login = ({ setUser, setIsLoggedIn }) => {
                 </div>
               </div>
             </div>
-            <p className={styleLogin.subText}>스마트한 재고 관리의 시작, <br/>TTIK</p>
+            <p className={styleLogin.subText}>스마트한 재고 관리의 시작, 띡</p>
           </div>
 
           <div className={styleLogin.visualElements}>
