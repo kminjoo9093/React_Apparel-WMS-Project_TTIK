@@ -89,7 +89,8 @@ jobs:
 
       - name: Restart React Server
         shell: cmd
-        run: "C:\deploy\scripts\restart-frontend.bat"
+        run: |
+          C:\deploy\scripts\restart-frontend.bat
 
       - name: Health Check # 배포 후 정상 작동 확인 단계 추가
         run: |
