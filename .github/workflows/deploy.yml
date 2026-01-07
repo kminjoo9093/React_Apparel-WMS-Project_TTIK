@@ -35,8 +35,10 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Build React
+        shell: pwsh
         run: |
-          CI=false npm run build
+          $env:CI="false"
+          npm run build
 
       - name: Create release directory
         shell: cmd
