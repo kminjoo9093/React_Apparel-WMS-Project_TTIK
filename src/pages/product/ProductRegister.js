@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styleRegister from "../../css/ProductRegister.module.css";
+import styleMainDashBoard from '../../css/MainDashboard.module.css';
 import ModalFrame from "./ModalFrame";
 import ProductSeason from "./ProductSeason";
 import ProductCode from "./ProductCode";
@@ -44,15 +45,15 @@ function ProductRegister(){
     const season = [
         {
             seasonCd: "25S"
-            ,seasonNm: "25 S/S"
+            ,seasonNm: "2025 S/S"
         }
         , {
             seasonCd: "25F"
-            ,seasonNm: "25 F/W"
+            ,seasonNm: "2025 F/W"
         }
         , {
             seasonCd: "24S"
-            ,seasonNm: "24 S/S"
+            ,seasonNm: "2024 S/S"
         }
     ]
 
@@ -99,9 +100,11 @@ function ProductRegister(){
     const [selectedCat, setSelectedCat] = useState(""); //선택된 카테고리(상/하/신/악)
     const [isDimmedOpen, setIsDimmedOpen] = useState(false);
     const [clickedSeasonBtn, setClickedSeasonBtn] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
     // const [isOpen, setIsOpen] = useState(false);
     // const [onClose, setOnClose] = useState(false);
+    
     const [modalConfig, setModalConfig] = useState({
         isOpen: false, title: '', children: null
     })
@@ -114,10 +117,20 @@ function ProductRegister(){
         setModalConfig({ ...modalConfig, isOpen: false });
     };
 
+    const validateNumber = (value) => {        
+        if(value < 0){
+            return "0 이상의 숫자를 입력하세요.";
+        }
+        return "";
+    }
 
     return (
         <div className={`${styleRegister.register} container`}>
-            <h1 className={`${styleRegister.register} heading`}>상품 등록하기</h1>
+            {/* <h1 className={`${styleRegister.register} heading`}>상품 등록하기</h1> */}
+            <div className={styleMainDashBoard.welcomeSection}>
+                <h1>Register</h1>
+                <p>상품을 등록하세요. </p>
+            </div>
             <div className={`${styleRegister.content} contentBox`}>
                 <form action={""} method="" className={styleRegister.registerForm}>
                     <fieldset className={`${styleRegister.productInfo}`}>
@@ -181,11 +194,11 @@ function ProductRegister(){
                         <div className={styleRegister.row}>
                             <div className={styleRegister.col}>
                                 <label className={`${styleRegister.required} ${styleRegister.label}`}>박스 입수량<span className={styleRegister.unit}>(EA/BOX)</span> </label>
-                                <input type="number" min="0" required placeholder="EA 수량 입력"></input>
+                                <input type="number" min="0" required placeholder="EA 수량 입력" onChange={(e)=>validateNumber(e.target.value)}></input>
                             </div>
                             <div className={`${styleRegister.col} ${styleRegister.right}`}>
                                 <label className={styleRegister.label}>단가 (원)</label>
-                                <input type="number" placeholder=""></input>
+                                <input type="number" placeholder="개별 단가를 입력해주세요"></input>
                             </div>
                         </div>
                         <div className={styleRegister.row}>
@@ -205,9 +218,9 @@ function ProductRegister(){
                         </div>
                         <div className={styleRegister.row}>
                             <div className={styleRegister.col}>
-                                <label className={styleRegister.label}>바코드</label>
+                                <label className={styleRegister.label}>QR코드</label>
                                 <input type="text" placeholder="생성 버튼을 누르세요" disabled></input>
-                                <button type="button" onClick={()=>{openModal("바코드 생성", <ProductBarcode/>)}}>생성</button>
+                                <button type="button" onClick={()=>{openModal("QR코드 생성", <ProductBarcode/>)}}>생성</button>
                             </div>
                         </div>
                     </fieldset>
