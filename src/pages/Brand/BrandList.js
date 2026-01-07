@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import BrandRegister from '../Brand/BrandRegister';
+import BrandRegister from './BrandRegister';
 import styleBrand from "../../css/Brand.module.css";
 
 function BrandList() {

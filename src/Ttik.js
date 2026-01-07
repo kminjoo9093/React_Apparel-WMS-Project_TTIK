@@ -6,7 +6,7 @@ import MainDashboard from "../src/pages/main/MainDashBoard";
 import Login from "../src/pages/main/Login";
 import Error404Page from "./Error404Page";
 import ProductRegister from "./pages/product/ProductRegister";
-import Brand from "../src/pages/Brand/BrandList";
+import Brand from "../src/pages/brand/BrandList";
 
 function Ttik() {
   const location = useLocation();
