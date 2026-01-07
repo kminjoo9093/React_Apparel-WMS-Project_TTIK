@@ -1,11 +1,96 @@
-.brandContainer{
-    background-color: white;
+.brandListbox{
+    padding: 2rem 0;
     padding: 3rem;
     border-radius: 1.5rem;
-    width: 100%;
-    max-width: 90%;
+    width: 100%; 
     position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.brandTitle{
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -1px;
+    margin-bottom: 0.8rem;
+}
+
+.brandSubTitle{
+    font-size: 15px;
+    color: #64748b;
+    font-weight: 400;
+    margin-bottom: 5rem;
+}
+
+.brand{
+    font-size: 1rem;
+    color: #64748b;
+    font-weight: 400;
+}
+
+.brandTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.brandTable th {
+    padding: 12px;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: bold;
+}
+
+.brandTable td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.noData {
+    padding: 50px 0 !important;
+    color: #999;
+}
+
+.brandNameCell {
+    text-align: center;
+}
+
+.brandNameCell span {
+    display: inline-block;
+    text-align: left;
+    min-width: 10rem;
+}
+
+.brandBtn {
+    position: flex;
+    padding: 0.82rem 2rem;
+    background-color: #f1f5f9;
+    color: #475569;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 1rem;
+}
+
+.brandBtn:hover{
+    background-color: #e2e8f0;
+}
+
+.searchInput{
+    padding: 0.82rem 1rem;
+    width: 50rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    margin-left: 1rem;
+    margin-right: auto;
+}
+
+.searchBox{
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    margin-bottom: 2rem;
 }
 
 
@@ -30,9 +115,13 @@
     padding: 3rem;
     border-radius: 1.5rem;
     width: 50rem;
+    height: 33rem;
     max-width: 90%;
-    position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 50%; 
+    left: calc(50% + 13rem);
+    transform: translate(-50%, -50%);
 }
 
 .modalItem{
@@ -66,17 +155,20 @@
     height: 2rem;
 }
 
-.buttonContainer {
-    display: flex;
-    justify-content: flex-start; /* 왼쪽 정렬 */
-    margin-top: 2rem;
-}
-
 .submitBtn {
+    position: absolute;
+    right: 2rem;
+    bottom: 2rem;
     padding: 0.8rem 2rem;
+    background-color: #f1f5f9;
     color: #475569;
     border: none;
     border-radius: 0.5rem;
     cursor: pointer;
     font-weight: bold;
+}
+
+
+.submitBtn:hover{
+    background-color: #e2e8f0;
 }

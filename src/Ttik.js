@@ -58,6 +58,7 @@ function Ttik() {
             <Routes>
               <Route path="/ttik" element={<MainDashboard user={user} />} />
               <Route path="/" element={<Navigate to="/ttik" replace />} />
+              <Route path="/brand" element={ <Brand /> } />
               {/* 추가할 메뉴들 */}
               <Route path="/products" element={<div>상품관리 페이지</div>} />
               <Route path="*" element={<Error404Page />} />
@@ -71,7 +72,6 @@ function Ttik() {
         <Routes>
           <Route path="/" element={<Navigate to="/main" replace />} />
           <Route path="/ttik" element={<MainDashboard />} />
-          <Route path="/brand" element={ <Brand /> } />
           {/* 상품관리, 입출고 등 다른 페이지들도 여기에 추가 */}
           <Route path="/register" element={<ProductRegister/>}/>
 
