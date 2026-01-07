@@ -1,5 +1,9 @@
 import { useState } from "react";
 import styleRegister from "../../css/ProductRegister.module.css";
+import ModalFrame from "./ModalFrame";
+import ProductSeason from "./ProductSeason";
+import ProductCode from "./ProductCode";
+import ProductBarcode from "./ProductBarcode";
 
 function ProductRegister(){
 
@@ -93,29 +97,50 @@ function ProductRegister(){
     }
     
     const [selectedCat, setSelectedCat] = useState(""); //선택된 카테고리(상/하/신/악)
+    const [isDimmedOpen, setIsDimmedOpen] = useState(false);
+    const [clickedSeasonBtn, setClickedSeasonBtn] = useState(false);
+
+    // const [isOpen, setIsOpen] = useState(false);
+    // const [onClose, setOnClose] = useState(false);
+    const [modalConfig, setModalConfig] = useState({
+        isOpen: false, title: '', children: null
+    })
+
+    const openModal = (title, children) => {
+        setModalConfig({ isOpen: true, title, children });
+    };
+
+    const closeModal = () => {
+        setModalConfig({ ...modalConfig, isOpen: false });
+    };
+
 
     return (
-        <div className="container">
-            <h1 className="heading">상품 등록</h1>
-            <div className={styleRegister.content}>
-                <form action={""} method="">
-                    <fieldset className={styleRegister.productInfo}>
-                        <label htmlFor="brand">브랜드</label>
-                        <select name="brand" id="brand">
-                            <option value="#">선택하세요</option>
-                            {
-                                brands.map((record) => (
-                                    <option key={record.code} value={record.code}>{record.name}</option>
-                                ))
-                            }
-                        </select>
+        <div className={`${styleRegister.register} container`}>
+            <h1 className={`${styleRegister.register} heading`}>상품 등록하기</h1>
+            <div className={`${styleRegister.content} contentBox`}>
+                <form action={""} method="" className={styleRegister.registerForm}>
+                    <fieldset className={`${styleRegister.productInfo}`}>
                         <div className={styleRegister.row}>
                             <div className={styleRegister.col}>
-                                <label htmlFor="product" className={styleRegister.required}>상품명</label>
-                                <input id="product" type="text" required></input>
+                                <label htmlFor="brand" className={styleRegister.label}>브랜드</label>
+                                <select name="brand" id="brand">
+                                    <option value="#">선택하세요</option>
+                                    {
+                                        brands.map((record) => (
+                                            <option key={record.code} value={record.code}>{record.name}</option>
+                                        ))
+                                    }
+                                </select>
                             </div>
+                        </div>
+                        <div className={styleRegister.row}>
                             <div className={styleRegister.col}>
-                                <label htmlFor="category">카테고리</label>
+                                <label htmlFor="product" className={`${styleRegister.required} ${styleRegister.label}`}>상품명</label>
+                                <input id="product" type="text" required placeholder="ex) 우븐 오버핏 티셔츠"></input>
+                            </div>
+                            <div className={`${styleRegister.col} ${styleRegister.right}`}>
+                                <label htmlFor="category" className={styleRegister.label}>카테고리</label>
                                 <select name="category" id="category" onChange={(e) => setSelectedCat(e.target.value)}>
                                     <option value="#">선택하세요</option>
                                     {
@@ -127,8 +152,8 @@ function ProductRegister(){
                             </div>
                         </div>
                         <div className={styleRegister.row}>
-                            <div className={styleRegister.col}>
-                                <label htmlFor="season">시즌</label>
+                            <div className={`${styleRegister.col}`}>
+                                <label htmlFor="season" className={styleRegister.label}>시즌</label>
                                 <select name="season" id="season">
                                     <option value="#">선택하세요</option>
                                     {
@@ -137,11 +162,11 @@ function ProductRegister(){
                                         ))
                                     }
                                 </select>
-                                <button type="button">등록</button>
+                                <button type="button" onClick={()=>{openModal("시즌 등록", <ProductSeason/>)}}>등록</button>
                             </div>
-                            <div className={styleRegister.col}>
-                                <label htmlFor="size">사이즈</label>
-                                <select name="size" id="size">
+                            <div className={`${styleRegister.col} ${styleRegister.right}`}>
+                                <label htmlFor="size" className={styleRegister.label}>사이즈</label>
+                                <select name="size" id="size" disabled={!selectedCat}>
                                     <option value="#">선택하세요</option>
                                     { selectedCat && 
                                         size[selectedCat].map((record) => (
@@ -152,38 +177,57 @@ function ProductRegister(){
                             </div>
                         </div>
                     </fieldset>
-                    <fieldset className={styleRegister.stockInfo}>
+                    <fieldset className={`${styleRegister.stockInfo}`}>
                         <div className={styleRegister.row}>
                             <div className={styleRegister.col}>
-                                <label className={styleRegister.required}>박스 입수량</label>
-                                <input type="number" required></input>
+                                <label className={`${styleRegister.required} ${styleRegister.label}`}>박스 입수량<span className={styleRegister.unit}>(EA/BOX)</span> </label>
+                                <input type="number" min="0" required placeholder="EA 수량 입력"></input>
                             </div>
-                            <div className={styleRegister.col}>
-                                <label>단가</label>
-                                <input type="number"></input>
+                            <div className={`${styleRegister.col} ${styleRegister.right}`}>
+                                <label className={styleRegister.label}>단가 (원)</label>
+                                <input type="number" placeholder=""></input>
                             </div>
                         </div>
                         <div className={styleRegister.row}>
-                            <label>임계치</label>
-                            <input type="number"></input>
+                            <div className={styleRegister.col}>
+                                <label className={styleRegister.label}>임계치</label>
+                                <input type="number" placeholder="알림을 받을 최소 재고 수량 입력"></input>
+                            </div>
                         </div>
                     </fieldset>
                     <fieldset className={styleRegister.codeInfo}>
                         <div className={styleRegister.row}>
-                            <label className={styleRegister.required}>상품코드</label>
-                            <input type="text" disabled></input>
-                            <button type="button">생성</button>
+                            <div className={styleRegister.col}>
+                                <label className={`${styleRegister.required} ${styleRegister.label}`}>상품코드</label>
+                                <input type="text" placeholder="생성 버튼을 누르세요" disabled></input>
+                                <button type="button" onClick={()=>{openModal("상품코드", <ProductCode/>)}}>생성</button>
+                            </div>
                         </div>
                         <div className={styleRegister.row}>
-                            <label>바코드</label>
-                            <input type="text" disabled></input>
-                            <button type="button">생성</button>
+                            <div className={styleRegister.col}>
+                                <label className={styleRegister.label}>바코드</label>
+                                <input type="text" placeholder="생성 버튼을 누르세요" disabled></input>
+                                <button type="button" onClick={()=>{openModal("바코드 생성", <ProductBarcode/>)}}>생성</button>
+                            </div>
                         </div>
                     </fieldset>
-                    <button type="submit">등록</button>
-                    <button type="button">취소</button>
+                    <div className={styleRegister.formBtnWrap}>
+                        <button type="submit" className={styleRegister.registerBtn}>등록</button>
+                        {/* <button type="button" className={styleRegister.cancelBtn}>취소</button> */}
+                    </div>
                 </form>
             </div>
+    
+            {/* 공통 모달 하나만 배치 */}
+            <ModalFrame 
+                isOpen={modalConfig.isOpen} 
+                onClose={closeModal} 
+                title={modalConfig.title}
+                >
+                    {modalConfig.children} {/* 버튼 누를 때 넘겨준 컨텐츠가 여기 쏙 들어감 */}
+            </ModalFrame>
+            {/* { (clickedSeasonBtn && isDimmedOpen ) && <SeasonModal />} */}
+            {/* {isDimmedOpen && <div className={styleRegister.dimmed} onClick={()=>{setIsDimmedOpen(false)}}></div>} */}
         </div>
     )
 }
