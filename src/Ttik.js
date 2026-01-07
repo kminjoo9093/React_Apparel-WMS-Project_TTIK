@@ -8,6 +8,7 @@ import Error404Page from "./Error404Page";
 import serverUrl from "./db/server.json"
 import RegisterAdmin from "./pages/main/RegisterAdmin";
 import ProductRegister from "./pages/product/ProductRegister";
+import Brand from "../src/pages/Brand/BrandList";
 
 function Ttik() {
   const location = useLocation();
@@ -57,10 +58,12 @@ function Ttik() {
             <Routes>
               <Route path="/ttik" element={<MainDashboard user={user} />} />
               <Route path="/" element={<Navigate to="/ttik" replace />} />
+              <Route path="/brand" element={ <Brand /> } />
               {/* 추가할 메뉴들 */}
               <Route path="/register" element={<ProductRegister/>}/>
               <Route path="/products" element={<div>상품관리 페이지</div>} />
               <Route path="/register-admin" element={<RegisterAdmin />} />
+              <Route path="/register" element={<ProductRegister/>}/>
               <Route path="*" element={<Error404Page />} />
             </Routes>
           </Layout>
@@ -72,12 +75,14 @@ function Ttik() {
         <Routes>
           <Route path="/" element={<Navigate to="/main" replace />} />
           <Route path="/ttik" element={<MainDashboard />} />
+          {/* 상품관리, 입출고 등 다른 페이지들도 여기에 추가 */}
           {/* Login 컴포넌트에 상태 변경 함수 전달 */}
           <Route 
-            path="/login" 
+            path="/login"
             element={<Login setUser={setUser} setIsLoggedIn={setIsLoggedIn} />} 
           />
         </Routes>
+
       )}
     </div>
   );

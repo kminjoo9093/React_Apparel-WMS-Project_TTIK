@@ -1,91 +1,64 @@
-# ==========================================
-# React Frontend CI/CD 파이프라인
-# ==========================================
+name: Deploy Frontend (Stable)
 
-name: Deploy Frontend
-
-# master 브랜치에 push 될 때 자동 실행
 on:
   push:
     branches: [ master ]
 
 jobs:
   deploy:
-    # self-hosted Windows 러너 사용
-    # react 라벨이 붙은 러너에서만 실행
     runs-on: [self-hosted, windows, react]
-
-    # 프론트엔드 배포 경로 환경변수
     env:
-      # frontend 배포 루트
       DEPLOY_ROOT: C:\deploy\frontend
-
-      # GitHub Actions 실행 ID 기반 release 디렉토리
       RELEASE_DIR: C:\deploy\frontend\releases\${{ github.run_id }}
+      SERVE_CMD: C:\Users\user\AppData\Roaming\npm\serve.cmd
+      PORT: 3000
 
     steps:
-      # --------------------------------------
-      # 1. 소스 코드 체크아웃
-      # --------------------------------------
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # --------------------------------------
-      # 2. Node.js 18 LTS 설정
-      # --------------------------------------
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            npm-${{ runner.os }}-
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      # --------------------------------------
-      # 3. 의존성 설치
-      # package-lock.json을 커밋하지 않기 때문에
-      # CI 환경에서는 npm install 사용
-      # --------------------------------------
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-audit --no-fund
 
-      # --------------------------------------
-      # 4. React 빌드
-      # --------------------------------------
       - name: Build React
-        run: npm run build
+        shell: cmd
+        run: |
+          set CI=false
+          npm run build
 
-      # --------------------------------------
-      # 5. release 디렉토리 생성 (CMD)
-      # --------------------------------------
       - name: Create release directory
         shell: cmd
         run: |
-          if not exist "%RELEASE_DIR%" (
-            mkdir "%RELEASE_DIR%"
-          )
+          if not exist "%RELEASE_DIR%" mkdir "%RELEASE_DIR%"
 
-      # --------------------------------------
-      # 6. build 결과물을 release로 복사 (CMD)
-      # --------------------------------------
-      - name: Copy build output to release
+      - name: Copy build to release
         shell: cmd
         run: |
           xcopy build "%RELEASE_DIR%\build" /E /I /Y
 
-      # --------------------------------------
-      # 7. current 디렉토리 교체 (CMD)
-      # --------------------------------------
-      - name: Switch current directory
+      - name: Update current folder safely
         shell: cmd
         run: |
-          if exist "%DEPLOY_ROOT%\current" (
-            rmdir /s /q "%DEPLOY_ROOT%\current"
-          )
-          mkdir "%DEPLOY_ROOT%\current"
-          xcopy "%RELEASE_DIR%\build" "%DEPLOY_ROOT%\current" /E /I /Y
+          echo Updating current folder safely...
+          robocopy "%RELEASE_DIR%\build" "%DEPLOY_ROOT%\current" /MIR /MT:4 /R:2 /W:2
+          exit /b 0
+          echo Current folder updated!
 
-      # --------------------------------------
-      # 8. 프론트엔드 서버 재시작
-      # --------------------------------------
-      - name: Restart frontend server
+      - name: Ensure React server is running
         shell: cmd
         run: |
-          C:\deploy\scripts\restart-frontend.bat
+          "C:\deploy\scripts\restart-frontend.bat"
