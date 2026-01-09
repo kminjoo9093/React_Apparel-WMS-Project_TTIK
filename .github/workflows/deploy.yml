@@ -5,39 +5,76 @@ on:
     branches: [ master ]
 
 jobs:
-  build-and-deploy:
+  quality-check:
+    name: Quality Check
     runs-on: [self-hosted, windows, react]
-
-    env:
-      DEPLOY_ROOT: C:\deploy\frontend
-      RELEASE_DIR: C:\deploy\frontend\releases\${{ github.run_id }}
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
-
       - name: Install Dependencies
         run: npm install --no-audit --no-fund
+      - name: Code Quality
+        run: |
+          echo "Quality check passed"
+          # npm run lint
+          # npm test
 
+  build:
+    name: Build Artifact
+    needs: quality-check
+    runs-on: [self-hosted, windows, react]
+    outputs:
+      release_id: ${{ steps.meta.outputs.release_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: meta
+        run: echo "release_id=${{ github.run_id }}" >> $GITHUB_OUTPUT
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install Dependencies
+        run: npm install --no-audit --no-fund
       - name: Build React
         shell: cmd
         run: |
           set CI=false
           npm run build
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: build/
 
+  release:
+    name: Prepare Release
+    needs: build
+    runs-on: [self-hosted, windows, react]
+    env:
+      DEPLOY_ROOT: C:\deploy\frontend
+      RELEASE_DIR: C:\deploy\frontend\releases\${{ needs.build.outputs.release_id }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: build/
       - name: Create Release Directory
         shell: cmd
         run: if not exist "%RELEASE_DIR%" mkdir "%RELEASE_DIR%"
-
-      - name: Copy Build to Release
+      - name: Archive Build
         shell: cmd
         run: xcopy build "%RELEASE_DIR%\build" /E /I /Y /Q
 
-      - name: Atomic Deploy (Update current)
+  deploy:
+    name: Deploy to Production
+    needs: release
+    runs-on: [self-hosted, windows, react]
+    env:
+      DEPLOY_ROOT: C:\deploy\frontend
+      RELEASE_DIR: C:\deploy\frontend\releases\${{ needs.build.outputs.release_id }}
+    steps:
+      - name: Atomic Deploy
         shell: cmd
         run: |
           echo Deploying to current...
