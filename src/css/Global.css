@@ -11,12 +11,15 @@
   --red-cf: #cf1322;
   --red-ff: #ff4d4f;
 
-  /* 버튼 배경 */
-  --gray-f1: #f1f5f9; /*배경*/
+  /* 버튼 & input 배경 */
+  --gray-f1: #f1f5f9;
+  --gray-f8: #f8fafc;
 
-  /* 폰트 */
+  /* 폰트 & 기타 */
   --gray-47: #475569;
   --gray-64: #64748b;
+  --gray-e2: #e2e8f0;
+  --gray-cb: #cbd5e1;
   --green-10: #10b981;
 }
 
@@ -58,6 +61,9 @@ a{
 
 button {
 /* border-radius, width, padding 등 설정 */
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
 }
 
 button:hover {
@@ -72,40 +78,82 @@ button:active {
   /* width: 90%; */
   max-width: 110rem;
   margin: 0 auto;
-  padding: 5rem 2rem;
+  padding-inline: 2rem;
   
 }
 
 /* 컨텐츠 box 스타일 */
 .contentBox{
-    border-radius: 10px;
-    box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.15);
-    background-color: #fff;
+    background: #ffffff;
+    padding: 3.2rem;
+    border-radius: 2.4rem;
+    border: 1px solid rgba(226, 232, 240, 0.6);
 }
 
 /* 제목 */
 .heading{
-    font-size: 3rem;
+    font-size: 2.4rem;
     text-align: center;
-    margin-bottom: 6rem;
+    color: var(--secondary-color);
+    margin-block: 2rem;
+    display: none;
+}
+
+/* 공통 input */
+input:focus
+, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: #fff;
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.15);
+}
+input, select{
+    width: 100%;
+    height: 4rem;
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    padding: 0.7rem 1rem;
+    background: var(--gray-f8);
+    vertical-align: middle;
+    border-radius: 1.5rem;
+    border: 2px solid #e2e8f0;
+}
+input:disabled,
+select:disabled {
+    background: var(--gray-e2);        
+    color: #a0aec0;              
+    border-color: var(--gray-cb);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+input::placeholder{
+    font-size: 1.3rem;
 }
 
 /* 태블릿 세로 */
-@media (max-width: 1023px){ 
+@media (max-width: 1024px){ 
     .container {
         max-width: 100%;
+    }
+    .heading{
+      display: block;
     }
 }
 
 /* 모바일 세로, 가로 */
-@media (max-width: 767px){
+@media (max-width: 768px){
     html{
         font-size: 56.25%; /* 9px = 1rem */
     }
     .container {
-        width: 95%;
+        width: 100%;
         max-width: 100%;
         margin: 0 auto;
-        padding: 4rem 1rem;
+        padding: 0;
     }
+}
+
+@media (max-width: 480px){
+
 }

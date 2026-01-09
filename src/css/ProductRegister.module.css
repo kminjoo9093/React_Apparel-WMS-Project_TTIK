@@ -1,12 +1,151 @@
-.content{
-    border: 1px solid red;
-    height: 50rem; /*임시*/
-    /* padding: 4rem 8rem; */
+
+.registerForm{
+    color: var(--secondary-color);
+}
+.productInfo, .stockInfo, .codeInfo{
+    padding: 2rem 4rem;
+    border: none;
+}
+.productInfo, .stockInfo{
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+}
+.label{
+    font-size: 1.8rem;
+    font-weight: 500;
+    flex-shrink: 0;
+    display: inline-block;
+    width: 11rem;
+}
+.required{
+    position: relative;
 }
 .required::before{
     content: "*";
-    color: inherit;
+    color: var(--red-cf);
     display: inline-block;
-    width: 1rem;
-    height: inherit;
+    position: absolute;
+    top: 0;
+    left: -1rem;
+}
+.row{
+    display: flex;
+    /* justify-content: space-between; */
+    margin-bottom: 2rem;
+    flex-wrap: nowrap;
+}
+.col{
+    flex: 1;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+.col.right{
+    justify-content: flex-end;
+}
+.registerForm input, .registerForm select{
+    /* padding: 0; */
+    height: 4.5rem;
+}
+
+.registerForm input[type="number"]{
+    /* text-align: right; */
+}
+
+.registerForm input, .registerForm select{
+    width: 60%;
+    /* flex: 1; */
+    max-width: 25rem;
+}
+
+.registerForm option{
+    padding: 1rem;
+}
+
+.productInfo button, .codeInfo button{
+    background-color: var(--gray-f1);
+    border: none;
+    padding: 0.8rem 1.6rem;
+    border-radius: 1rem;
+    color: var(--gray-47);
+    font-weight: 600;
+    margin-left: 1rem;
+    text-wrap: nowrap;
+}
+.productInfo button:hover, .codeInfo button:hover{
+    background-color: var(--gray-e2);
+}
+
+.unit{
+    display: inline-block;
+    width: 100%;
+    font-size: 1.3rem;
+    /* text-align: center; */
+}
+
+/* form buttons */
+.formBtnWrap{
+    text-align: center;
+    margin-top: 1.5rem;
+}
+.registerBtn{
+    width: 8rem;
+    height: 4.5rem;
+    border-radius: 1rem;
+    margin-inline: 1rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+.registerBtn{
+    color: #fff;
+    background-color: var(--secondary-color);
+    transition: all 0.3s;
+}
+.registerBtn:hover{
+    background: #2563eb;
+    box-shadow: 0 2rem 4rem rgba(37, 99, 235, 0.3);
+}
+
+@media (max-width: 1024px){ 
+    .productInfo, .stockInfo, .codeInfo{
+        padding: 2rem;
+    }
+    .label{
+        font-size: 1.6rem;
+        width: 10rem;
+    }
+    .row{
+        flex-direction: column;
+        margin-bottom: 0;
+
+        align-items: center;
+    }
+    .col{
+        margin-bottom: 2rem;
+        width: 100%;        /* [추가] col 너비를 전체로 확장 */
+        max-width: 50rem;   /* [추가] 너무 퍼지지 않게 적절한 최대 너비 설정 (선택사항) */
+        justify-content: center; /* [추가] 라벨과 인풋 묶음을 중앙 정렬 */
+    }
+    .col:last-child{
+        justify-content: flex-start;
+    }
+    .registerForm input, .registerForm select{
+        height: 5rem;
+        font-size: 1.5rem;
+
+        width: 100%;        /* [수정] 60% 대신 100%로 가득 채우기 */
+        flex: 1;            /* [추가] 라벨 제외 남은 공간 다 쓰기 */
+        max-width: none;    /* [수정] 기존 max-width 해제 (col에서 제어하므로) */
+    }
+}
+@media (max-width: 480px){
+    .productInfo, .stockInfo, .codeInfo{
+        /* border-bottom: none; */
+        padding: 0;
+        padding-top: 2rem;
+    }
+    .label{
+        font-size: 1.5rem;
+        width: 9rem;
+    }
 }
