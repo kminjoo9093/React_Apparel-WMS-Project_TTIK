@@ -89,6 +89,9 @@ jobs:
 
       - name: Restart React Server
         shell: cmd
+        env:
+          DEPLOY_ROOT: C:\deploy\backend
+          RUNNER_TRACKING_ID: ""
         run: |
           C:\deploy\scripts\restart-frontend.bat
 
