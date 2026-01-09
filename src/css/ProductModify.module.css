@@ -1,48 +1,54 @@
-/* 컨테이너: 카드들이 쌓일 공간 */
 .card-stack-wrapper {
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* 중앙이 아닌 위쪽 기준으로 배치 */
+    align-items: flex-start;
     position: relative;
-    padding-top: 20px; /* 최상단 여백 */
+    padding-top: 20px;
     background-color: #f8f9fa;
 }
 
-/* 개별 카드 스타일 */
 .detail-card {
     background: white;
     border-radius: 40px;
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
     border: 1px solid #eee;
-    /* 중요: 기존보다 150px 더 위로 강제 이동 */
+    /* 중요: 기존 -220px 유지하여 카드 겹침 효과 적용 */
     margin-top: -220px; 
     transition: transform 0.3s ease;
 }
 
-/* 상단 스테퍼 UI */
+/* 첫 번째 카드나 단일 카드는 너무 올라가지 않도록 보정 (선택 사항) */
+.detail-card:first-child {
+    margin-top: 50px;
+}
+
+/* PC 버전에서는 페이지 내부에 포함된 하단바를 숨김 (MainLayout 사이드바와 충돌 방지) */
+.sidebar {
+    display: none;
+}
+
 .stepper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
 }
 
 .step-badge {
-  background: #0d1b3e;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+    background: #0d1b3e;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
 }
 
-/* 정보 그리드 레이아웃 */
 .info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
 .info-item {
@@ -63,7 +69,6 @@
     font-weight: 600;
 }
 
-/* 하단 버튼 */
 .continue-btn {
     cursor: pointer;
     transition: all 0.2s;
@@ -72,4 +77,83 @@
 .continue-btn:hover {
     filter: brightness(1.1);
     transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    /* 1. 컨테이너 및 카드 위치 초기화 */
+    .card-stack-wrapper {
+        padding-top: 10px;
+        height: auto;
+        padding-bottom: 100px; /* 하단바 여백 확보 */
+    }
+
+    .detail-card {
+        margin-top: 0 !important; /* 중요: 마이너스 마진 제거하여 카드 나열 */
+        border-radius: 20px;
+        padding: 20px;
+        width: 92%;
+        margin-left: auto;
+        margin-right: auto;
+        position: relative !important;
+        top: 0 !important;
+    }
+
+    /* 2. 정보 그리드: 가로 2열 -> 세로 1열 (수정 페이지 가독성) */
+    .info-grid {
+        grid-template-columns: 1fr; 
+        gap: 10px;
+    }
+
+    /* 3. 입력 필드 최적화: 라벨과 값을 위아래로 배치 */
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px 0;
+    }
+
+    .info-label {
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .info-value {
+        width: 100%; /* 입력창이 있다면 가로 꽉 차게 */
+    }
+
+    /* 4. 페이지 내부 하단 탭 바 활성화 (기존 코드 유지용) */
+    .sidebar {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 65px;
+        background: #0d1b3e;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 1000;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar li span {
+        display: none;
+    }
+
+    /* 5. 버튼 그룹: 세로로 쌓기 */
+    .button-group {
+        display: flex;
+        flex-direction: column; 
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .continue-btn, .cancel-btn { 
+        width: 100% !important;
+        height: 50px !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }

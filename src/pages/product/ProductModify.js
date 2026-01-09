@@ -55,14 +55,14 @@ const ProductEdit = () => {
           type="text"
           value={product.productName}
           onChange={(e) => handleChange(e, 'productName')}
-          style={{ fontSize: '4rem', fontWeight: '900', border: 'none', borderBottom: '3px solid #2563eb', width: '100%', outline: 'none', color: '#2563eb' }}
+          style={{ fontSize: '3rem', fontWeight: '900', border: 'none', borderBottom: '3px solid #ffffffff', width: '100%', outline: 'none', color: '#2563eb' }}
         />
       </div>
 
       <div style={{ display: 'flex', gap: '100px' }}>
         {/* 왼쪽: 기본 정보 (블루 라벨) */}
         <div style={{ flex: 1 }}>
-          <h3 style={{ color: '#2563eb', fontSize: '22px', borderBottom: '3px solid #2563eb', paddingBottom: '10px', width: 'fit-content', marginBottom: '25px' }}>기본 정보</h3>
+          <h3 style={{ color: '#1e293b', fontSize: '22px', borderBottom: '3px solid #1e293b', paddingBottom: '10px', width: 'fit-content', marginBottom: '25px' }}>기본 정보</h3>
           <EditField label="상품코드(SKU)" value={product.productCode} disabled />
           <EditField label="제품명" value={product.productName} onChange={(e) => handleChange(e, 'productName')} />
           <EditField label="카테고리" value={product.category} onChange={(e) => handleChange(e, 'category')} />
@@ -72,7 +72,7 @@ const ProductEdit = () => {
 
         {/* 오른쪽: 상세 정보 (그린 라벨) */}
         <div style={{ flex: 1 }}>
-          <h3 style={{ color: '#28a745', fontSize: '22px', borderBottom: '3px solid #28a745', paddingBottom: '10px', width: 'fit-content', marginBottom: '25px' }}>상세 정보</h3>
+          <h3 style={{ color: '#1e293b', fontSize: '22px', borderBottom: '3px solid #1e293b', paddingBottom: '10px', width: 'fit-content', marginBottom: '25px' }}>상세 정보</h3>
           <EditField label="브랜드" value={product.brand} onChange={(e) => handleChange(e, 'brand')} />
           <EditField label="위치정보" value={product.locateInfo} onChange={(e) => handleChange(e, 'locateInfo')} />
           <EditField label="현재재고" value={product.currentQuantity} disabled suffix="EA" />
@@ -84,13 +84,13 @@ const ProductEdit = () => {
       <div style={{ display: 'flex', gap: '20px', marginTop: '80px' }}>
         <button 
           onClick={() => navigate(-1)} // 취소 시 이전 페이지(상세)로 이동
-          style={{ flex: 1, height: '80px', fontSize: '26px', fontWeight: '900', borderRadius: '20px', background: '#f1f5f9', color: '#64748b', border: 'none', cursor: 'pointer' }}
+          style={{ flex: 1, height: '50px', fontSize: '22px', fontWeight: '600', borderRadius: '40px', background: '#f1f5f9', color: '#64748b', border: 'none', cursor: 'pointer' }}
         >
           취 소
         </button>
         <button 
           onClick={handleSave} // 수정 완료 버튼
-          style={{ flex: 1, height: '80px', fontSize: '26px', fontWeight: '900', borderRadius: '20px', background: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}
+          style={{ flex: 1, height: '50px', fontSize: '22px', fontWeight: '600', borderRadius: '40px', background: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}
         >
           수 정 완 료
         </button>

@@ -5,9 +5,11 @@ import Layout from "../src/pages/main/Layout";
 import MainDashboard from "../src/pages/main/MainDashBoard";
 import Login from "../src/pages/main/Login";
 import Error404Page from "./Error404Page";
+import RegisterAdmin from "./pages/main/RegisterAdmin";
 import ProductRegister from "./pages/product/ProductRegister";
 import ProductDetail from "../src/pages/product/ProductDetail";
 import ProductModify from "../src/pages/product/ProductModify";
+import ProductArchive from "../src/pages/product/ProductArchive";
 
 
 function Ttik() {
@@ -62,6 +64,10 @@ function Ttik() {
               <Route path="/" element={<Navigate to="/ttik" replace />} />
               {/* 추가할 메뉴들 */}
               <Route path="/products" element={<div>상품관리 페이지</div>} />
+              <Route path="/register-admin" element={<RegisterAdmin />} />
+              <Route path="/product/productDetail" element={<ProductDetail />} />
+              <Route path="/product/productModify" element={<ProductModify />} />
+              <Route path="/product/productArchive" element={<ProductArchive />} />
               <Route path="*" element={<Error404Page />} />
             </Routes>
           </Layout>
@@ -72,8 +78,7 @@ function Ttik() {
       ) : (
         <Routes>
           <Route path="/" element={<Navigate to="/ttik" replace />} />
-          <Route path="/product/productDetail" element={<ProductDetail />} />
-          <Route path="/product/productModify" element={<ProductModify />} />
+
           <Route path="/ttik" element={<MainDashboard />} />
           {/* 상품관리, 입출고 등 다른 페이지들도 여기에 추가 */}
           <Route path="/register" element={<ProductRegister/>}/>

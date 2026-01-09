@@ -30,6 +30,16 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            npm-${{ runner.os }}-
+
+
       # --------------------------------------
       # 2. Node.js 18 LTS 설정
       # --------------------------------------
@@ -44,7 +54,7 @@ jobs:
       # CI 환경에서는 npm install 사용
       # --------------------------------------
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-audit --no-fund
 
       # --------------------------------------
       # 4. React 빌드
