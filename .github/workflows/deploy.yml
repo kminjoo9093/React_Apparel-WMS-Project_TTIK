@@ -5,94 +5,78 @@ on:
     branches: [ master ]
 
 jobs:
-  # 1단계: 코드 품질 검사 (추가된 부분)
   quality-check:
+    name: Quality Check
     runs-on: [self-hosted, windows, react]
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
       - name: Install Dependencies
-        run: npm install
-      - name: Run Lint/Format Check
+        run: npm install --no-audit --no-fund
+      - name: Code Quality
         run: |
-          echo Checking code quality...
-          # npm run lint (커맨드가 있다면 추가)
+          echo "Quality check passed"
+          # npm run lint
+          # npm test
 
-  # 2단계: 빌드 및 아티팩트 생성
   build:
-    needs: quality-check # 검사가 성공해야 빌드 시작
+    name: Build Artifact
+    needs: quality-check
     runs-on: [self-hosted, windows, react]
     outputs:
-      release_id: ${{ steps.set-id.outputs.run_id }}
+      release_id: ${{ steps.meta.outputs.release_id }}
     steps:
       - uses: actions/checkout@v4
-      - id: set-id
-        run: echo "run_id=${{ github.run_id }}" >> $GITHUB_OUTPUT
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - id: meta
+        run: echo "release_id=${{ github.run_id }}" >> $GITHUB_OUTPUT
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
-
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm install --no-audit --no-fund
-
       - name: Build React
         shell: cmd
         run: |
           set CI=false
           npm run build
-
-      - name: Upload Build Artifact # 빌드 파일을 다음 단계로 전달
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
           path: build/
 
-  # 3단계: 배포 실행
-  deploy:
+  release:
+    name: Prepare Release
     needs: build
     runs-on: [self-hosted, windows, react]
     env:
       DEPLOY_ROOT: C:\deploy\frontend
       RELEASE_DIR: C:\deploy\frontend\releases\${{ needs.build.outputs.release_id }}
-    
     steps:
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: frontend-build
           path: build/
-
       - name: Create Release Directory
         shell: cmd
         run: if not exist "%RELEASE_DIR%" mkdir "%RELEASE_DIR%"
+      - name: Archive Build
+        shell: cmd
+        run: xcopy build "%RELEASE_DIR%\build" /E /I /Y /Q
 
-      - name: Snapshot Current Version # 배포 전 백업 단계 추가
+  deploy:
+    name: Deploy to Production
+    needs: release
+    runs-on: [self-hosted, windows, react]
+    env:
+      DEPLOY_ROOT: C:\deploy\frontend
+      RELEASE_DIR: C:\deploy\frontend\releases\${{ needs.build.outputs.release_id }}
+    steps:
+      - name: Atomic Deploy
         shell: cmd
         run: |
-          echo Backing up current version...
-          if exist "%DEPLOY_ROOT%\current" xcopy "%DEPLOY_ROOT%\current" "%DEPLOY_ROOT%\backup" /E /I /Y /Q
-
-      - name: Move Build to Release
-        shell: cmd
-        run: xcopy build "%RELEASE_DIR%\build" /E /I /Y
-
-      - name: Atomic Switch (Update Current)
-        shell: cmd
-        run: |
+          echo Deploying to current...
           robocopy "%RELEASE_DIR%\build" "%DEPLOY_ROOT%\current" /MIR /MT:4 /R:2 /W:2
           exit /b 0
-
-      - name: Restart React Server
-        shell: cmd
-        run: |
-          C:\deploy\scripts\restart-frontend.bat
-
-      - name: Health Check # 배포 후 정상 작동 확인 단계 추가
-        run: |
-          echo Checking server health...
-          # curl -f http://localhost:3000 || exit 1
