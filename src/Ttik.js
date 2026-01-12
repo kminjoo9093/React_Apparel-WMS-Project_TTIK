@@ -22,12 +22,12 @@ function Ttik() {
   const [user, setUser] = useState(null); 
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [isInitialized, setIsInitialized] = useState(false); 
-  const SERVER_URL = serverUrl.SERVER_URL;
+  //const SERVER_URL = serverUrl.SERVER_URL;
 
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch(`${SERVER_URL}/ttik/me`, {
+        const response = await fetch(`${serverUrl.SERVER_URL}/ttik/me`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -83,8 +83,6 @@ function Ttik() {
           <Route path="/" element={<Navigate to="/ttik" replace />} />
 
           <Route path="/ttik" element={<MainDashboard />} />
-          {/* 상품관리, 입출고 등 다른 페이지들도 여기에 추가 */}
-          {/* Login 컴포넌트에 상태 변경 함수 전달 */}
           <Route 
             path="/login"
             element={<Login setUser={setUser} setIsLoggedIn={setIsLoggedIn} />} 
