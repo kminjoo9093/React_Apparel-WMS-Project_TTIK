@@ -20,6 +20,7 @@ function ProductRegister(){
     const [lmtQty, setLmtQty] = useState(""); //입수량
     const [price, setPrice] = useState(""); //단가
     const [threshold, setThreshold] = useState(""); //임계치
+    const [initStock, setInitStock] = useState(0); //초기 재고량
 
     const [productCd, setProductCd] = useState("");
     const [boxCd, setBoxCd] = useState("");
@@ -79,14 +80,16 @@ function ProductRegister(){
 
     // 숫자 입력 유효성 검사 
     const [errors, setErrors] = useState({
-        stock: false,    // 박스 입수량
+        qty: false,    // 박스 입수량
         price: false,    // 단가
-        threshold: false // 임계치
+        threshold: false, // 임계치
+        init: false    //초기재고량
     })
     const [errorMsg, setErrorMsg] = useState({
-        stock: "",
+        qty: "",
         price: "",
-        threshold: ""
+        threshold: "",
+        init: ""
     });
 
     const validateNumber = (e) => {        
@@ -95,11 +98,13 @@ function ProductRegister(){
 
         if(!isInvalid){
             switch (name){
-                case "stock" : setLmtQty(value);
+                case "qty" : setLmtQty(value);
                     break;
                 case "price" : setPrice(value);
                     break;
                 case "threshold" : setThreshold(value);
+                    break;
+                case "init" : setInitStock(value);
                     break;
             }
         }
@@ -343,14 +348,14 @@ function ProductRegister(){
                             <div className={styleRegister.col}>
                                 <label className={`${styleRegister.required} ${styleRegister.label}`}>박스 입수량<span className={styleRegister.unit}>(EA/BOX)</span> </label>
                                 <div className={styleRegister.numberWrapper}>
-                                    <input type="number" name="stock" min="0" required placeholder="EA 수량 입력" value={lmtQty} onChange={validateNumber}></input>
-                                    <p className={styleRegister.errorMsg} style={{ visibility: errors.stock ? "visible" : "hidden" }}>{errorMsg.stock}</p>
+                                    <input type="number" name="qty" min="0" required placeholder="EA 수량 입력" value={lmtQty} onChange={validateNumber}></input>
+                                    <p className={styleRegister.errorMsg} style={{ visibility: errors.qty ? "visible" : "hidden" }}>{errorMsg.qty}</p>
                                 </div>
                             </div>
                             <div className={`${styleRegister.col} ${styleRegister.right}`}>
                                 <label className={styleRegister.label}>단가 (원)</label>
                                 <div className={styleRegister.numberWrapper}>
-                                    <input type="number" name="price" placeholder="개별 단가를 입력해주세요" value={price} onChange={validateNumber}></input>
+                                    <input type="number" name="price" min="0" placeholder="개별 단가를 입력해주세요" value={price} onChange={validateNumber}></input>
                                     <p className={styleRegister.errorMsg} style={{ visibility: errors.price ? "visible" : "hidden" }}>{errorMsg.price}</p>
                                 </div>
                             </div>
@@ -359,8 +364,15 @@ function ProductRegister(){
                             <div className={styleRegister.col}>
                                 <label className={styleRegister.label}>임계치</label>
                                 <div className={styleRegister.numberWrapper}>
-                                    <input type="number" name="threshold" placeholder="알림을 받을 최소 재고 수량 입력" value={threshold} onChange={validateNumber}></input>
+                                    <input type="number" name="threshold" min="0" placeholder="알림을 받을 최소 재고 수량 입력" value={threshold} onChange={validateNumber}></input>
                                     <p className={styleRegister.errorMsg} style={{ visibility: errors.threshold ? "visible" : "hidden" }}>{errorMsg.threshold}</p>
+                                </div>
+                            </div>
+                            <div className={`${styleRegister.col} ${styleRegister.right}`}>
+                                <label className={styleRegister.label}>초기 재고량</label>
+                                <div className={styleRegister.numberWrapper}>
+                                    <input type="number" name="initStock" min="0" placeholder="초기 재고량을 입력하세요" value={initStock} onChange={validateNumber}></input>
+                                    <p className={styleRegister.errorMsg} style={{ visibility: errors.init ? "visible" : "hidden" }}>{errorMsg.init}</p>
                                 </div>
                             </div>
                         </div>
