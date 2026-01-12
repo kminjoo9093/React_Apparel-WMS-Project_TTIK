@@ -65,7 +65,6 @@ function Ttik() {
               <Route path="/brand" element={ <Brand /> } />
               {/* 추가할 메뉴들 */}
               <Route path="/register" element={<ProductRegister/>}/>
-              <Route path="/products" element={<div>상품관리 페이지</div>} />
               <Route path="/register-admin" element={<RegisterAdmin />} />
               <Route path="/product/productDetail" element={<ProductDetail />} />
               <Route path="/product/productModify" element={<ProductModify />} />
