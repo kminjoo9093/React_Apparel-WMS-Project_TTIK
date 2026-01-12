@@ -18,12 +18,12 @@ function Ttik() {
   const [user, setUser] = useState(null); 
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const [isInitialized, setIsInitialized] = useState(false); 
-  const SERVER_URL = serverUrl.SERVER_URL;
+  //const SERVER_URL = serverUrl.SERVER_URL;
 
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch(`${SERVER_URL}/ttik/me`, {
+        const response = await fetch(`${serverUrl.SERVER_URL}/ttik/me`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -63,7 +63,6 @@ function Ttik() {
               <Route path="/register" element={<ProductRegister/>}/>
               <Route path="/products" element={<div>상품관리 페이지</div>} />
               <Route path="/register-admin" element={<RegisterAdmin />} />
-              <Route path="/register" element={<ProductRegister/>}/>
               <Route path="*" element={<Error404Page />} />
             </Routes>
           </Layout>
