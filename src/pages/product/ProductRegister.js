@@ -46,7 +46,7 @@ function ProductRegister(){
     const [sizeMap, setSizeMap] = useState({});
     const [sizeList, setSizeList] = useState([]);
 
-    const jsonUrl = "http://localhost:3002";
+    const jsonUrl = "https://localhost:3002";
     async function getData(url){
         try{
             const res = await fetch(url); 

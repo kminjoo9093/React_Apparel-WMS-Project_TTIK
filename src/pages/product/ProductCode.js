@@ -12,7 +12,7 @@ function ProductCode({onClose, qrCd, setQrCd}){
 
         //fetch
         try{
-            const res = await fetch(`http://localhost:3002/productMaster?productCd=${qrCd}`);
+            const res = await fetch(`https://localhost:3002/productMaster?productCd=${qrCd}`);
             if(!res.ok){
                 throw new Error(`Error : ${res.status}`);
             }

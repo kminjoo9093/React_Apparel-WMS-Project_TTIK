@@ -21,7 +21,7 @@ function ProductSeason({onClose}){
 
         
         try{
-            const res = await fetch('http://localhost:3002/season', {
+            const res = await fetch('https://localhost:3002/season', {
                 method: "POST",
                 headers: {'Content-type': 'application/json'},
                 body: JSON.stringify({
