@@ -8,11 +8,11 @@ import Error404Page from "./Error404Page";
 import serverUrl from "./db/server.json"
 import RegisterAdmin from "./pages/main/RegisterAdmin";
 import ProductRegister from "./pages/product/ProductRegister";
-
 import ProductDetail from "../src/pages/product/ProductDetail";
 import ProductModify from "../src/pages/product/ProductModify";
 import ProductArchive from "../src/pages/product/ProductArchive";
-import Brand from "../src/pages/Brand/BrandList";
+import Brand from "../src/pages/brand/BrandList";
+import Plans from "../src/pages/stock/StockPlans";
 
 function Ttik() {
   const location = useLocation();
@@ -20,14 +20,14 @@ function Ttik() {
   const hideLayout = hideLayoutRoutes.includes(location.pathname);
 
   const [user, setUser] = useState(null); 
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false); 
-  const SERVER_URL = serverUrl.SERVER_URL;
+  //const SERVER_URL = serverUrl.SERVER_URL;
 
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch(`${SERVER_URL}/ttik/me`, {
+        const response = await fetch(`${serverUrl.SERVER_URL}/ttik/me`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -63,9 +63,8 @@ function Ttik() {
               <Route path="/ttik" element={<MainDashboard user={user} />} />
               <Route path="/" element={<Navigate to="/ttik" replace />} />
               <Route path="/brand" element={ <Brand /> } />
-              {/* 추가할 메뉴들 */}
+              <Route path="/stock/plans" element={ <Plans /> } />
               <Route path="/register" element={<ProductRegister/>}/>
-              <Route path="/products" element={<div>상품관리 페이지</div>} />
               <Route path="/register-admin" element={<RegisterAdmin />} />
               <Route path="/product/productDetail" element={<ProductDetail />} />
               <Route path="/product/productModify" element={<ProductModify />} />
@@ -83,7 +82,6 @@ function Ttik() {
           <Route path="/" element={<Navigate to="/ttik" replace />} />
 
           <Route path="/ttik" element={<MainDashboard />} />
-          {/* 상품관리, 입출고 등 다른 페이지들도 여기에 추가 */}
           {/* Login 컴포넌트에 상태 변경 함수 전달 */}
           <Route 
             path="/login"
@@ -95,5 +93,4 @@ function Ttik() {
     </div>
   );
 }
-
 export default Ttik;
