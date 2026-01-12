@@ -8,6 +8,9 @@ import Error404Page from "./Error404Page";
 import serverUrl from "./db/server.json"
 import RegisterAdmin from "./pages/main/RegisterAdmin";
 import ProductRegister from "./pages/product/ProductRegister";
+import ProductDetail from "../src/pages/product/ProductDetail";
+import ProductModify from "../src/pages/product/ProductModify";
+import ProductArchive from "../src/pages/product/ProductArchive";
 import Brand from "../src/pages/brand/BrandList";
 import Plans from "../src/pages/stock/StockPlans";
 
@@ -19,12 +22,12 @@ function Ttik() {
   const [user, setUser] = useState(null); 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false); 
-  const SERVER_URL = serverUrl.SERVER_URL;
+  //const SERVER_URL = serverUrl.SERVER_URL;
 
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch(`${SERVER_URL}/ttik/me`, {
+        const response = await fetch(`${serverUrl.SERVER_URL}/ttik/me`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -65,6 +68,11 @@ function Ttik() {
               <Route path="/register" element={<ProductRegister/>}/>
               <Route path="/products" element={<div>상품관리 페이지</div>} />
               <Route path="/register-admin" element={<RegisterAdmin />} />
+
+              <Route path="/product/productDetail" element={<ProductDetail />} />
+              <Route path="/product/productModify" element={<ProductModify />} />
+              <Route path="/product/productArchive" element={<ProductArchive />} />
+              <Route path="/register" element={<ProductRegister/>}/>
               <Route path="*" element={<Error404Page />} />
             </Routes>
           </Layout>
@@ -74,7 +82,8 @@ function Ttik() {
         )
       ) : (
         <Routes>
-          <Route path="/" element={<Navigate to="/main" replace />} />
+          <Route path="/" element={<Navigate to="/ttik" replace />} />
+
           <Route path="/ttik" element={<MainDashboard />} />
           {/* Login 컴포넌트에 상태 변경 함수 전달 */}
           <Route 

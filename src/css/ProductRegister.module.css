@@ -14,7 +14,7 @@
     font-weight: 500;
     flex-shrink: 0;
     display: inline-block;
-    width: 11rem;
+    width: 12rem;
 }
 .required{
     position: relative;
@@ -29,8 +29,7 @@
 }
 .row{
     display: flex;
-    /* justify-content: space-between; */
-    margin-bottom: 1.5rem;
+    margin-bottom: 3.5rem;
     flex-wrap: nowrap;
 }
 .col{
@@ -38,16 +37,22 @@
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
+    position: relative;
 }
 .col.right{
     justify-content: flex-end;
 }
-.registerForm input{
+.registerForm input, .registerForm select{
     /* padding: 0; */
+    height: 4.5rem;
 }
 
-.registerForm input[type="number"]{
-    /* text-align: right; */
+.registerForm input:read-only {
+    background: var(--gray-e2);        
+    color: #a0aec0;              
+    border-color: var(--gray-cb);
+    cursor: not-allowed;
+    opacity: 0.8;
 }
 
 .registerForm input, .registerForm select{
@@ -56,6 +61,12 @@
     max-width: 25rem;
 }
 
+.registerForm input:focus::placeholder {
+    color: transparent;
+}
+.registerForm input::placeholder{
+    transition: all 0.3s;
+}
 .registerForm option{
     padding: 1rem;
 }
@@ -104,6 +115,35 @@
     background: #2563eb;
     box-shadow: 0 2rem 4rem rgba(37, 99, 235, 0.3);
 }
+.numberWrapper {
+    position: relative;
+    flex: 1;
+    width: 60%;          /* 기존 input에 있던 너비 설정 */
+    max-width: 25rem;    /* 기존 input에 있던 최대 너비 설정 */
+}
+.numberWrapper input{
+    width: 100%;
+    max-width: none;
+}
+.errorMsg, .guide{
+    position: absolute;
+    font-size: 1.3rem;
+    line-height: 2em;
+}
+.errorMsg{
+    color: var(--red-ff);
+    left: 0;
+    /* height: 1.7rem; */
+}
+
+.guide{
+    text-wrap: nowrap;
+    right: 1rem;
+    bottom: 0;
+    transform: translateY(100%);
+    color: var(--gray-64);
+}
+
 
 @media (max-width: 1024px){ 
     .productInfo, .stockInfo, .codeInfo{

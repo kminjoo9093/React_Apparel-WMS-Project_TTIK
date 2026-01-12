@@ -1,22 +1,84 @@
+import { useRef, useState } from "react";
 import styleProdModal from "../../css/ProductModal.module.css";
 import styleRegister from "../../css/ProductRegister.module.css";
 
-function ProductSeason(){
+function ProductSeason({onClose}){
+
+    const yearRef = useRef();
+    const seasonRef = useRef();
+
+    async function registerSeason(e){
+        e.preventDefault();
+
+        const year = yearRef.current.value;
+        const season = seasonRef.current.value;
+
+        //유효성 검사 로직
+        if(!year || year.length !== 4){
+            alert("연도 4자리 숫자를 정확히 입력하세요.");
+            return;
+        }
+
+        
+        try{
+            const res = await fetch('http://localhost:3002/season', {
+                method: "POST",
+                headers: {'Content-type': 'application/json'},
+                body: JSON.stringify({
+                    "year": year,
+                    "season": season,
+
+                    //test코드. 나중에 백엔드에서 파싱할 것
+                    "seasonSn": Number(year + (season === "S" ? "01" : "02")),
+                    "seasonCd": year.slice(-2) + season,
+                    "seasonNm": year + " " + (season === "S" ? "S/S" : "F/W")
+                })
+            });
+
+            if(res.ok){
+                console.log(year, season);
+                const temp = season === "S" ? "S/S" : "FW";
+                alert(` ${year} ${temp} 시즌이 정상 등록되었습니다.`);
+
+                //모달창 닫기
+                onClose();
+            } else {
+                //이미 있는 시즌인 경우 처리 -> db 무결성 유니크 활용할 것
+                alert("이미 등록된 시즌이거나 등록할 수 없는 정보입니다.");
+            }
+        } catch(error){
+            console.error(error);
+            alert("네트워크 통신 중 오류가 발생했습니다.");
+        }
+
+    }
+
+
     return (
         <div className={styleProdModal.modalInner}>
             <p>상품 등록에 사용할 시즌을 추가하세요.</p>
-            <div className={styleProdModal.modalContents}>
+            <form onSubmit={registerSeason} className={styleProdModal.modalContents}>
                 <div className={styleProdModal.inputGroup}>
                     <div>
-                        <input className={styleProdModal.year} type="number" placeholder="ex) 2026"></input>년도
+                        <input 
+                            className={styleProdModal.year} 
+                            type="number" 
+                            min="0" 
+                            name="year"
+                            required 
+                            placeholder="ex) 2026"
+                            ref={yearRef}
+                        >
+                        </input>
+                        년도
                     </div>
-                    <select name="" className={styleProdModal.seasonType}>
-                        <option value="#">S/S</option>
-                        <option value="#">F/W</option>
+                    <select name="season" className={styleProdModal.seasonType} ref={seasonRef}>
+                        <option value="S">S/S</option>
+                        <option value="F">F/W</option>
                     </select>
-                </div> 
-            </div>
-            <button className={`${styleRegister.registerBtn}`}>등록</button>
+                </div>             
+                <button type="submit" className={`${styleRegister.registerBtn}`}>등록</button>
+            </form>
         </div>
     )
 }
