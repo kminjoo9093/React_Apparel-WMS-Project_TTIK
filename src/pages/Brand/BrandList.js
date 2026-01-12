@@ -99,9 +99,10 @@ function BrandList() {
     };
 
     return (
-        <div className="container">
+        // className="container"
+        <div> 
             <h1 className={styleBrand.brandTitle}>Brand</h1>
-            <p className={styleBrand.brandSubTitle}>브랜드 관리</p>
+            <p className={styleBrand.brandSubTitle}>브랜드를 관리 하세요.</p>
 
             <div className={styleBrand.brandListbox}>
                 <div className={styleBrand.searchBox}>

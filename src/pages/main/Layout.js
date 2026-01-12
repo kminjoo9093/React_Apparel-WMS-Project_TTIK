@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styleLayout from '../../css/Layout.module.css';
 import Modal from '../../components/Modal';
+import serverUrl from "../../db/server.json"
 
 const Layout = ({ children, user }) => {
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const SERVER_URL = serverUrl.SERVER_URL;
   
   const [modal, setModal] = useState({ 
     isOpen: false, 
@@ -23,7 +25,7 @@ const Layout = ({ children, user }) => {
       message: '정말 로그아웃 하시겠습니까?',
       onConfirm: async () => {
         try {
-          const response = await fetch('http://localhost:3001/logout', {
+          const response = await fetch(`${SERVER_URL}/logout`, {
             method: 'POST', 
             credentials: 'include',
           });
@@ -50,10 +52,11 @@ const Layout = ({ children, user }) => {
   const menus = [
     { path: '/ttik', name: '대시보드', icon: '📊' },
     { path: '/products', name: '상품 관리', icon: '📦' },
-    { path: '/inventory', name: '입출고 관리', icon: '🔄' },
-    { path: '/brandlist', name: '등록하기', icon: '➕' },
+    { path: '/stock/plans', name: '입출고 관리', icon: '🔄' },
+    { path: '/register', name: '등록하기', icon: '➕' },
     { path: '/history', name: '이력 조회', icon: '📜' },
     { path: '/brand', name: '브랜드', icon: '🏷️' },
+    { path: '/register-admin', name: '관리자 등록', icon: '👤' }
   ];
 
   const closeSidebar = () => setIsSidebarOpen(false);
