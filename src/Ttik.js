@@ -64,11 +64,8 @@ function Ttik() {
               <Route path="/" element={<Navigate to="/ttik" replace />} />
               <Route path="/brand" element={ <Brand /> } />
               <Route path="/stock/plans" element={ <Plans /> } />
-              {/* 추가할 메뉴들 */}
               <Route path="/register" element={<ProductRegister/>}/>
-              <Route path="/products" element={<div>상품관리 페이지</div>} />
               <Route path="/register-admin" element={<RegisterAdmin />} />
-
               <Route path="/product/productDetail" element={<ProductDetail />} />
               <Route path="/product/productModify" element={<ProductModify />} />
               <Route path="/product/productArchive" element={<ProductArchive />} />
@@ -96,5 +93,4 @@ function Ttik() {
     </div>
   );
 }
-
 export default Ttik;
