@@ -1,22 +1,16 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import style from '../../css/QRsave.module.css';
 import serverUrl from "../../db/server.json";
 
-const INITIAL_PRODUCTS = [
-    { id: '0125S-TPS01-Z001', name: '데님 모자' },
-    { id: '0820S-JAC02-C001', name: '청자켓' },
-    { id: '1952S-SHO03-N001', name: '나이키 신발' }
-];
-
 const QRsave = () => {
-    const [products] = useState(INITIAL_PRODUCTS);
+    const [products, setProducts] = useState([]);
     const [generatedQrs, setGeneratedQrs] = useState([]);
     const [isDownloading, setIsDownloading] = useState(false);
     const [progress, setProgress] = useState(0);
 
     const [printConfig, setPrintConfig] = useState({
-        productId: '0125S-TPS01-Z001',
+        productId: '', // 초기 선택값 비움
         boxQty: 50,
         boxStart: 1,
         boxEnd: 1,
@@ -27,6 +21,32 @@ const QRsave = () => {
 
     const printAreaRef = useRef(null);
     const SERVER_URL = serverUrl.SERVER_URL;
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await fetch(`${SERVER_URL}/ttik/product/list`);
+                if (response.ok) {
+                    const data = await response.json();
+                    // DTO 필드명에 맞춰 매핑 (productCd -> id, productNm -> name)
+                    const mappedData = data.map(p => ({
+                        id: p.productCd,
+                        name: p.productNm
+                    }));
+                    setProducts(mappedData);
+                    
+                    // 데이터가 있다면 첫 번째 상품을 기본값으로 설정
+                    if (mappedData.length > 0) {
+                        setPrintConfig(prev => ({ ...prev, productId: mappedData[0].id }));
+                    }
+                }
+            } catch (error) {
+                console.error("상품 목록 로딩 실패:", error);
+            }
+        };
+
+        fetchProducts();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -138,9 +158,13 @@ const QRsave = () => {
                         <div className={style.inputGroup}>
                             <label>발행 대상 상품</label>
                             <select name="productId" value={printConfig.productId} onChange={handleChange}>
-                                {products.map(p => (
-                                    <option key={p.id} value={p.id}>{p.name}</option>
-                                ))}
+                                {products.length > 0 ? (
+                                    products.map(p => (
+                                        <option key={p.id} value={p.id}>{p.name} ({p.id})</option>
+                                    ))
+                                ) : (
+                                    <option value="">상품 로딩 중...</option>
+                                )}
                             </select>
                         </div>
 
