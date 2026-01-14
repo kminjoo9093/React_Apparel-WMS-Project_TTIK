@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import stylePlans from "../../css/plarns.module.css";
 import PlanRegister from './PlanRegister';
+import { useNavigate } from 'react-router-dom';
 
 function StockPlans() {
     const [plansType, setPlansType] = useState(null);
@@ -8,6 +9,7 @@ function StockPlans() {
     const [inboundList, setInboundList] = useState([]);
     const [outboundList, setOutboundList] = useState([]);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const postsPerPage = 10;
 
@@ -32,7 +34,7 @@ function StockPlans() {
             setLoading(false);
         }
     };
-
+    
     useEffect(() => {
         fetchStockPlanList();
     }, [plansType, currentPage]);
@@ -70,7 +72,15 @@ function StockPlans() {
                     >
                         + 새 일정 등록
                     </button>
+                    <button 
+                        style={{backgroundColor: "var(--primary-color)", color:"white"}} 
+                        className={stylePlans.plansBtn}
+                        onClick={()=> navigate("qr/print")}
+                    >
+                        🖨️ QR코드 인쇄
+                    </button>
                 </div>
+                
 
 
                 {/* 테이블 영역 */}

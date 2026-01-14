@@ -13,6 +13,7 @@ import ProductModify from "../src/pages/product/ProductModify";
 import ProductArchive from "../src/pages/product/ProductArchive";
 import Brand from "../src/pages/Brand/BrandList";
 import Plans from "../src/pages/stock/StockPlans";
+import QRsave from "./pages/qrcode/QRsave";
 
 function Ttik() {
   const location = useLocation();
@@ -70,6 +71,7 @@ function Ttik() {
               <Route path="/product/productModify" element={<ProductModify />} />
               <Route path="/product/productArchive" element={<ProductArchive />} />
               <Route path="/register" element={<ProductRegister/>}/>
+              <Route path="/stock/plans/qr/print" element={<QRsave />}/>
               <Route path="*" element={<Error404Page />} />
             </Routes>
           </Layout>

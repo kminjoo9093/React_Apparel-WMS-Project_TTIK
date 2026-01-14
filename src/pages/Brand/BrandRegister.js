@@ -69,7 +69,7 @@ function BrandRegister({ isOpen, onClose, onRegisterSuccess }) {
         }
 
         try {
-            const response = await fetch('http://localhost:3001/ttik/brand/register', {
+            const response = await fetch('https://localhost:3001/ttik/brand/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
