@@ -1,9 +1,13 @@
 import { useState } from "react";
 import styleProdModal from "../../css/ProductModal.module.css";
 import styleRegister from "../../css/ProductRegister.module.css";
+import serverUrl from "../../db/server.json";
 
-function ProductCode({onClose, qrCd, setQrCd}){
+function ProductCode({onClose, productCd, setProductCd}){
+
+    const SERVER_URL = serverUrl.SERVER_URL;
     
+    const [isChecked, setIsChecked] = useState(false); //중복체크 여부 
     const [isDuplicate, setIsDuplicate] = useState(null); //QR 코드 중복체크 
 
     // 코드 중복체크
@@ -12,18 +16,20 @@ function ProductCode({onClose, qrCd, setQrCd}){
 
         //fetch
         try{
-            const res = await fetch(`http://localhost:3002/productMaster?productCd=${qrCd}`);
+            const res = await fetch(`${SERVER_URL}/ttik/product/exist/${productCd}`);
             if(!res.ok){
                 throw new Error(`Error : ${res.status}`);
             }
             const data = await res.json();
             console.log(data);
             
-            if(data.length > 0){
+            if(data === true){
                 //코드 중복
                 setIsDuplicate(true);
             } else {
+                //중복 X. 사용 가능
                 setIsDuplicate(false);
+                setIsChecked(true);
             }
             return;
         } catch(error){
@@ -33,20 +39,20 @@ function ProductCode({onClose, qrCd, setQrCd}){
     }
 
     // 코드 등록
-    function registerQRCd(e){
+    function registerProductCd(e){
         e.preventDefault();
 
         //코드 중복 시
         if(isDuplicate){
-            setQrCd("");
+            setProductCd("");
             setIsDuplicate(null);
             alert("상품 등록 정보를 확인해주세요.");
             onClose();
         }
 
         //바코드 이미지 생성 로직 성공하면 모달 닫기
-        if(!isDuplicate && qrCd){
-            console.log("QR코드 생성 성공 : ", qrCd);
+        if(!isDuplicate && productCd){
+            console.log("상품코드 생성 성공 : ", productCd);
             //모달창 닫기
             setIsDuplicate(null);
             onClose();
@@ -55,15 +61,15 @@ function ProductCode({onClose, qrCd, setQrCd}){
 
     return (
          <div className={styleProdModal.modalInner}>
-            <p>사용 가능한 상품 QR 코드를 자동 생성합니다.</p>
-            <form onSubmit={registerQRCd} className={styleProdModal.modalContents}>
-                    <div className={styleProdModal.inputGroup}>
-                        <input className={styleProdModal.productCdInput} type="text" value={qrCd} readOnly></input>
-                        <button className={styleProdModal.checkBtn} onClick={checkDuplicate}>중복 체크</button>
-                    </div>
-                    <span className={`${styleProdModal.notice} ${styleProdModal.available}`} style={{ visibility: isDuplicate === false ? 'visible' : 'hidden'}}>사용 가능</span>
-                    <span className={`${styleProdModal.notice} ${styleProdModal.duplicate}`} style={{ visibility: isDuplicate === true ? 'visible' : 'hidden'}}>중복된 코드</span>
-                <button className={`${styleRegister.registerBtn}`}>등록</button>
+            <p>사용 가능한 상품 코드를 자동 생성합니다.</p>
+            <form onSubmit={registerProductCd} className={styleProdModal.modalContents}>
+                <div className={styleProdModal.inputGroup}>
+                    <input className={styleProdModal.productCdInput} type="text" value={productCd} readOnly></input>
+                    <button className={styleProdModal.checkBtn} onClick={checkDuplicate}>중복 체크</button>
+                </div>
+                <span className={`${styleProdModal.notice} ${styleProdModal.available}`} style={{ visibility: isDuplicate === false ? 'visible' : 'hidden'}}>사용 가능</span>
+                <span className={`${styleProdModal.notice} ${styleProdModal.duplicate}`} style={{ visibility: isDuplicate === true ? 'visible' : 'hidden'}}>중복된 코드</span>
+                <button className={`${styleRegister.registerBtn} ${styleProdModal.registerBtn}`} disabled={!isChecked}>등록</button>
             </form>
         </div>
     )
