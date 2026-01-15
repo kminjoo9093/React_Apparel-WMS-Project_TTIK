@@ -17,7 +17,7 @@ function BoxCode({onClose, qrCd}){
 
     return (
         <div className={styleProdModal.modalInner}>
-        <p>상자 QR코드를 자동 생성합니다.</p>
+        <p>브랜드를 검색하세요.</p>
         <form onSubmit={registerQRCd} className={styleProdModal.modalContents}>
             <div>
                 <input className={styleProdModal.year} type="text" value={qrCd} readOnly></input>

@@ -20,16 +20,17 @@ function ProductRegister(){
     const [sizeCd, setSizeCd] = useState("");
     const [styleNo, setStyleNo] = useState("");
     const [target, setTarget] = useState("");
-
+    
     const [inboxQty, setInboxQty] = useState(""); //입수량
     const [price, setPrice] = useState(""); //단가
     const [threshold, setThreshold] = useState(""); //임계치
-    const [frstStock, setFrstStock] = useState(0); //초기 재고량
-
+    // const [frstStock, setFrstStock] = useState(0); //초기 재고량
+    
     const [productCd, setProductCd] = useState("");
     // const [boxCd, setBoxCd] = useState("");
 
     const [searchWord, setSearchWord] = useState("");
+    const [inputValue, setInputValue] = useState(""); //임시 인풋값
 
 
     // 모달
@@ -62,7 +63,7 @@ function ProductRegister(){
             return data;
         } catch(error){
             console.log(error);
-            return [];
+            return null;
         }
     }
 
@@ -88,13 +89,13 @@ function ProductRegister(){
         qty: false,    // 박스 입수량
         price: false,    // 단가
         threshold: false, // 임계치
-        init: false    //초기재고량
+        // init: false    //초기재고량
     })
     const [errorMsg, setErrorMsg] = useState({
         qty: "",
         price: "",
         threshold: "",
-        init: ""
+        // init: ""
     });
 
     const validateNumber = (e) => {        
@@ -109,8 +110,8 @@ function ProductRegister(){
                     break;
                 case "threshold" : setThreshold(value);
                     break;
-                case "frstStock" : setFrstStock(value);
-                    break;
+                // case "frstStock" : setFrstStock(value);
+                //     break;
             }
         }
 
@@ -134,13 +135,28 @@ function ProductRegister(){
         // setSizeList(sizeMap[cat] || []);
     }
 
-    //스타일 넘버
+    //스타일 넘버 -> 품번
     function handleStyleNo(e){
-        const value = e.target.value;
-        setStyleNo(value);
-        
-        const target = value.substring(0, 1);
-        setTarget(target);
+        setSizeCd("");
+
+        //유효성 검사(W/M/U/K)
+        const value = e.target.value.toUpperCase();
+
+        if(!value) return;
+
+        const startAlphas = ["W", "M", "U", "K"];
+        const isValid = startAlphas.some(alpha => value.startsWith(alpha));
+
+        if(value.length > 0 && isValid){
+            setStyleNo(value);
+
+            const target = value.substring(0, 1);
+            setTarget(target);
+        } else {
+            alert("입력 형식을 확인하세요.");
+            setInputValue("");
+        }
+    
     }
 
 
@@ -149,22 +165,17 @@ function ProductRegister(){
 
         if(!target || !category) return;
 
-        try{
-            const fetchData = async () => {
-                const res = await getData(`${URL}/size?target=${target}&category=${category}`);
-                if(!res.ok){
-                    throw new Error(`Error : ${res.status}`);
-                } 
-                const data = await res.json();
-                console.log(data);
-                setSizeMap(data);
+         const fetchData = async () => {
+            const sizeData = await getData(`${URL}/size?target=${target}&category=${category}`);
+            
+            if(sizeData){
+                setSizeMap(sizeData);
+            } else {
+                setSizeMap({});
             }
-
-            fetchData();
-        } catch(error){
-            console.log(error);
-            return {};
         }
+        fetchData();
+        
     }, [target, category])
 
 
@@ -178,7 +189,7 @@ function ProductRegister(){
                 body: JSON.stringify({
                     "styleNo": styleNo,
                     "brandCd": brandCd,
-                    "sizeCd": "WS001", //sizeCd
+                    "sizeCd": sizeCd, 
                     "catCd": category,
                     "seasonCd": seasonCd,
                 })
@@ -207,21 +218,19 @@ function ProductRegister(){
             return;
         }
 
-        // 상품 QR 코드 생성
-        const newQRCode = await generateProductCd();
-        console.log("qr1 -> ", newQRCode);
+        // 상품 코드 생성
+        const newProductCd = await generateProductCd();
+        console.log("qr1 -> ", newProductCd);
 
         // 모달 오픈
-        openModal("QR코드 생성", <ProductCode onClose={closeModal} qrCd={newQRCode} setQrCd={setProductCd}/>)
+        openModal("QR코드 생성", <ProductCode onClose={closeModal} productCd={newProductCd} setProductCd={setProductCd}/>)
     }
 
-    // 인풋 값 변경 시 qr코드 초기화
+    // 인풋 값 변경 시 상품 코드 초기화
     useEffect(()=>{
         // if(!productCd || !boxCd) return;
 
         setProductCd("");
-
-        console.log("qrcode2 -> ", productCd);
     }, [brandCd, seasonCd, category, sizeCd, styleNo])
 
 
@@ -253,7 +262,7 @@ function ProductRegister(){
                     "inboxQty": Number(inboxQty),  //입수량
                     "price": Number(price), //단가
                     "threshold": Number(threshold), //임계치
-                    "frstStock": Number(frstStock) //초기재고량
+                    // "frstStock": Number(frstStock) //초기재고량
                 })
             })
             if(res.ok){
@@ -303,15 +312,18 @@ function ProductRegister(){
                                         ))
                                     }
                                 </select>
+                                <button type="button">검색</button>
                             </div>
                             <div className={`${styleRegister.col} ${styleRegister.right}`}>
-                                <label htmlFor="style" className={styleRegister.label}>스타일 넘버</label>
+                                <label htmlFor="style" className={styleRegister.label}>품번</label>
                                 <input id="style" 
                                         type="text" 
                                         required 
                                         placeholder="ex) M001"
-                                        value={styleNo}
-                                        onChange={handleStyleNo}
+                                        value={inputValue}
+                                        onChange={(e)=>setInputValue(e.target.value)}
+                                        onBlur={handleStyleNo}
+                                        style={{textTransform: 'uppercase'}}
                                 >
                                 </input>
                                 <p className={styleRegister.guide}>첫 글자 남성: M, 여성: W, 공용: U, 키즈: K</p>
@@ -328,7 +340,7 @@ function ProductRegister(){
                                         ))
                                     }
                                 </select>
-                                <button type="button" onClick={()=>{openModal("시즌 등록", <ProductSeason onClose={closeModal}/>)}}>등록</button>
+                                <button type="button" onClick={()=>{openModal("시즌 등록", <ProductSeason onClose={closeModal} setSeasonList={setSeasonList}/>)}}>등록</button>
                             </div>
                             <div className={`${styleRegister.col} ${styleRegister.right}`}>
                                 <label htmlFor="category" className={styleRegister.label}>카테고리</label>
@@ -359,7 +371,6 @@ function ProductRegister(){
                                 <label htmlFor="size" className={styleRegister.label}>사이즈</label>
                                 <select name="size" id="size" disabled={!category || !target} value={sizeCd} onChange={(e)=>setSizeCd(e.target.value)}>
                                     <option value="">선택하세요</option>
-                                    <option value="WS001">S</option>
                                     {/* {
                                         (!target || !category) && <option value="">스타일 넘버와 카테고리를 먼저 선택하세요</option>
                                     } */}
@@ -397,19 +408,12 @@ function ProductRegister(){
                                     <p className={styleRegister.errorMsg} style={{ visibility: errors.threshold ? "visible" : "hidden" }}>{errorMsg.threshold}</p>
                                 </div>
                             </div>
-                            <div className={`${styleRegister.col} ${styleRegister.right}`}>
-                                <label className={`${styleRegister.required} ${styleRegister.label}`}>초기 재고 수량</label>
-                                <div className={styleRegister.numberWrapper}>
-                                    <input type="number" name="frstStock" min="0" placeholder="초기 재고 수량을 입력하세요" value={frstStock} onChange={validateNumber}></input>
-                                    <p className={styleRegister.errorMsg} style={{ visibility: errors.init ? "visible" : "hidden" }}>{errorMsg.init}</p>
-                                </div>
-                            </div>
                         </div>
                     </fieldset>
                     <fieldset className={styleRegister.codeInfo}>
                         <div className={styleRegister.row}>
                             <div className={styleRegister.col}>
-                                <label className={`${styleRegister.required} ${styleRegister.label}`}>상품 QR 코드</label>
+                                <label className={`${styleRegister.required} ${styleRegister.label}`}>상품 코드</label>
                                 <input type="text" placeholder="생성 버튼을 누르세요" readOnly value={productCd}></input>
                                 <button type="button" onClick={handleProductCd}>생성</button>
                             </div>
