@@ -23,6 +23,12 @@
     background-color: var(--gray-e2);
 }
 
+.registerBtn:disabled {
+    background-color: #e0e0e0; /* 회색으로 변경 */
+    color: #999;              /* 글자색 흐리게 */
+    cursor: not-allowed;      /* 마우스 커서 금지 표시 */
+}
+
 .notice{
     align-self: flex-start;
     margin-top: -1rem;

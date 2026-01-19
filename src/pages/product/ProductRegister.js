@@ -4,9 +4,13 @@ import styleMainDashBoard from '../../css/MainDashboard.module.css';
 import ModalFrame from "./ModalFrame";
 import ProductSeason from "./ProductSeason";
 import ProductCode from "./ProductCode";
-import BoxCode from "./BoxCode";
+import serverUrl from "../../db/server.json";
 
 function ProductRegister(){
+
+    const SERVER_URL = serverUrl.SERVER_URL;
+    const URL = `${SERVER_URL}/ttik/product`;
+
 
     // 입력값
     const [brandCd, setBrandCd] = useState("");
@@ -16,13 +20,17 @@ function ProductRegister(){
     const [sizeCd, setSizeCd] = useState("");
     const [styleNo, setStyleNo] = useState("");
     const [target, setTarget] = useState("");
-
-    const [lmtQty, setLmtQty] = useState(""); //입수량
+    
+    const [inboxQty, setInboxQty] = useState(""); //입수량
     const [price, setPrice] = useState(""); //단가
     const [threshold, setThreshold] = useState(""); //임계치
-
+    // const [frstStock, setFrstStock] = useState(0); //초기 재고량
+    
     const [productCd, setProductCd] = useState("");
-    const [boxCd, setBoxCd] = useState("");
+    // const [boxCd, setBoxCd] = useState("");
+
+    const [searchWord, setSearchWord] = useState("");
+    const [inputValue, setInputValue] = useState(""); //임시 인풋값
 
 
     // 모달
@@ -43,9 +51,8 @@ function ProductRegister(){
     const [categoryList, setCategoryList] = useState([]);
     const [seasonList, setSeasonList] = useState([]);
     const [sizeMap, setSizeMap] = useState({});
-    const [sizeList, setSizeList] = useState([]);
+    // const [sizeList, setSizeList] = useState([]);
 
-    const jsonUrl = "http://localhost:3002";
     async function getData(url){
         try{
             const res = await fetch(url); 
@@ -56,22 +63,22 @@ function ProductRegister(){
             return data;
         } catch(error){
             console.log(error);
-            return [];
+            return null;
         }
     }
 
     //브랜드,카테고리,시즌 데이터 가져오기
     useEffect(() => {
         const fetchData = async() => {
-            const brandData = await getData(`${jsonUrl}/brands`);
-            const categoryData = await getData(`${jsonUrl}/category`);
-            const seasonData = await getData(`${jsonUrl}/season`);
-            const sizeData = await getData(`${jsonUrl}/size`);
+            const brandData = await getData(`${URL}/brands`);
+            const categoryData = await getData(`${URL}/category`);
+            const seasonData = await getData(`${URL}/season`);
+            // const sizeData = await getData(`${URL}/size`);
             setBrandList(brandData);
             setCategoryList(categoryData);
             setSeasonList(seasonData);
-            setSizeMap(sizeData);
-            console.log(seasonData);
+            // setSizeMap(sizeData);
+            console.log("여기" + seasonData);
         };
 
         fetchData();
@@ -79,14 +86,16 @@ function ProductRegister(){
 
     // 숫자 입력 유효성 검사 
     const [errors, setErrors] = useState({
-        stock: false,    // 박스 입수량
+        qty: false,    // 박스 입수량
         price: false,    // 단가
-        threshold: false // 임계치
+        threshold: false, // 임계치
+        // init: false    //초기재고량
     })
     const [errorMsg, setErrorMsg] = useState({
-        stock: "",
+        qty: "",
         price: "",
-        threshold: ""
+        threshold: "",
+        // init: ""
     });
 
     const validateNumber = (e) => {        
@@ -95,12 +104,14 @@ function ProductRegister(){
 
         if(!isInvalid){
             switch (name){
-                case "stock" : setLmtQty(value);
+                case "qty" : setInboxQty(value);
                     break;
                 case "price" : setPrice(value);
                     break;
                 case "threshold" : setThreshold(value);
                     break;
+                // case "frstStock" : setFrstStock(value);
+                //     break;
             }
         }
 
@@ -124,17 +135,82 @@ function ProductRegister(){
         // setSizeList(sizeMap[cat] || []);
     }
 
-    // QR 코드 생성 & 모달 오픈
-    // 상품 qr 코드
-    function generateProQRCd(){
+    //스타일 넘버 -> 품번
+    function handleStyleNo(e){
+        setSizeCd("");
 
-        const code = brandCd + seasonCd + "-" + category + sizeCd + "-" + styleNo;
+        //유효성 검사(W/M/U/K)
+        const value = e.target.value.toUpperCase();
 
-        setProductCd(code);
-        return code;
+        if(!value) return;
+
+        const startAlphas = ["W", "M", "U", "K"];
+        const isValid = startAlphas.some(alpha => value.startsWith(alpha));
+
+        if(value.length > 0 && isValid){
+            setStyleNo(value);
+
+            const target = value.substring(0, 1);
+            setTarget(target);
+        } else {
+            alert("입력 형식을 확인하세요.");
+            setInputValue("");
+        }
+    
     }
 
-    function handleProQRCd(){
+
+    //사이즈 옵션 받아오기
+    useEffect(()=>{
+
+        if(!target || !category) return;
+
+         const fetchData = async () => {
+            const sizeData = await getData(`${URL}/size?target=${target}&category=${category}`);
+            
+            if(sizeData){
+                setSizeMap(sizeData);
+            } else {
+                setSizeMap({});
+            }
+        }
+        fetchData();
+        
+    }, [target, category])
+
+
+    // 상품 코드 생성 & 모달 오픈
+    // 상품 코드
+    async function generateProductCd(){
+        try{
+            const res = await fetch(`${SERVER_URL}/ttik/productCode`, {
+                method: 'POST',
+                headers: {'Content-type': 'application/json'},
+                body: JSON.stringify({
+                    "styleNo": styleNo,
+                    "brandCd": brandCd,
+                    "sizeCd": sizeCd, 
+                    "catCd": category,
+                    "seasonCd": seasonCd,
+                })
+            })
+            if(res.ok){
+                const code = await res.text();
+                console.log("상품코드 생성 완료", code);
+                setProductCd(code);
+                return code;
+            }
+        } catch(error){
+            alert("생성 실패. 입력한 정보를 확인하세요.")
+        }
+
+        // const code = brandCd + seasonCd + "-" + category + sizeCd + "-" + styleNo;
+
+        // setProductCd(code);
+        // return code;
+    }
+
+    async function handleProductCd(){
 
         if(!brandCd || !seasonCd || !category || !sizeCd) {
             console.log(brandCd, seasonCd, category, sizeCd);
@@ -142,53 +218,20 @@ function ProductRegister(){
             return;
         }
 
-        // 상자 QR 코드 생성
-        const newQRCode = generateProQRCd();
-
-        console.log("qr1 -> ", newQRCode);
-
-        // 모달 오픈
-        openModal("QR코드 생성", <ProductCode onClose={closeModal} qrCd={newQRCode} setQrCd={setProductCd}/>)
-    }
-
-    //상자 qr코드
-    function generateBoxQRCd(){
-
-        const code = productCd + "-B" + lmtQty;
-
-        setBoxCd(code);
-        return code;
-    }
-
-    function handleBoxQRCd(){
-
-        if(!productCd || !styleNo || !lmtQty) {
-            alert("입수량, 상품 QR 코드를 먼저 입력해야 합니다.");
-            return;
-        }
-
-        // 상자 QR 코드 생성
-        const newQRCode = generateBoxQRCd();
-
-        console.log("qr1 -> ", newQRCode);
+        // 상품 코드 생성
+        const newProductCd = await generateProductCd();
+        console.log("qr1 -> ", newProductCd);
 
         // 모달 오픈
-        openModal("QR코드 생성", <BoxCode onClose={closeModal} qrCd={newQRCode}/>)
+        openModal("QR코드 생성", <ProductCode onClose={closeModal} productCd={newProductCd} setProductCd={setProductCd}/>)
     }
 
-    // 인풋 값 변경 시 qr코드 초기화
+    // 인풋 값 변경 시 상품 코드 초기화
     useEffect(()=>{
         // if(!productCd || !boxCd) return;
 
         setProductCd("");
-
-        console.log("qrcode2 -> ", productCd);
     }, [brandCd, seasonCd, category, sizeCd, styleNo])
-
-    useEffect(()=>{
-        setBoxCd("");
-
-    }, [lmtQty])
 
 
     // 상품 등록 처리 
@@ -196,8 +239,8 @@ function ProductRegister(){
 
         e.preventDefault();
 
-        if(!productCd || !boxCd){
-            alert("상품QR코드와 상자QR코드 모두 생성해야 등록이 가능합니다.");
+        if(!productCd){
+            alert("상품QR코드를 생성해야 등록이 가능합니다.");
             return;
         }
         
@@ -205,25 +248,23 @@ function ProductRegister(){
         if(hasError) alert("입력값을 확인하세요.");
 
         try{
-            const res = await fetch(`${jsonUrl}/productMaster`, {
+            const res = await fetch(`${URL}/register`, {
                 method: 'POST',
                 headers: {'Content-type': 'application/json'},
                 body: JSON.stringify({
                     "productCd": productCd,
-                    "boxCd" : boxCd,
-                    "brandCd": brandCd,
+                    "styleNo": styleNo,
+                    "productNm": productNm,
+                    "brandSn": Number(brandCd),
                     "sizeCd": sizeCd,
                     "catCd": category,
-                    "seasonCd": seasonCd,
-                    "productNm": productNm,
-                    "lmtQty": Number(lmtQty), 
-                    "price": Number(price),
-                    "threshold": Number(threshold),
-                    // "stkCount": "",
-                    // "storage": "" 
+                    "seasonCd": seasonCd ,
+                    "inboxQty": Number(inboxQty),  //입수량
+                    "price": Number(price), //단가
+                    "threshold": Number(threshold), //임계치
+                    // "frstStock": Number(frstStock) //초기재고량
                 })
             })
-
             if(res.ok){
                 alert("등록이 완료되었습니다.");
                 setBrandCd("");
@@ -231,23 +272,19 @@ function ProductRegister(){
                 setCategory("");
                 setSeasonCd("");
                 setSizeCd("");
-                setLmtQty("");
+                setInboxQty("");
                 setPrice("");
                 setThreshold("");
                 setProductCd("");
-                setBoxCd("");
+                setStyleNo("");
+                // setBoxCd("");
+
+                const data = await res.json();
+                console.log(data);
             }
         } catch(error){
             alert("등록 실패 입력한 정보를 확인하세요.")
         }
-    }
-
-    function handleStyleNo(e){
-        const value = e.target.value;
-        setStyleNo(value);
-        
-        const target = value.substring(0, 1);
-        setTarget(target);
     }
 
     return (
@@ -257,6 +294,11 @@ function ProductRegister(){
                 <p>상품을 등록하세요. </p>
             </div>
             <div className={`${styleRegister.content} contentBox`}>
+                <form className={styleRegister.searchArea}>
+                    {/* <label className={styleRegister.searchLabel}>상품 검색</label> */}
+                    <input className={styleRegister.searchInput} type="text" placeholder="등록된 상품을 검색하세요" value={searchWord} onChange={(e)=>setSearchWord(e.target.value)}></input>
+                    <button className={styleRegister.searchBtn} type="submit">검색</button>
+                </form>
                 <form onSubmit={handleSubmit} className={styleRegister.registerForm}>
                     <fieldset className={`${styleRegister.productInfo}`}>
                         <div className={styleRegister.row}>
@@ -266,19 +308,22 @@ function ProductRegister(){
                                     <option value="">선택하세요</option>
                                     {
                                         brandList.map((record) => (
-                                            <option key={record.code} value={record.code}>{record.name}</option>
+                                            <option key={record.brandSn} value={record.brandSn}>{record.brandNm}</option>
                                         ))
                                     }
                                 </select>
+                                <button type="button">검색</button>
                             </div>
                             <div className={`${styleRegister.col} ${styleRegister.right}`}>
-                                <label htmlFor="style" className={styleRegister.label}>스타일 넘버</label>
+                                <label htmlFor="style" className={styleRegister.label}>품번</label>
                                 <input id="style" 
                                         type="text" 
                                         required 
                                         placeholder="ex) M001"
-                                        value={styleNo}
-                                        onChange={handleStyleNo}
+                                        value={inputValue}
+                                        onChange={(e)=>setInputValue(e.target.value)}
+                                        onBlur={handleStyleNo}
+                                        style={{textTransform: 'uppercase'}}
                                 >
                                 </input>
                                 <p className={styleRegister.guide}>첫 글자 남성: M, 여성: W, 공용: U, 키즈: K</p>
@@ -295,7 +340,7 @@ function ProductRegister(){
                                         ))
                                     }
                                 </select>
-                                <button type="button" onClick={()=>{openModal("시즌 등록", <ProductSeason onClose={closeModal}/>)}}>등록</button>
+                                <button type="button" onClick={()=>{openModal("시즌 등록", <ProductSeason onClose={closeModal} setSeasonList={setSeasonList}/>)}}>등록</button>
                             </div>
                             <div className={`${styleRegister.col} ${styleRegister.right}`}>
                                 <label htmlFor="category" className={styleRegister.label}>카테고리</label>
@@ -343,14 +388,14 @@ function ProductRegister(){
                             <div className={styleRegister.col}>
                                 <label className={`${styleRegister.required} ${styleRegister.label}`}>박스 입수량<span className={styleRegister.unit}>(EA/BOX)</span> </label>
                                 <div className={styleRegister.numberWrapper}>
-                                    <input type="number" name="stock" min="0" required placeholder="EA 수량 입력" value={lmtQty} onChange={validateNumber}></input>
-                                    <p className={styleRegister.errorMsg} style={{ visibility: errors.stock ? "visible" : "hidden" }}>{errorMsg.stock}</p>
+                                    <input type="number" name="qty" min="0" required placeholder="EA 수량 입력" value={inboxQty} onChange={validateNumber}></input>
+                                    <p className={styleRegister.errorMsg} style={{ visibility: errors.qty ? "visible" : "hidden" }}>{errorMsg.qty}</p>
                                 </div>
                             </div>
                             <div className={`${styleRegister.col} ${styleRegister.right}`}>
                                 <label className={styleRegister.label}>단가 (원)</label>
                                 <div className={styleRegister.numberWrapper}>
-                                    <input type="number" name="price" placeholder="개별 단가를 입력해주세요" value={price} onChange={validateNumber}></input>
+                                    <input type="number" name="price" min="0" placeholder="개별 단가를 입력해주세요" value={price} onChange={validateNumber}></input>
                                     <p className={styleRegister.errorMsg} style={{ visibility: errors.price ? "visible" : "hidden" }}>{errorMsg.price}</p>
                                 </div>
                             </div>
@@ -359,7 +404,7 @@ function ProductRegister(){
                             <div className={styleRegister.col}>
                                 <label className={styleRegister.label}>임계치</label>
                                 <div className={styleRegister.numberWrapper}>
-                                    <input type="number" name="threshold" placeholder="알림을 받을 최소 재고 수량 입력" value={threshold} onChange={validateNumber}></input>
+                                    <input type="number" name="threshold" min="0" placeholder="알림을 받을 최소 재고 수량 입력" value={threshold} onChange={validateNumber}></input>
                                     <p className={styleRegister.errorMsg} style={{ visibility: errors.threshold ? "visible" : "hidden" }}>{errorMsg.threshold}</p>
                                 </div>
                             </div>
@@ -368,16 +413,9 @@ function ProductRegister(){
                     <fieldset className={styleRegister.codeInfo}>
                         <div className={styleRegister.row}>
                             <div className={styleRegister.col}>
-                                <label className={`${styleRegister.required} ${styleRegister.label}`}>상품 QR 코드</label>
+                                <label className={`${styleRegister.required} ${styleRegister.label}`}>상품 코드</label>
                                 <input type="text" placeholder="생성 버튼을 누르세요" readOnly value={productCd}></input>
-                                <button type="button" onClick={handleProQRCd}>생성</button>
-                            </div>
-                        </div>
-                        <div className={styleRegister.row}>
-                            <div className={styleRegister.col}>
-                                <label className={`${styleRegister.required} ${styleRegister.label}`}>상자 QR코드</label>
-                                <input type="text" placeholder="생성 버튼을 누르세요" readOnly value={boxCd}></input>
-                                <button type="button" onClick={handleBoxQRCd}>생성</button>
+                                <button type="button" onClick={handleProductCd}>생성</button>
                             </div>
                         </div>
                     </fieldset>
