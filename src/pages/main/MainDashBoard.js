@@ -1,41 +1,65 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import styleMainDashBoard from '../../css/MainDashboard.module.css';
 import StatCard from '../../components/StatCard';
+import serverUrl from "../../db/server.json";
 
 const MainDashboard = () => {
-  // 업데이트 시간을 확인하기 위한 상태 (데이터 연동 시 여기에 실제 데이터를 저장)
+  // DB 통계 상태 관리
+  const [stats, setStats] = useState({
+    totalProducts: 0,
+    inStockProducts: 0,
+    lowStockProducts: 0
+  });
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const SERVER_URL = serverUrl.SERVER_URL;
+
+  // API 호출 함수
+  const fetchStats = async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/ttik/dashboard/stats`);
+      setStats(response.data);
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error("데이터 동기화 실패:", error);
+    }
+  };
 
   useEffect(() => {
-    // 10초마다 실행될 함수
-    const refreshData = () => {
-      console.log("10초 경과: 데이터를 실시간으로 동기화합니다.");
-      setLastUpdated(new Date());
-      
-      // 실제 API 연동 시 여기에 호출 로직 작성
-      // axios.get('/api/inventory').then(res => setData(res.data));
-    };
+    fetchStats(); // 초기 로드
 
-    // 인터벌 설정 (10초)
-    const intervalId = setInterval(refreshData, 10000);
-
-    // 컴포넌트 언마운트 시 인터벌 제거 (메모리 누수 방지)
-    return () => clearInterval(intervalId);
+    const intervalId = setInterval(fetchStats, 10000); // 10초마다 갱신
+    return () => clearInterval(intervalId); 
   }, []);
 
   return (
     <div className={styleMainDashBoard.modernDashboard}>
       <div className={styleMainDashBoard.welcomeSection}>
         <h1>Overview</h1>
-        <p>실시간 재고 현황을 확인하세요. </p>
+        <p>실시간 재고 현황을 확인하세요.</p>
         <p>(최근 업데이트: {lastUpdated.toLocaleTimeString()})</p>
       </div>
 
-      {/* 상단 통계 그리드 */}
-      <div className={styleMainDashBoard.statsGrid}>
-        <StatCard title="전체 등록 상품" value="1,240" unit="건" trend={12} />
-        <StatCard title="현재 재고 보유" value="1,120" unit="건" trend={-2} />
-        <StatCard title="재고 부족 품목" value="12" unit="건" trend={5} isWarning={true} />
+     <div className={styleMainDashBoard.statsGrid}>
+        <StatCard 
+          title="전체 등록 상품" 
+          value={stats.totalProducts} 
+          unit="건"
+          trend={stats.totalTrend} 
+        />
+        <StatCard 
+          title="현재 재고 보유" 
+          value={stats.inStockProducts} 
+          unit="건"
+          trend={stats.inStockTrend} 
+        />
+        <StatCard 
+          title="재고 부족 품목" 
+          value={stats.lowStockProducts} 
+          unit="건" 
+          trend={stats.lowStockTrend} 
+          isWarning={true} 
+        />
       </div>
 
       {/* 하단 상세 데이터 섹션 */}
