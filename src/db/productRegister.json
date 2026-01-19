@@ -2,50 +2,60 @@
   "brands": [
     {
       "name": "나이키",
-      "code": "01"
+      "code": "01",
+      "id": "5fe4"
     },
     {
       "name": "아디다스",
-      "code": "02"
+      "code": "02",
+      "id": "86c0"
     },
     {
       "name": "아식스",
-      "code": "03"
+      "code": "03",
+      "id": "9908"
     }
   ],
   "category": [
     {
       "catNm": "상의",
-      "catCd": "TP"
+      "catCd": "TP",
+      "id": "9b33"
     },
     {
       "catNm": "하의",
-      "catCd": "BT"
+      "catCd": "BT",
+      "id": "69ff"
     },
     {
       "catNm": "악세서리",
-      "catCd": "AC"
+      "catCd": "AC",
+      "id": "ac0b"
     },
     {
       "catNm": "신발",
-      "catCd": "SH"
+      "catCd": "SH",
+      "id": "e849"
     }
   ],
   "season": [
     {
       "seasonSn": 202501,
       "seasonCd": "25S",
-      "seasonNm": "2025 S/S"
+      "seasonNm": "2025 S/S",
+      "id": "954b"
     },
     {
       "seasonSn": 202502,
       "seasonCd": "25F",
-      "seasonNm": "2025 F/W"
+      "seasonNm": "2025 F/W",
+      "id": "b229"
     },
     {
       "seasonSn": 202401,
       "seasonCd": "24S",
-      "seasonNm": "2024 S/S"
+      "seasonNm": "2024 S/S",
+      "id": "fe32"
     },
     {
       "id": "2f0e",
@@ -347,6 +357,33 @@
       "lmtQty": 40,
       "price": 50000,
       "threshold": 30
+    },
+    {
+      "id": "65e5",
+      "productCd": "0125F-BTWXL02-W001",
+      "brandCd": "01",
+      "sizeCd": "WXL02",
+      "catCd": "BT",
+      "seasonCd": "25F",
+      "productNm": "스몰 로고 트랙팬츠",
+      "lmtQty": 50,
+      "price": 55000,
+      "threshold": 50,
+      "initStock": 0
+    },
+    {
+      "id": "bc77",
+      "productCd": "0327S-TPWFR01-W001",
+      "styleNo": "W001",
+      "productNm": "스몰 로고 트랙팬츠",
+      "brandCd": "03",
+      "sizeCd": "WFR01",
+      "catCd": "TP",
+      "seasonCd": "27S",
+      "inboxQty": 50,
+      "price": 42000,
+      "threshold": 50,
+      "initStock": 5
     }
   ]
 }

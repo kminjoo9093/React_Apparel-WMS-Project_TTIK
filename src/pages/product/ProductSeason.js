@@ -1,8 +1,11 @@
 import { useRef, useState } from "react";
 import styleProdModal from "../../css/ProductModal.module.css";
 import styleRegister from "../../css/ProductRegister.module.css";
+import serverUrl from "../../db/server.json";
 
-function ProductSeason({onClose}){
+function ProductSeason({onClose, setSeasonList}){
+
+    const SERVER_URL = serverUrl.SERVER_URL;
 
     const yearRef = useRef();
     const seasonRef = useRef();
@@ -19,31 +22,27 @@ function ProductSeason({onClose}){
             return;
         }
 
-        
         try{
-            const res = await fetch('http://localhost:3002/season', {
+            const res = await fetch(`${SERVER_URL}/ttik/product/seasonRegister`, {
                 method: "POST",
                 headers: {'Content-type': 'application/json'},
                 body: JSON.stringify({
                     "year": year,
                     "season": season,
-
-                    //test코드. 나중에 백엔드에서 파싱할 것
-                    "seasonSn": Number(year + (season === "S" ? "01" : "02")),
-                    "seasonCd": year.slice(-2) + season,
-                    "seasonNm": year + " " + (season === "S" ? "S/S" : "F/W")
                 })
             });
 
             if(res.ok){
                 console.log(year, season);
-                const temp = season === "S" ? "S/S" : "FW";
-                alert(` ${year} ${temp} 시즌이 정상 등록되었습니다.`);
+                const updatedList = await res.json();
+                setSeasonList(updatedList);
+                const newSeason = season === "S" ? "S/S" : "FW";
+                alert(`${year} ${newSeason} 시즌이 정상 등록되었습니다.`);
 
                 //모달창 닫기
                 onClose();
             } else {
-                //이미 있는 시즌인 경우 처리 -> db 무결성 유니크 활용할 것
+                //이미 있는 시즌인 경우 처리
                 alert("이미 등록된 시즌이거나 등록할 수 없는 정보입니다.");
             }
         } catch(error){
