@@ -4,6 +4,7 @@ import styleMainDashBoard from '../../css/MainDashboard.module.css';
 import ModalFrame from "./ModalFrame";
 import ProductSeason from "./ProductSeason";
 import ProductCode from "./ProductCode";
+import ModalBrandSearch from "./ModalBrandSearch";
 import serverUrl from "../../db/server.json";
 
 function ProductRegister(){
@@ -52,6 +53,7 @@ function ProductRegister(){
     const [seasonList, setSeasonList] = useState([]);
     const [sizeMap, setSizeMap] = useState({});
     // const [sizeList, setSizeList] = useState([]);
+    // const [brandNm, setBrandNm] = useState("");
 
     async function getData(url){
         try{
@@ -294,11 +296,6 @@ function ProductRegister(){
                 <p>상품을 등록하세요. </p>
             </div>
             <div className={`${styleRegister.content} contentBox`}>
-                <form className={styleRegister.searchArea}>
-                    {/* <label className={styleRegister.searchLabel}>상품 검색</label> */}
-                    <input className={styleRegister.searchInput} type="text" placeholder="등록된 상품을 검색하세요" value={searchWord} onChange={(e)=>setSearchWord(e.target.value)}></input>
-                    <button className={styleRegister.searchBtn} type="submit">검색</button>
-                </form>
                 <form onSubmit={handleSubmit} className={styleRegister.registerForm}>
                     <fieldset className={`${styleRegister.productInfo}`}>
                         <div className={styleRegister.row}>
@@ -312,7 +309,7 @@ function ProductRegister(){
                                         ))
                                     }
                                 </select>
-                                <button type="button">검색</button>
+                                <button type="button" onClick={()=>{openModal("브랜드 검색", <ModalBrandSearch onClose={closeModal} setBrandCd={setBrandCd}/>)}}>검색</button>
                             </div>
                             <div className={`${styleRegister.col} ${styleRegister.right}`}>
                                 <label htmlFor="style" className={styleRegister.label}>품번</label>
