@@ -1,10 +1,12 @@
 
 /* 공통 form buttons */
 .registerBtn, .searchBtn{
-    width: 8rem;
+    /* width: 8rem; */
+    padding-inline: 2rem;
     height: 4.5rem;
     border-radius: 1rem;
     margin-inline: 1rem;
+    text-wrap: nowrap;
     font-size: 1.8rem;
     font-weight: 600;
     /* color: var(--secondary-color); */
@@ -14,33 +16,13 @@
 }
 
 .registerBtn{
-    width: 8rem;
-    height: 4.5rem;
+    /* width: 8rem; */
+    /* height: 4.5rem; */
 }
 
 .registerBtn:hover, .searchBtn:hover{
     background: #2563eb;
     box-shadow: 0 2rem 4rem rgba(37, 99, 235, 0.3);
-}
-
-/* 검색 */
-.searchArea{
-    padding: 2rem 4rem;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-.searchLabel{
-    font-size: 1.8rem;
-    text-wrap: nowrap;
-}
-.searchArea .searchInput{
-    padding-inline: 1.5rem;
-    width: 35%;
-    height: 5rem;
-    min-width: 10rem;
-    opacity: 0.8;
 }
 
 /* 등록 폼 */
