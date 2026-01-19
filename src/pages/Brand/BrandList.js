@@ -25,7 +25,7 @@ function BrandList() {
         setLoading(true);
         try {
 
-            const response = await fetch('http://localhost:3001/ttik/brand/list'); 
+            const response = await fetch('https://localhost:3001/ttik/brand/list'); 
             
             const contentType = response.headers.get("content-type");
             
@@ -60,7 +60,7 @@ function BrandList() {
 
         if (window.confirm(`선택한 ${selectedIds.length}개의 브랜드를 삭제하시겠습니까?`)) {
             try {
-                const response = await fetch('http://localhost:3001/ttik/brand/delete', {
+                const response = await fetch('https://localhost:3001/ttik/brand/delete', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

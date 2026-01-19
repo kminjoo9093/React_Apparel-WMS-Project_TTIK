@@ -58,7 +58,7 @@
     padding: 3rem;
     border-radius: 1.5rem;
     width: 50rem;
-    height: 44rem;
+    height: 52rem;
     max-width: 90%;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     position: absolute;
@@ -109,5 +109,16 @@
 
 .inputBox {
     margin-top: 0.5rem;
-    padding: 0 1rem;
+    width: 100%;
+}
+
+.inputBoxL {
+    margin-top: 0.5rem;
+    width: 100%;
+    margin-left: 2rem;
+}
+
+.doubleBox {
+    display: flex;
+    margin-bottom: 1rem;
 }
