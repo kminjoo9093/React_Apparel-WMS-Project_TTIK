@@ -4,6 +4,7 @@ import styleList from "../../css/ProductList.module.css";
 import styleRegister from "../../css/ProductRegister.module.css";
 import serverUrl from "../../db/server.json";
 import Pagination from '../Pagination';
+import { Link } from 'lucide-react';
 
 function ProductList(){
 
@@ -15,9 +16,6 @@ function ProductList(){
     const [categoryList, setCategoryList] = useState([]);
     const [seasonList, setSeasonList] = useState([]);
 
-    // const [brandCd, setBrandCd] = useState("");
-    // const [categoryCd, setCategoryCd] = useState("");
-    // const [seasonCd, setSeasonCd] = useState("");
     const [searchFilters, setSearchFilters] = useState({
         brandCd: "",
         categoryCd: "",
@@ -34,7 +32,6 @@ function ProductList(){
     const indexOfFirst = indexOfLast - postsPerPage;
     const currentProducts = filteredProductList.slice(indexOfFirst, indexOfLast);
 
-    console.log("컴포넌트 렌더링됨!");
 
     //데이터 요청
     async function getData(url){
@@ -57,12 +54,9 @@ function ProductList(){
             const brandData = await getData(`${URL}/brands`);
             const categoryData = await getData(`${URL}/category`);
             const seasonData = await getData(`${URL}/season`);
-            // const sizeData = await getData(`${URL}/size`);
             setBrandList(brandData);
             setCategoryList(categoryData);
             setSeasonList(seasonData);
-            // setSizeMap(sizeData);
-            console.log("여기", brandData);
         };
 
         fetchData();
@@ -71,9 +65,9 @@ function ProductList(){
     //재고 상태 판단
     function handleStkStatus(stkQty, threshold){
         if(stkQty <= threshold) {
-            return false;
+            return false; //부족
         }else{
-            return true;
+            return true; //정상
         }
     }
 
@@ -93,8 +87,18 @@ function ProductList(){
                 return [];
             }
         }
+
+        // 즉시 한 번 실행
         getProductList();
-    }, [])
+
+        // 1분마다 반복 실행
+        const timer = setInterval(getProductList, 60000);
+
+        // 컴포넌트가 사라질 때 타이머 해제
+        return () => clearInterval(timer);
+
+    }, [SERVER_URL])
+
 
     //필터 & 검색
     useEffect(()=>{
@@ -110,20 +114,17 @@ function ProductList(){
                     const isMatchCategory = product.catCd === searchFilters.categoryCd || searchFilters.categoryCd === "";
                     const isMatchSeason = product.seasonCd === searchFilters.seasonCd || searchFilters.seasonCd === "";
 
-                    const status = handleStkStatus(product.stkQty, product.threshold) ? "부족" : "정상";
+                    const status = handleStkStatus(product.stkQty, product.threshold) ? "정상" : "부족";
                     const isMatchStkStatus = status === searchFilters.stkStatus || searchFilters.stkStatus === "";
 
                     const isMatchKeyword = searchFilters.keyword === ""
                                             || product.productCd.toLowerCase().includes(searchFilters.keyword)
                                             || product.productNm.toLowerCase().includes(searchFilters.keyword);
 
-                    console.log("확인2-->", isMatchBrand, isMatchCategory, isMatchSeason, isMatchKeyword);
                     return isMatchBrand && isMatchCategory && isMatchSeason && isMatchStkStatus && isMatchKeyword;
                 });
                 setFilteredProductList(filteredList);
     }, [searchFilters, productList])
-
-    console.log("확인3-->", filteredProductList);
 
     const handleFilterChange = (e) => {
         const {name, value} = e.target;
@@ -136,7 +137,19 @@ function ProductList(){
         setCurrentPage(1);
     }
 
-    console.log("확인1 -->", searchFilters);
+
+    //필터링 초기화
+    const handleReset = (e) => {
+        e.preventDefault();
+
+        setSearchFilters({
+            brandCd: "",
+            categoryCd: "",
+            seasonCd: "",
+            stkStatus: "",
+            keyword: ""
+        })
+    }
 
     return(
         <div>
@@ -149,92 +162,108 @@ function ProductList(){
             </div>
             <div className={styleList.productListBox}>
                 <div className={styleList.listTopWrap}>
-                    <div className={styleList.filterArea}>
-                        <select name="brandCd" id="brand" value={searchFilters.brandCd} onChange={handleFilterChange}>
-                            <option value="">브랜드</option>
-                            {
-                                brandList.map((record) => (
-                                    <option key={record.brandSn} value={record.brandSn}>{record.brandNm}</option>
-                                ))
-                            }
-                        </select>
-                        <select name="categoryCd" value={searchFilters.categoryCd} onChange={handleFilterChange}>
-                            <option value="">카테고리</option>
-                            {
-                                categoryList.map((record) => (
-                                    <option key={record.catCd} value={record.catCd}>{record.catNm}</option>
-                                ))
-                            }
-                        </select>
-                        <select name="seasonCd" value={searchFilters.seasonCd} onChange={handleFilterChange}>
-                            <option value="">시즌</option>
-                            {
-                                seasonList.map((record, index) => (
-                                    <option key={index} value={record.seasonCd}>{record.seasonNm}</option>
-                                ))
-                            }
-                        </select>
-                        <select name="stkStatus" value={searchFilters.stkStatus} onChange={handleFilterChange}>
-                            <option value="">재고상태</option>
-                            <option value="정상">정상</option>
-                            <option value="부족">부족</option>
-                        </select>
-                        <button className={styleList.btnRefresh}></button>
+                    <div className={styleList.searchArea}>
+                        <label htmlFor='searchProduct' className={styleList.searchLabel}>상품 검색</label>
+                        <input className={styleList.searchInput} 
+                                id='searchProduct'
+                                name='keyword'
+                                value={searchFilters.keyword} 
+                                onChange={handleFilterChange}
+                                type="text" placeholder="상품명 또는 코드 검색"
+                        ></input>
+                        {/* <button className={styleList.searchBtn} type="submit">검색</button> */}
                     </div>
-                    {/* <div className={styleList.actionArea}> */}
-                        <div className={styleList.searchArea}>
-                            <label htmlFor='searchProduct'>상품 검색</label>
-                            <input className={styleList.searchInput} 
-                                    id='searchProduct'
-                                    name='keyword'
-                                    value={searchFilters.keyword} 
-                                    onChange={handleFilterChange}
-                                    type="text" placeholder="등록된 상품을 검색하세요"
-                            ></input>
-                            {/* <button className={styleList.searchBtn} type="submit">검색</button> */}
+                </div>
+                <div className={styleList.contentWrap}>
+                    <div className={styleList.filterArea}>
+                        <div className={styleList.filterCard}>
+                            <div className={styleList.filterHeading}>
+                                <h3>검색 필터 설정</h3>
+                            </div>
+                            <div className={styleList.filterContents}>
+                                <select name="brandCd" id="brand" value={searchFilters.brandCd} onChange={handleFilterChange}>
+                                    <option value="">브랜드</option>
+                                    {
+                                        brandList.map((record) => (
+                                            <option key={record.brandSn} value={record.brandSn}>{record.brandNm}</option>
+                                        ))
+                                    }
+                                </select>
+                                <select name="categoryCd" value={searchFilters.categoryCd} onChange={handleFilterChange}>
+                                    <option value="">카테고리</option>
+                                    {
+                                        categoryList.map((record) => (
+                                            <option key={record.catCd} value={record.catCd}>{record.catNm}</option>
+                                        ))
+                                    }
+                                </select>
+                                <select name="seasonCd" value={searchFilters.seasonCd} onChange={handleFilterChange}>
+                                    <option value="">시즌</option>
+                                    {
+                                        seasonList.map((record, index) => (
+                                            <option key={index} value={record.seasonCd}>{record.seasonNm}</option>
+                                        ))
+                                    }
+                                </select>
+                                <select name="stkStatus" value={searchFilters.stkStatus} onChange={handleFilterChange}>
+                                    <option value="">재고상태</option>
+                                    <option value="정상">정상</option>
+                                    <option value="부족">부족</option>
+                                </select>
+                                <button className={styleList.btnReset} onClick={handleReset}></button>
+                            </div>
                         </div>
-                    {/* </div> */}
+
+                    </div>
+                    <div className={styleList.listArea}>
+                        <div className={styleList.totalCount}>[ 총 {productList.length}개 상품 ]</div>
+                        <ul className={styleList.productList}>
+                                {
+                                    currentProducts.map((product, index) => (
+                                        <li className={`${styleList.productItem} ${handleStkStatus(product.stkQty, product.threshold) ? "" : styleList.warning}`} key={product.productCd}>
+                                            <a href="#" 
+                                            className={`${styleList.itemCard} `
+                                            }>
+                                                <div className={styleList.itemNo}>{index + postsPerPage + 1}</div>
+                                                <div className={styleList.itemInfoL}>
+                                                    <div className={styleList.brand}>{product.brandNm}</div>
+                                                    <div>
+                                                        <div className={styleList.proCd}>
+                                                            <span className={styleList.infoLabel} style={{display: 'block', marginBottom: "0.5rem"}}>상품코드</span>
+                                                            {product.productCd}
+                                                        </div>
+                                                        <div className={styleList.proNm}>
+                                                            <span className={styleList.infoLabel} style={{display: 'block'}}>상품명</span>{product.productNm}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className={styleList.itemInfoR}>
+                                                    <div className={styleList.stkQty}><span className={styleList.infoLabel}>현재 재고 수량</span>{product.stkQty}</div>
+                                                    <div className={`${styleList.stkStatus}`}>
+                                                        <span className={styleList.infoLabel}>재고 상태</span>
+                                                        {handleStkStatus(product.stkQty, product.threshold) ? "정상" : "부족"}
+                                                    </div>
+                                                    <div className={styleList.date}>
+                                                        <span className={styleList.infoLabel}>등록일</span>
+                                                        {product.frstRegDt.split('T')[0]}
+                                                    </div>
+                                                </div>
+                                                
+                                            </a>
+                                        </li>
+                                    ))
+                                }
+                        </ul>
+                    </div>
                 </div>
-                <div className={styleList.listArea}>
-                    <table className={styleList.listTable}>
-                        <thead className={styleList.listHead}>
-                            <tr>
-                                <th>NO</th>
-                                <th>브랜드</th>
-                                <th>상품코드</th>
-                                <th>상품명</th>
-                                <th>현재 재고 수량</th>
-                                <th>재고상태</th>
-                                <th>등록일</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                currentProducts.map((product, index) => (
-                                    <tr className={`${styleList.listRow} 
-                                                    ${handleStkStatus(product.stkQty, product.threshold) ? styleList.warning : ""}`
-                                    }>
-                                        <td>{index + 1}</td>
-                                        <td>{product.brandNm}</td>
-                                        <td>{product.productCd}</td>
-                                        <td>{product.productNm}</td>
-                                        <td>{product.stkQty}</td>
-                                        <td className={styleList.stkStatus}>
-                                            {handleStkStatus(product.stkQty, product.threshold) ? "부족" : "정상"}
-                                        </td>
-                                        <td>{product.frstRegDt.split('T')[0]}</td>
-                                    </tr>
-                                ))
-                            }
-                        </tbody>
-                    </table>
-                </div>
+
 
                 <Pagination 
                     targetList={filteredProductList} 
                     postsPerPage={postsPerPage}
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
+                    blockSize={5}
                 />
             </div>
         </div>
