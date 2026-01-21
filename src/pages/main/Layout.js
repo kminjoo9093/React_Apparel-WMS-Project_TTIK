@@ -54,7 +54,7 @@ const Layout = ({ children, user }) => {
     { path: '/productList', name: '상품 관리', icon: '📦' },
     { path: '/stock/plans', name: '입출고 관리', icon: '🔄' },
     { path: '/register', name: '등록하기', icon: '➕' },
-    { path: '/history', name: '이력 조회', icon: '📜' },
+    { path: '/stock/history', name: '이력 조회', icon: '📜' },
     { path: '/brand', name: '브랜드', icon: '🏷️' },
     { path: '/register-admin', name: '관리자 등록', icon: '👤' }
   ];
