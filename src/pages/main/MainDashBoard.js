@@ -5,19 +5,23 @@ import StatCard from '../../components/StatCard';
 import serverUrl from "../../db/server.json";
 
 const MainDashboard = () => {
-  // DB 통계 상태 관리
+  // 1. 초기 상태값에 trend 필드 추가 (DTO 구조와 일치)
   const [stats, setStats] = useState({
     totalProducts: 0,
+    totalTrend: 0,
     inStockProducts: 0,
-    lowStockProducts: 0
+    inStockTrend: 0,
+    lowStockProducts: 0,
+    lowStockTrend: 0
   });
+
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const SERVER_URL = serverUrl.SERVER_URL;
 
-  // API 호출 함수
   const fetchStats = async () => {
     try {
       const response = await axios.get(`${SERVER_URL}/ttik/dashboard/stats`);
+      // 백엔드에서 GDS_ENABLED='Y' 조건이 적용된 데이터를 받아옴
       setStats(response.data);
       setLastUpdated(new Date());
     } catch (error) {

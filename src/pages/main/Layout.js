@@ -113,7 +113,7 @@ const Layout = ({ children, user }) => {
           <div className={styleLayout.topBarLeft} style={{ display: 'flex', alignItems: 'center' }}>
             <button className={styleLayout.menuToggle} onClick={() => setIsSidebarOpen(true)}>☰</button>
             <h2 className={styleLayout.sageTitle}>
-              {menus.find(m => m.path === location.pathname)?.name || "QR코드 PDF저장 페이지" }
+              {menus.find(m => m.path === location.pathname)?.name || "시스템" }
             </h2>
           </div>
 
