@@ -178,3 +178,51 @@
     display: flex;
     margin-bottom: 1rem;
 }
+/* --- 모바일 반응형만 추가 --- */
+@media screen and (max-width: 768px) {
+    .plansListbox {
+        padding: 1rem;
+    }
+    
+    .buttonGroup {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .plansBtn {
+        margin-left: 0;
+        flex: 1 1 45%; /* 버튼을 2열로 배치 */
+        padding: 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    /* 테이블 가로 스크롤 허용 */
+    .tableContainer {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .plansTable {
+        min-width: 600px; /* 테이블이 너무 뭉개지지 않게 최소 너비 설정 */
+    }
+
+    /* 모달 반응형 */
+    .modalContent {
+        width: 95% !important;
+        height: auto !important;
+        max-height: 90vh;
+        overflow-y: auto;
+        left: 50% !important; /* 모바일은 중앙 정렬 */
+        padding: 1.5rem !important;
+    }
+
+    .doubleBox {
+        flex-direction: column;
+    }
+
+    .inputBoxL {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+}
