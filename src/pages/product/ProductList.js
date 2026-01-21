@@ -1,34 +1,39 @@
+
 import { useEffect, useState, useRef } from 'react';
+import { useLocation, Link } from 'react-router-dom'; // URL 파라미터 감지용
 import styleMainDashBoard from '../../css/MainDashboard.module.css';
 import styleList from "../../css/ProductList.module.css";
 import styleRegister from "../../css/ProductRegister.module.css";
 import serverUrl from "../../db/server.json";
 import Pagination from '../Pagination';
-import { Link } from 'lucide-react';
 
 function ProductList(){
-
     const SERVER_URL = serverUrl.SERVER_URL;
     const URL = `${SERVER_URL}/ttik/product`;
-    const [productList, setProductList] = useState([]);
+    const location = useLocation(); // 추가: 대시보드에서 넘어온 쿼리 스트링 읽기
 
+    const [productList, setProductList] = useState([]);
     const [brandList, setBrandList] = useState([]);
     const [categoryList, setCategoryList] = useState([]);
     const [seasonList, setSeasonList] = useState([]);
 
+    // 필터 상태 (초기값에 URL 파라미터 로직 통합)
     const [searchFilters, setSearchFilters] = useState({
         brandCd: "",
         categoryCd: "",
         seasonCd: "",
-        stkStatus: "",
+        // 대시보드에서 ?status=부족 으로 왔다면 초기값을 "부족"으로 설정
+        stkStatus: new URLSearchParams(location.search).get('status') || "",
         keyword: ""
     })
 
+
     const [filteredProductList, setFilteredProductList] = useState([]);
 
-    //페이지네이션
+    // 페이지네이션 관련 로직
     const [currentPage, setCurrentPage] = useState(1);
     const postsPerPage = 10; // 한페이지에 10개씩 (Pc)
+
     const indexOfLast = currentPage * postsPerPage;
     const indexOfFirst = indexOfLast - postsPerPage;
 
@@ -129,14 +134,11 @@ function ProductList(){
         }
     }
 
-
-    //데이터 요청
+    // 공통 데이터 페치 함수
     async function getData(url){
         try{
             const res = await fetch(url); 
-            if(!res.ok){
-                throw new Error(`Error : ${res.status}`);
-            }
+            if(!res.ok) throw new Error(`Error : ${res.status}`);
             const data = await res.json();
             return data || [];
         } catch(error){
@@ -145,7 +147,7 @@ function ProductList(){
         }
     }
 
-    //브랜드,카테고리,시즌 데이터 가져오기
+    // 브랜드, 카테고리, 시즌 공통 코드 데이터 가져오기
     useEffect(() => {
         const fetchData = async() => {
             const brandData = await getData(`${URL}/brands`);
@@ -155,20 +157,16 @@ function ProductList(){
             setCategoryList(categoryData);
             setSeasonList(seasonData);
         };
-
         fetchData();
-    }, [])
+    }, []);
+
 
     //재고 상태 판단 - 없음 추가하기
     function handleStkStatus(stkQty, threshold){
-        if(stkQty <= threshold) {
-            return false; //부족
-        }else{
-            return true; //정상
-        }
+        return stkQty > threshold; // true: 정상, false: 부족
     }
 
-    //상품 목록 리스트 불러오기
+    // 상품 전체 목록 불러오기 (1분마다 갱신 기능 포함)
     useEffect(()=>{
         const getProductList = async () => {    
 
@@ -195,6 +193,7 @@ function ProductList(){
                 if(res.ok){
                     const data = await res.json();
                     // console.log(data);
+
                     setProductList(data);
                     if(isMobile) {
                         // setVisibleCount(prev => prev + data.length);
@@ -203,6 +202,7 @@ function ProductList(){
                 }
             } catch (error){
                 console.log("데이터 요청 실패 - ", error);
+
                 return [];
             } finally {
                 setIsLoading(false); 
@@ -223,33 +223,36 @@ function ProductList(){
 
     //필터 & 검색
     useEffect(()=>{
-
+        // 모든 필터가 비어있으면 전체 리스트 표시
         if(!searchFilters.brandCd && !searchFilters.categoryCd && !searchFilters.seasonCd && !searchFilters.stkStatus && !searchFilters.keyword){
             setFilteredProductList(productList);
             return;
         }
 
-        const filteredList =
-                productList.filter((product)=>{
-                    const isMatchBrand = String(product.brandSn) === searchFilters.brandCd || searchFilters.brandCd === "";
-                    const isMatchCategory = product.catCd === searchFilters.categoryCd || searchFilters.categoryCd === "";
-                    const isMatchSeason = product.seasonCd === searchFilters.seasonCd || searchFilters.seasonCd === "";
+        const filteredList = productList.filter((product)=>{
+            // 브랜드/카테고리/시즌 필터
+            const isMatchBrand = String(product.brandSn) === searchFilters.brandCd || searchFilters.brandCd === "";
+            const isMatchCategory = product.catCd === searchFilters.categoryCd || searchFilters.categoryCd === "";
+            const isMatchSeason = product.seasonCd === searchFilters.seasonCd || searchFilters.seasonCd === "";
 
-                    const status = handleStkStatus(product.stkQty, product.threshold) ? "정상" : "부족";
-                    const isMatchStkStatus = status === searchFilters.stkStatus || searchFilters.stkStatus === "";
+            // 재고 상태 필터 (정상/부족)
+            const status = handleStkStatus(product.stkQty, product.threshold) ? "정상" : "부족";
+            const isMatchStkStatus = status === searchFilters.stkStatus || searchFilters.stkStatus === "";
 
-                    const isMatchKeyword = searchFilters.keyword === ""
-                                            || product.productCd.toLowerCase().includes(searchFilters.keyword)
-                                            || product.productNm.toLowerCase().includes(searchFilters.keyword);
+            // 키워드 검색 (상품코드 또는 상품명)
+            const isMatchKeyword = searchFilters.keyword === ""
+                                || product.productCd.toLowerCase().includes(searchFilters.keyword.toLowerCase())
+                                || product.productNm.toLowerCase().includes(searchFilters.keyword.toLowerCase());
 
-                    return isMatchBrand && isMatchCategory && isMatchSeason && isMatchStkStatus && isMatchKeyword;
-                });
-                setFilteredProductList(filteredList);
-    }, [searchFilters, productList])
+            return isMatchBrand && isMatchCategory && isMatchSeason && isMatchStkStatus && isMatchKeyword;
+        });
 
+        setFilteredProductList(filteredList);
+    }, [searchFilters, productList]);
+
+    // 입력값 변경 핸들러
     const handleFilterChange = (e) => {
         const {name, value} = e.target;
-
         setSearchFilters(prev => ({
             ...prev,
             [name]: value
@@ -263,20 +266,20 @@ function ProductList(){
             // 다시 처음 5개를 fetch하게 됩니다.
         }
         setCurrentPage(1);
-    }
+    };
+    
 
-
-    //필터링 초기화
+    // 필터 초기화 핸들러
     const handleReset = (e) => {
         e.preventDefault();
-
         setSearchFilters({
             brandCd: "",
             categoryCd: "",
             seasonCd: "",
             stkStatus: "",
             keyword: ""
-        })
+        });
+        setCurrentPage(1);
     }
 
     return(
@@ -286,7 +289,7 @@ function ProductList(){
                 <p>상품 목록을 확인하세요. </p>
             </div>
             <div className={styleList.actionArea}>
-                <button className={styleRegister.registerBtn}>상품 등록</button>
+                <Link to="/product/register" className={styleRegister.registerBtn}>상품 등록</Link>
             </div>
             <div className={styleList.productListBox}>
                 <div className={styleList.listTopWrap}>
@@ -299,7 +302,6 @@ function ProductList(){
                                 onChange={handleFilterChange}
                                 type="text" placeholder="상품명 또는 코드 검색"
                         ></input>
-                        {/* <button className={styleList.searchBtn} type="submit">검색</button> */}
                     </div>
                 </div>
                 <div className={styleList.contentWrap}>
@@ -312,27 +314,21 @@ function ProductList(){
                             <div className={styleList.filterContents}>
                                 <select name="brandCd" id="brand" value={searchFilters.brandCd} onChange={handleFilterChange}>
                                     <option value="">브랜드</option>
-                                    {
-                                        brandList.map((record) => (
-                                            <option key={record.brandSn} value={record.brandSn}>{record.brandNm}</option>
-                                        ))
-                                    }
+                                    {brandList.map((record) => (
+                                        <option key={record.brandSn} value={record.brandSn}>{record.brandNm}</option>
+                                    ))}
                                 </select>
                                 <select name="categoryCd" value={searchFilters.categoryCd} onChange={handleFilterChange}>
                                     <option value="">카테고리</option>
-                                    {
-                                        categoryList.map((record) => (
-                                            <option key={record.catCd} value={record.catCd}>{record.catNm}</option>
-                                        ))
-                                    }
+                                    {categoryList.map((record) => (
+                                        <option key={record.catCd} value={record.catCd}>{record.catNm}</option>
+                                    ))}
                                 </select>
                                 <select name="seasonCd" value={searchFilters.seasonCd} onChange={handleFilterChange}>
                                     <option value="">시즌</option>
-                                    {
-                                        seasonList.map((record, index) => (
-                                            <option key={index} value={record.seasonCd}>{record.seasonNm}</option>
-                                        ))
-                                    }
+                                    {seasonList.map((record, index) => (
+                                        <option key={index} value={record.seasonCd}>{record.seasonNm}</option>
+                                    ))}
                                 </select>
                                 <select name="stkStatus" value={searchFilters.stkStatus} onChange={handleFilterChange}>
                                     <option value="">재고상태</option>
@@ -341,56 +337,57 @@ function ProductList(){
                                 </select>
                             </div>
                         </div>
-
                     </div>
                     <div className={styleList.listArea}>
-                        <div className={styleList.totalCount}>[ 총 {productList.length}개 상품 ]</div>
+                        <div className={styleList.totalCount}>
+                            [ 총 {filteredProductList.length}개 상품 ]
+                        </div>
                         <ul className={styleList.productList}>
-                                {
-                                    currentProducts.map((product, index) => (
-                                        <li className={`${styleList.productItem} ${handleStkStatus(product.stkQty, product.threshold) ? "" : styleList.warning}`} key={product.productCd}>
-                                            <a href="#" 
-                                            className={`${styleList.itemCard} `
-                                            }>
-                                                <div className={styleList.itemNo}>
-                                                    {isMobile 
-                                                        ? index + 1  // 모바일은 누적 리스트이므로 인덱스 그대로 사용
-                                                        : (currentPage - 1) * postsPerPage + index + 1 // PC는 페이지 번호 고려
-                                                    }
+                            {
+                                currentProducts.map((product, index) => (
+                                    <li className={`${styleList.productItem} ${handleStkStatus(product.stkQty, product.threshold) ? "" : styleList.warning}`} key={product.productCd}>
+                                        <a href="#" 
+                                        className={`${styleList.itemCard} `
+                                        }>
+                                            <div className={styleList.itemNo}>
+                                                {isMobile 
+                                                    ? index + 1  // 모바일은 누적 리스트이므로 인덱스 그대로 사용
+                                                    : (currentPage - 1) * postsPerPage + index + 1 // PC는 페이지 번호 고려
+                                                }
+                                            </div>
+                                            {/* <div className={styleList.itemAlignMo}> */}
+                                                <div className={styleList.itemInfoL}>
+                                                    <div className={styleList.brand}>{product.brandNm}</div>
+                                                    <div className={styleList.proCdNmWrap}>
+                                                        <div className={styleList.proCd}>
+                                                            <span className={styleList.infoLabel} style={{marginBottom: "0.5rem"}}>상품코드</span>
+                                                            {product.productCd}
+                                                        </div>
+                                                        <div className={styleList.proNm}>
+                                                            <span className={styleList.infoLabel}>상품명</span>{product.productNm}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                {/* <div className={styleList.itemAlignMo}> */}
-                                                    <div className={styleList.itemInfoL}>
-                                                        <div className={styleList.brand}>{product.brandNm}</div>
-                                                        <div className={styleList.proCdNmWrap}>
-                                                            <div className={styleList.proCd}>
-                                                                <span className={styleList.infoLabel} style={{marginBottom: "0.5rem"}}>상품코드</span>
-                                                                {product.productCd}
-                                                            </div>
-                                                            <div className={styleList.proNm}>
-                                                                <span className={styleList.infoLabel}>상품명</span>{product.productNm}
-                                                            </div>
+                                                <div className={styleList.itemInfoR}>
+                                                    <div className={styleList.stkWrap}>
+                                                        <div className={styleList.stkQty}><span className={styleList.infoLabel}>현재 재고 수량</span>{product.stkQty}</div>
+                                                        <div className={`${styleList.stkStatus}`}>
+                                                            <span className={styleList.infoLabel}>재고 상태</span>
+                                                            {handleStkStatus(product.stkQty, product.threshold) ? "정상" : "부족"}
                                                         </div>
                                                     </div>
-                                                    <div className={styleList.itemInfoR}>
-                                                        <div className={styleList.stkWrap}>
-                                                            <div className={styleList.stkQty}><span className={styleList.infoLabel}>현재 재고 수량</span>{product.stkQty}</div>
-                                                            <div className={`${styleList.stkStatus}`}>
-                                                                <span className={styleList.infoLabel}>재고 상태</span>
-                                                                {handleStkStatus(product.stkQty, product.threshold) ? "정상" : "부족"}
-                                                            </div>
-                                                        </div>
-                                                        <div className={styleList.date}>
-                                                            <span className={styleList.infoLabel}>등록일</span>
-                                                            {product.frstRegDt.split('T')[0]}
-                                                        </div>
+                                                    <div className={styleList.date}>
+                                                        <span className={styleList.infoLabel}>등록일</span>
+                                                        {product.frstRegDt.split('T')[0]}
                                                     </div>
-                                                {/* </div> */}
+                                                </div>
+                                            {/* </div> */}
 
-                                                
-                                            </a>
-                                        </li>
-                                    ))
-                                }
+                                            
+                                        </a>
+                                    </li>
+                                ))
+                            }
                         </ul>
                     </div>
                 </div>
