@@ -7,19 +7,20 @@ const initialFormState = {
     brand: '',      
     category: '',
     itemName: '',
-    untprc: 0,      // ✅ [추가] 단가 상태 초기화
+    untprc: 0,
     quantity: 0,
     boxQuantity: 0,
     eaQuantity: 0,
-    storage: '',
-    zone: '',
-    rack: ''
+    // storage: '',
+    // zone: '',
+    // rack: ''
 };
 
 function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
     const [formData, setFormData] = useState(initialFormState);
     const [selectOptions, setSelectOptions] = useState({
-        partners: [], brands: [], categories: [], Product: [], storages: [], zones: [], racks: []
+        partners: [], brands: [], categories: [], Product: [] 
+        // storages: [], zones: [], racks: []
     });
 
     useEffect(() => {
@@ -240,7 +241,7 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
                         </div>
                     </div>
 
-                    <div className={stylePlans.doubleBox}>
+                    {/* <div className={stylePlans.doubleBox}>
                         <div className={stylePlans.inputBox}>
                             <label>창고</label>
                             <select name="storage" value={formData.storage} onChange={handleChange}>
@@ -262,7 +263,7 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
                                 {selectOptions.racks?.map(r => <option key={r.RACK_CD} value={r.RACK_CD}>{r.RACK_NM}</option>)}
                             </select>
                         </div>
-                    </div>
+                    </div> */}
 
                     <button type='submit' className={stylePlans.submitBtn}>등록</button>
                 </form>

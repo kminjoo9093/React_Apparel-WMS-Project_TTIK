@@ -124,21 +124,41 @@ function StockPlans() {
                                         const date = item.IN_PLAN_DATE || item.OUT_PLAN_DATE || item.PLAN_YMD;
                                         const target = item.BRAND_NM || item.PARTNER_NM || item.PARTNER_SN;
                                         const product = item.GDS_NM || item.GDS_CD;
-                                        const qty = item.IN_PLAN_QTY || item.OUT_PLAN_QTY || item.GDS_QTY || 0;
                                         const price = item.UNTPRC || 0;
+                                        const qty = plansType === "InBound" 
+                                            ? (item.TOTAL_EA_QTY || 0) 
+                                            : (item.OUT_PLAN_QTY || item.GDS_QTY || 0);
+
+                                        const boxCount = item.BOX_COUNT || 1;
 
                                         return (
                                             <tr 
                                                 key={item.IN_PLAN_SN || item.OUT_PLAN_SN || index} 
                                                 onClick={() => {
-                                                    const productCode = item.GDS_CD || item.gdsCd || (item.BOX_CD ? item.BOX_CD.split('-').slice(0,3).join('-') : null);
+                                                    // 1. 우선순위 1: API에서 직접 내려주는 GDS_CD 확인
+                                                    let productCode = item.GDS_CD || item.gdsCd;
+
+                                                    // 2. 우선순위 2: GDS_CD가 없다면 BOX_LIST에서 추출 
+                                                    if (!productCode && item.BOX_LIST) {
+                                                        const firstBox = item.BOX_LIST.split(',')[0].trim();
+                                                        const parts = firstBox.split('-');
+                                                        if (parts.length >= 3) {
+                                                            productCode = parts.slice(0, 3).join('-');
+                                                        }
+                                                    }
+                                                    // 3. 우선순위 3: 그 외 BOX_CD 확인
+                                                    if (!productCode && item.BOX_CD) {
+                                                        productCode = item.BOX_CD.split('-').slice(0, 3).join('-');
+                                                    }
+
+                                                    console.log("최종 추출된 상품코드:", productCode);
 
                                                     if (!productCode || productCode === "undefined") {
-                                                        alert("상품 코드를 인식할 수 없습니다.");
+                                                        alert(`상품 코드를 인식할 수 없습니다.`);
                                                         return;
                                                     }
                                                     
-                                                    // 상세 페이지로 이동할 때 현재 타입 전달
+                                                    // 상세 페이지로 이동
                                                     navigate(`/stock/plans/${productCode}`, { 
                                                         state: { type: plansType } 
                                                     });
@@ -146,16 +166,18 @@ function StockPlans() {
                                                 style={{ cursor: 'pointer' }}
                                                 className={stylePlans.tableRow}
                                             >
+                                            {/* <tr key={item.IN_PLAN_SN || item.OUT_PLAN_SN || index}> */}
                                                 <td>{index + 1 + (currentPage - 1) * postsPerPage}</td>
                                                 <td>{date}</td>
                                                 <td>{target}</td>
                                                 <td>{product}</td>
-                                                <td>0 / {qty.toLocaleString()}</td> 
+                                                {/* <td>0 / {qty.toLocaleString()}</td>  */}
+                                                <td>{0}/{qty.toLocaleString()}</td>
                                                 <td>{price.toLocaleString()}</td>
                                                 <td>{(qty * price).toLocaleString()}</td>
                                                 <td>
                                                     <span className={stylePlans.statusBadge}>
-                                                        {item.BOX_CD ? '대기' : '완료'}
+                                                        {0 === qty ? '완료' : '대기'}
                                                     </span>
                                                 </td>
                                             </tr>
