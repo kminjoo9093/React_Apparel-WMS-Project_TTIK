@@ -125,22 +125,25 @@ function StockPlans() {
                                         const date = item.IN_PLAN_DATE || item.OUT_PLAN_DATE || item.PLAN_YMD;
                                         const target = item.BRAND_NM || item.PARTNER_NM || item.PARTNER_SN;
                                         const product = item.GDS_NM || item.GDS_CD;
-                                        const qty = item.IN_PLAN_QTY || item.OUT_PLAN_QTY || item.GDS_QTY || 0;
                                         const price = item.UNTPRC || 0;
+                                        const qty = plansType === "InBound" 
+                                            ? (item.TOTAL_EA_QTY || 0) 
+                                            : (item.OUT_PLAN_QTY || item.GDS_QTY || 0);
+
+                                        const boxCount = item.BOX_COUNT || 1;
 
                                         return (
                                             <tr key={item.IN_PLAN_SN || item.OUT_PLAN_SN || index}>
-                                                {/* 순번 계산: (현재페이지-1) * 5 + index + 1 */}
                                                 <td>{index + 1 + (currentPage - 1) * postsPerPage}</td>
                                                 <td>{date}</td>
                                                 <td>{target}</td>
                                                 <td>{product}</td>
-                                                <td>{0}/{qty.toLocaleString()}</td> {/*바코드 수량 추가*/}
+                                                <td>{0}/{qty.toLocaleString()}</td>{/*바코드 수량 추가*/}
                                                 <td>{price.toLocaleString()}</td>
                                                 <td>{(qty * price).toLocaleString()}</td>
                                                 <td>
                                                     <span className={stylePlans.statusBadge}>
-                                                        {item.BOX_CD ? '대기' : '완료'}
+                                                        {0 === qty ? '완료' : '대기'}
                                                     </span>
                                                 </td>
                                             </tr>
