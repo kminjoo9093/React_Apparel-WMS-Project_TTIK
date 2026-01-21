@@ -1,158 +1,180 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import axios from 'axios';
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine, Tooltip, LabelList } from 'recharts';
 import style from '../../css/ProductDetail.module.css';
 
 const ProductDetail = () => {
   const navigate = useNavigate();
+  const [cardList, setCardList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [cardList, setCardList] = useState([
-    { id: 1, productCode: "SKU-B001", productName: "비스포크 냉장고", category: "가전 > 주방", basicPrice: "2,500,000", brand: "Samsung", locateInfo: "P-13C", inboundUnit: "1ea /1box", inventoryThreshold: "5", currentQuantity: "0" },
-    { id: 2, productCode: "SKU-C011", productName: "AI 전용 세탁기", category: "가전 > 생활", basicPrice: "1,700,000", brand: "LG", locateInfo: "K-1B", inboundUnit: "2ea /1box", inventoryThreshold: "3", currentQuantity: "15" },
-    { id: 3, productCode: "SKU-B012", productName: "노트북 gram", category: "가전 > IT", basicPrice: "2,800,000", brand: "LG", locateInfo: "P-16C", inboundUnit: "11ea /1box", inventoryThreshold: "6", currentQuantity: "14" },
-    { id: 4, productCode: "SKU-V002", productName: "무선 청소기 Z", category: "가전 > 생활", basicPrice: "890,000", brand: "Samsung", locateInfo: "A-3C", inboundUnit: "5ea /1box", inventoryThreshold: "10", currentQuantity: "24" }
-  ]);
+  const fetchProductData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('http://localhost:3001/api/product/list');
+      if (response.data && Array.isArray(response.data)) {
+        setCardList(response.data);
+      }
+    } catch (error) {
+      console.error("데이터 호출 에러:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const historyData = [
-    { type: "출고", date: "2026.01.05 14:00", qty: "-2 EA", note: "A대리점" },
-    { type: "입고", date: "2026.01.04 10:30", qty: "+10 EA", note: "삼성 물류센터" },
-    { type: "출고", date: "2026.01.02 16:45", qty: "-1 EA", note: "B거래처" },
-  ];
-
-  const dummyGraphData = [
-    { name: '12-20', stock: 24 },
-    { name: '12-25', stock: 18 },
-    { name: '01-01', stock: 10 },
-    { name: '01-04', stock: 22 },
-    { name: '01-05', stock: 12 },
-  ];
+  useEffect(() => { fetchProductData(); }, []);
 
   const handleCardClick = () => {
-    setCardList((prev) => {
-      const newList = [...prev];
-      const firstItem = newList.shift();
-      newList.push(firstItem);
-      return newList;
-    });
+    if (cardList.length <= 1) return;
+    setCardList((prev) => [...prev.slice(1), prev[0]]);
   };
 
-  // ★ INV-FUR-008: 상품 삭제 시 삭제 방지 로직(Validation) 및 아카이브 이동 적용 ★
-  const handleDelete = (product) => {
-    // 1. 현재 재고 확인 (재고가 0보다 크면 삭제 차단)
-    if (Number(product.currentQuantity) > 0) {
-      alert(`현재 재고가 ${product.currentQuantity}개 남아있어 삭제할 수 없습니다.\n먼저 재고를 비워주세요.`);
-      return; // 로직 종료
+  const handleDelete = async (product) => {
+    if (!product || product.gds_cd === undefined) {
+      alert("상품 정보를 불러올 수 없습니다.");
+      return;
     }
-
-    // 2. 재고가 0일 때만 작동하는 비활성화 확인 창
-    const isConfirm = window.confirm(`[${product.productName}] 제품을 비활성화하시겠습니까?\n확인을 누르면 '상품 보관함(Archive)'으로 이동합니다.`);
-    if (isConfirm) {
-      alert("비활성화 처리가 완료되었습니다. 보관함으로 이동합니다.");
-      // 이동 경로를 기존 productList에서 productArchive로 변경
-      navigate('/product/productArchive'); 
+    const currentStock = Number(product.frst_stk_qty);
+    if (currentStock === 0) {
+      const confirmMessage = `[${product.gds_nm}] \n재고가 0입니다. 관리 제외 품목(Archive)으로 이동시킬까요?`;
+      if (window.confirm(confirmMessage)) {
+        try {
+          await axios.post('http://localhost:3001/api/product/disable', { 
+            gds_cd: product.gds_cd,
+            gds_enabled: 'N'
+          });
+          alert("관리 제외 품목으로 이동되었습니다.");
+          navigate('/product/productArchive', { state: { product: { ...product, gds_enabled: 'N' } } });
+        } catch (error) {
+          console.error("비활성화 처리 에러:", error);
+          alert("처리 중 오류가 발생했습니다.");
+        }
+      }
+    } else {
+      alert(`현재 재고가 ${currentStock}개 남아있어 삭제할 수 없습니다. \n재고를 먼저 소진해주세요.`);
     }
   };
-  
+
+  const handleModifyClick = (product) => {
+    navigate('/product/productModify', { state: { product } });
+  };
+
+  if (loading) return <div style={{ textAlign: 'center', marginTop: '100px' }}>데이터 로딩 중...</div>;
+  if (cardList.length === 0) return <div style={{ textAlign: 'center', marginTop: '100px' }}>표시할 상품이 없습니다.</div>;
+
   return (
-    <div className={style['card-stack-wrapper']} onClick={handleCardClick}>
-      <p style={{ position: 'absolute', top: '0px', color: '#999', fontSize: '16px', zIndex: 5 }}>
-        카드를 클릭하면 다음 정보를 보여줍니다.
-      </p>
-      
+    <div className={style['card-stack-wrapper']} onClick={handleCardClick} style={{ cursor: 'pointer', position: 'relative', minHeight: '100vh', background: '#f8f9fa', paddingBottom: '100px' }}>
       <AnimatePresence mode="popLayout">
-        {cardList.map((product, index) => (
-          <motion.div
-            key={product.id}
-            className={style['detail-card']}
-            initial={{ opacity: 0, scale: 0.9, y: 0 }}
-            animate={{ 
-              opacity: 1, 
-              y: index * 10, 
-              scale: 1 - index * 0.03,
-              zIndex: cardList.length - index 
-            }}
-            exit={{ opacity: 0, x: -300, transition: { duration: 0.3 } }}
-            style={{ 
-                position: 'absolute', width: '1100px', padding: '60px', left: '50%', top: '20%', x: '-50%'
-            }}
-          >
-            <div style={{ marginBottom: '30px' }}>
-              <div style={{ color: '#1e293b', fontWeight: 'bold', fontSize: '18px', marginBottom: '10px' }}>{product.productCode}</div>
-              <h2 style={{ fontSize: '3rem', margin: 0, fontWeight: '900', color: '#2563eb' }}>{product.productName}</h2>
-            </div>
+        {cardList.slice(0, 3).map((product, index) => {
+          const isLowStock = product.frst_stk_qty <= product.threshold;
+          const analysisData = [
+            { name: '임계치', qty: product.threshold, fill: '#cbd5e1' },
+            { name: '현재고', qty: product.frst_stk_qty, fill: isLowStock ? '#ef4444' : '#2563eb' }
+          ];
 
-            <div style={{ display: 'flex', gap: '80px' }}>
-              <div style={{ flex: 1 }}>
-                <h3 className={style['info-header']}>기본 정보</h3>
-                <div className={style['info-item']}><span className={style['info-label']}>상품코드(SKU)</span><span className={style['info-value']}>{product.productCode}</span></div>
-                <div className={style['info-item']}><span className={style['info-label']}>제품명</span><span className={style['info-value']}>{product.productName}</span></div>
-                <div className={style['info-item']}><span className={style['info-label']}>카테 고리</span><span className={style['info-value']}>{product.category}</span></div>
-                <div className={style['info-item']}><span className={style['info-label']}>기본 단가</span><span className={style['info-value']}>{product.basicPrice}원</span></div>
-                <div className={style['info-item']}><span className={style['info-label']}>입수량</span><span className={style['info-value']}>{product.inboundUnit}</span></div>
+          return (
+            <motion.div
+              key={product.gds_cd}
+              className={style['detail-card']}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: index === 0 ? 1 : 0.6, y: index * 20, scale: 1 - index * 0.05, zIndex: cardList.length - index }}
+              exit={{ opacity: 0, x: -500, rotate: -20 }}
+              transition={{ duration: 0.4 }}
+              style={{ position: 'absolute', width: '1050px', padding: '45px 55px', left: '50%', top: '180px', x: '-50%', background: '#fff', borderRadius: '30px', boxShadow: '0 20px 50px rgba(0,0,0,0.1)' }}
+            >
+              {/* 1. 헤더 영역 */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px' }}>
+                <div>
+                  <h2 style={{ fontSize: '2.8rem', fontWeight: '900', color: '#1e293b', margin: 0 }}>{product.gds_nm}</h2>
+                  <p style={{ color: '#64748b', fontSize: '1.2rem', marginTop: '10px' }}>{product.season_nm} | {product.gds_cd}</p>
+                </div>
+                {isLowStock ? (
+                  <div style={{ background: '#fff1f2', color: '#e11d48', padding: '15px 25px', borderRadius: '15px', fontWeight: '900', border: '2px solid #e11d48' }}>⚠️ 재고 위험: {product.threshold}EA 이하!</div>
+                ) : (
+                  <div style={{ background: '#f0fdf4', color: '#16a34a', padding: '15px 25px', borderRadius: '15px', fontWeight: 'bold', border: '1px solid #bbf7d0' }}>✅ 재고 정상</div>
+                )}
               </div>
-              <div style={{ flex: 1 }}>
-                <h3 className={style['info-header']}>상세 정보</h3>
-                <div className={style['info-item']}><span className={style['info-label']}>브랜드</span><span className={style['info-value']}>{product.brand}</span></div>
-                <div className={style['info-item']}><span className={style['info-label']}>위치 정보</span><span className={style['info-value']}>{product.locateInfo}</span></div>
-                <div className={style['info-item']}><span className={style['info-label']}>현재 재고</span><span className={style['info-value']} style={{color: '#d32f2f'}}>{product.currentQuantity} EA</span></div>
-                <div style={{ marginTop: '20px', padding: '15px', fontWeight: '700', background: '#fff5f5', borderRadius: '12px', color: '#c62828' }}>
-                  임계치 알림: {product.inventoryThreshold} 개 미만
+
+              {/* 2. 정보 그리드 (창고 위치 추가됨) */}
+              <div style={{ display: 'flex', gap: '80px', marginBottom: '35px' }}>
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ borderBottom: '2px solid #1e293b', paddingBottom: '10px' }}>기본 정보</h3>
+                  <div className={style['info-item']}><span className={style['info-label']}>시즌</span><span className={style['info-value']}>{product.season_nm}</span></div>
+                  <div className={style['info-item']}><span className={style['info-label']}>브랜드</span><span className={style['info-value']} style={{color: '#2a9426', fontWeight: 'bold'}}>{product.brand_nm}</span></div>
+                  <div className={style['info-item']}><span className={style['info-label']}>상품 코드</span><span className={style['info-value']}>{product.gds_cd}</span></div>
+                  <div className={style['info-item']}><span className={style['info-label']}>상품 명</span><span className={style['info-value']} style={{color: '#003cff', fontWeight: 'bold'}}>{product.gds_nm}</span></div>
+                  <div className={style['info-item']}><span className={style['info-label']}>단가</span><span className={style['info-value']}>{product.untprc?.toLocaleString()} 원</span></div>
+                  {/* 창고 상세 위치 추가 */}
+                  <div className={style['info-item']} style={{marginTop: '10px', padding: '10px', background: '#f0f9ff', borderRadius: '10px'}}>
+                    <span className={style['info-label']} style={{color: '#0369a1'}}>📍 창고 위치</span>
+                    <span className={style['info-value']} style={{color: '#0369a1', fontWeight: 'bold'}}>{product.storage_dtl_pstn || '위치 미지정'}</span>
+                  </div>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ borderBottom: '2px solid #1e293b', paddingBottom: '10px' }}>상세 정보</h3>
+                  <div className={style['info-item']}><span className={style['info-label']}>카테고리</span><span className={style['info-value']}>{product.gds_cat_nm}</span></div>
+                  <div className={style['info-item']}><span className={style['info-label']}>최초 등록일</span><span className={style['info-value']}>{product.frst_reg_dt}</span></div>
+                  <div className={style['info-item']}><span className={style['info-label']}>사이즈</span><span className={style['info-value']}>{product.size_nm}</span></div>
+                  <div className={style['info-item']}><span className={style['info-label']}>임계치</span><span className={style['info-value']} style={{color: '#e11d48', fontWeight: 'bold'}}>{product.threshold} EA</span></div>
+                  <div className={style['info-item']}>
+                    <span className={style['info-label']}>현재 재고</span>
+                    <span className={style['info-value']} style={{ fontSize: '1.4rem', fontWeight: '900', color: isLowStock ? '#e11d48' : '#1e293b' }}>{product.frst_stk_qty} EA</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* 입출고 이력 테이블 */}
-            <div style={{ marginTop: '30px' }}>
-              <h3 style={{ color: '#1e293b', fontSize: '22px', borderBottom: '3px solid #1e293b', paddingBottom: '10px', width: 'fit-content' }}>최근 입/출고 요약 이력</h3>
-              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #eee', textAlign: 'left', color: '#666', fontSize: '15px' }}>
-                    <th style={{ padding: '12px 0' }}>구분</th>
-                    <th>일시</th>
-                    <th>수량</th>
-                    <th>비고/거래처</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historyData.map((item, idx) => (
-                    <tr key={idx} style={{ borderBottom: '1px solid #f9f9f9', fontSize: '15px' }}>
-                      <td style={{ padding: '8px 0', color: item.type === '입고' ? '#007bff' : '#d32f2f', fontWeight: 'bold' }}>
-                        {item.type === '입고' ? '▲ 입고' : '▼ 출고'}
-                      </td>
-                      <td style={{ color: '#555' }}>{item.date}</td>
-                      <td style={{ fontWeight: 'bold' }}>{item.qty}</td>
-                      <td style={{ color: '#777' }}>{item.note}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* 재고 변동 그래프 영역 */}
-            <div style={{ marginTop: '30px' }}>
-              <h3 className={style['info-header']}>재고 변동 추이</h3>
-              <div style={{ width: '100%', height: '250px', background: '#f8fafc', padding: '20px', borderRadius: '20px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={dummyGraphData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="name" fontSize={12} />
-                    <YAxis fontSize={12} />
-                    <Tooltip />
-                    <ReferenceLine y={Number(product.inventoryThreshold)} stroke="#ef4444" strokeDasharray="3 3" />
-                    <Line type="monotone" dataKey="stock" stroke="#2563eb" strokeWidth={3} />
-                  </LineChart>
-                </ResponsiveContainer>
+              {/* 3. 재고 자산 분석 카드 (기존 유지) */}
+              <div style={{ marginBottom: '35px' }}>
+                <h3 style={{ borderBottom: '2px solid #1e293b', paddingBottom: '10px', marginBottom: '20px' }}>📉 실시간 재고 지표 분석</h3>
+                <div style={{ display: 'flex', gap: '15px' }}>
+                  <div style={{ flex: 1, background: '#f8fafc', padding: '20px', borderRadius: '15px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                    <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '5px' }}>재고 자산 가치</p>
+                    <h4 style={{ fontSize: '1.3rem', fontWeight: 'bold' }}>{(product.frst_stk_qty * product.untprc).toLocaleString()}원</h4>
+                  </div>
+                  <div style={{ flex: 1, background: '#f8fafc', padding: '20px', borderRadius: '15px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                    <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '5px' }}>박스 단위 환산</p>
+                    <h4 style={{ fontSize: '1.3rem', fontWeight: 'bold', color: '#2563eb' }}>{Math.floor(product.frst_stk_qty / (product.inbox_qty || 1))} BOX</h4>
+                  </div>
+                  <div style={{ flex: 1, background: '#f8fafc', padding: '20px', borderRadius: '15px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                    <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '5px' }}>재고 충족률</p>
+                    <h4 style={{ fontSize: '1.3rem', fontWeight: 'bold', color: isLowStock ? '#ef4444' : '#16a34a' }}>{Math.round((product.frst_stk_qty / (product.threshold || 1)) * 100)}%</h4>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* 하단 버튼 그룹 */}
-            <div style={{ display: 'flex', gap: '20px', marginTop: '25px' }}>
-              <button onClick={(e) => { e.stopPropagation(); handleDelete(product); }} style={{ flex: 1, height: '50px', fontSize: '22px', fontWeight: '600', background: '#f5f5f5', borderRadius: '40px', border: 'none' }}>제 품 삭 제</button>
-              <button onClick={(e) => { e.stopPropagation(); navigate('/product/productModify', { state: { product } }); }} style={{ flex: 1, height: '50px', fontSize: '22px', fontWeight: '600', background: '#000', color: '#fff', borderRadius: '40px', border: 'none' }}>정 보 수 정</button>
-            </div>
-          </motion.div>
-        ))}
+              {/* 4. 재고 안전성 비교 차트 (기존 유지) */}
+              <div style={{ marginBottom: '40px' }}>
+                <h3 style={{ fontSize: '1.3rem', fontWeight: 'bold', marginBottom: '12px' }}>📊 재고 보유 현황 분석</h3>
+                <div style={{ width: '100%', height: '160px', background: '#f8fafc', borderRadius: '20px', padding: '20px', border: '1px solid #f1f5f9' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={analysisData} layout="vertical" margin={{ left: 20, right: 60 }}>
+                      <XAxis type="number" hide domain={[0, Math.max(product.frst_stk_qty, product.threshold) * 1.2]} />
+                      <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} width={70} />
+                      <Tooltip cursor={{fill: 'transparent'}} />
+                      <Bar dataKey="qty" barSize={30} radius={[0, 10, 10, 0]}>
+                        {analysisData.map((entry, i) => (
+                          <Cell key={i} fill={entry.fill} />
+                        ))}
+                        <LabelList dataKey="qty" position="right" formatter={(v) => `${v} EA`} style={{fontWeight:'bold', fontSize:'12px'}} />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* 5. 하단 버튼 */}
+              <div style={{ display: 'flex', gap: '20px' }}>
+                <button onClick={(e) => { e.stopPropagation(); handleDelete(product); }} style={{ flex: 1, height: '60px', borderRadius:'15px', border:'none', background:'#f1f5f9', color:'#1e293b', fontSize: '1.4rem', fontWeight:'bold', cursor:'pointer' }}>제품 삭제</button>
+                <button onClick={(e) => { e.stopPropagation(); handleModifyClick(product); }} style={{ flex: 1, height: '60px', borderRadius:'15px', border:'none', background:'#1e293b', color:'#fff', fontSize: '1.4rem', fontWeight:'bold', cursor:'pointer' }}>정보 수정</button>
+              </div>
+              <p style={{ position: 'absolute', top: '10px', color: '#999', fontSize: '11px', zIndex: 5 }}>
+                카드를 클릭하면 다음 정보를 보여줍니다.
+              </p>
+            </motion.div>
+          );
+        })}
       </AnimatePresence>
     </div>
   );

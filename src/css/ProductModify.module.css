@@ -15,7 +15,7 @@
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
     border: 1px solid #eee;
     /* 중요: 기존 -220px 유지하여 카드 겹침 효과 적용 */
-    margin-top: -220px; 
+    margin-top: -200px; 
     transition: transform 0.3s ease;
 }
 
