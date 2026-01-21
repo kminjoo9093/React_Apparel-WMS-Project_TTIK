@@ -11,12 +11,8 @@ import ProductRegister from "./pages/product/ProductRegister";
 import ProductDetail from "../src/pages/product/ProductDetail";
 import ProductModify from "../src/pages/product/ProductModify";
 import ProductArchive from "../src/pages/product/ProductArchive";
-<<<<<<< HEAD
 import Brand from "../src/pages/brand/BrandList";
-=======
 import ProductList from "./pages/product/ProductList";
-import Brand from "../src/pages/Brand/BrandList";
->>>>>>> 119564d308ff8319d23226a6975108f4dfc6c0cc
 import Plans from "../src/pages/stock/StockPlans";
 import QRsave from "./pages/qrcode/QRsave";
 import History from "../src/pages/stock/StockHistory";
