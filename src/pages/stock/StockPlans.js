@@ -98,8 +98,8 @@ function StockPlans() {
                 </div>
                 
                 {plansType ? (
-                    <div className={stylePlans.tableContainer}>
-                        <div className={stylePlans.tableHeader}>
+                    <div>
+                        <div>
                             <h3>{plansType === "InBound" ? "📦 입고 예정 목록" : "🚚 출고 예정 목록"}</h3>
                         </div>
 
