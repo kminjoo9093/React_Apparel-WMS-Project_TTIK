@@ -38,6 +38,62 @@
     background-color: #e2e8f0;
 }
 
+.plansTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.plansTable th {
+    padding: 12px;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: bold;
+}
+
+.plansTable td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding-bottom: 10px;
+}
+
+.pageNumber {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.activePage {
+    background-color: var(--primary-color) !important; /* 또는 강조하고 싶은 색상 */
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.pageMoveBtn {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.pageMoveBtn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
 
 /* 모달창 */
 .modalOverlay {
@@ -58,7 +114,7 @@
     padding: 3rem;
     border-radius: 1.5rem;
     width: 50rem;
-    height: 52rem;
+    height: 59rem;
     max-width: 90%;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     position: absolute;
