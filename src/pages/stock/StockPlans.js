@@ -1,33 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import stylePlans from "../../css/plarns.module.css";
 import PlanRegister from './PlanRegister';
-import { useNavigate } from 'react-router-dom';
+import serverUrl from "../../db/server.json";
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function StockPlans() {
-    const [plansType, setPlansType] = useState(null);
+    const navigate = useNavigate();
+    const location = useLocation(); // useState보다 위에 선언해야 초기값으로 사용 가능합니다.
+
+    // 1. 초기값 설정: 상세페이지에서 뒤로가기 시 전달한 activeTab 확인, 없으면 "InBound"
+    const [plansType, setPlansType] = useState(location.state?.activeTab || "InBound");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [inboundList, setInboundList] = useState([]);
     const [outboundList, setOutboundList] = useState([]);
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+    const SERVER_URL = serverUrl.SERVER_URL;
+    
+    // 페이지네이션 상태
     const [currentPage, setCurrentPage] = useState(1);
-    const postsPerPage = 10;
+    const postsPerPage = 5;
 
+    // 데이터 호출 함수
     const fetchStockPlanList = async () => {
         if (!plansType) return;
-
         setLoading(true);
         try {
             const endpoint = plansType === "InBound" ? "inbound" : "outbound";
-            const response = await fetch(`http://localhost:3001/ttik/${endpoint}/list`);
-
+            const response = await fetch(`${SERVER_URL}/ttik/${endpoint}/list`);
             if (!response.ok) throw new Error('서버 응답 에러.');
 
             const data = await response.json();
-            
+            console.log(`${plansType} 데이터 로드:`, data);
+
             if (plansType === "InBound") setInboundList(data);
             else setOutboundList(data);
-
         } catch (error) {
             console.error(`${plansType} 로드 에러:`, error);
         } finally {
@@ -35,16 +41,26 @@ function StockPlans() {
         }
     };
     
+    // 탭(plansType)이 변경될 때마다 데이터 재호출
     useEffect(() => {
         fetchStockPlanList();
-    }, [plansType, currentPage]);
+    }, [plansType]);
 
     const handleTypeChange = (type) => {
         setPlansType(type);
-        setCurrentPage(1);
+        setCurrentPage(1); // 타입 변경 시 첫 페이지로 리셋
     };
 
+    // --- 페이지네이션 로직 ---
     const currentList = plansType === "InBound" ? inboundList : outboundList;
+    const indexOfLastPost = currentPage * postsPerPage;
+    const indexOfFirstPost = indexOfLastPost - postsPerPage;
+    const currentPosts = currentList.slice(indexOfFirstPost, indexOfLastPost);
+    const totalPages = Math.ceil(currentList.length / postsPerPage);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    
 
     return (
         <div>
@@ -52,7 +68,7 @@ function StockPlans() {
             <p className={stylePlans.plansSubTitle}>입·출고 예정을 확인하고 관리하세요.</p>
             
             <div className={stylePlans.plansListbox}>
-                <div>
+                <div className={stylePlans.buttonGroup}>
                     <button 
                         className={`${stylePlans.plansBtn} ${plansType === 'InBound' ? stylePlans.active : ''}`} 
                         onClick={() => handleTypeChange("InBound")}
@@ -81,56 +97,114 @@ function StockPlans() {
                     </button>
                 </div>
                 
-
-
-                {/* 테이블 영역 */}
                 {plansType ? (
                     <div className={stylePlans.tableContainer}>
                         <div className={stylePlans.tableHeader}>
                             <h3>{plansType === "InBound" ? "📦 입고 예정 목록" : "🚚 출고 예정 목록"}</h3>
                         </div>
 
-                        <table className="data-table">
+                        <table className={stylePlans.plansTable}>
                             <thead>
                                 <tr>
-                                    <th>번호</th>
+                                    <th>순번</th>
                                     <th>날짜</th>
-                                    <th>품목명</th>
-                                    <th>수량</th>
                                     <th>{plansType === "InBound" ? "입고처" : "출고처"}</th>
+                                    <th>상품명</th>
+                                    <th>수량</th>
+                                    <th>단가</th>
+                                    <th>총액</th>
                                     <th>상태</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {loading ? (
-                                    <tr><td colSpan="6">데이터를 불러오는 중입니다...</td></tr>
-                                ) : currentList.length > 0 ? (
-                                    currentList.map((item, index) => (
-                                        <tr key={item.id || index}>
-                                            <td>{index + 1 + (currentPage - 1) * postsPerPage}</td>
-                                            <td>{item.date}</td>
-                                            <td>{item.itemName}</td>
-                                            <td>{item.quantity?.toLocaleString()}</td>
-                                            <td>{plansType === "InBound" ? item.supplier : item.customer}</td>
-                                            <td>
-                                                <span className={stylePlans.statusBadge}>{item.status}</span>
-                                            </td>
-                                        </tr>
-                                    ))
+                                    <tr><td colSpan="8" style={{textAlign:'center', padding:'2rem'}}>데이터를 불러오는 중입니다...</td></tr>
+                                ) : currentPosts.length > 0 ? (
+                                    currentPosts.map((item, index) => {
+                                        const date = item.IN_PLAN_DATE || item.OUT_PLAN_DATE || item.PLAN_YMD;
+                                        const target = item.BRAND_NM || item.PARTNER_NM || item.PARTNER_SN;
+                                        const product = item.GDS_NM || item.GDS_CD;
+                                        const qty = item.IN_PLAN_QTY || item.OUT_PLAN_QTY || item.GDS_QTY || 0;
+                                        const price = item.UNTPRC || 0;
+
+                                        return (
+                                            <tr 
+                                                key={item.IN_PLAN_SN || item.OUT_PLAN_SN || index} 
+                                                onClick={() => {
+                                                    const productCode = item.GDS_CD || item.gdsCd || (item.BOX_CD ? item.BOX_CD.split('-').slice(0,3).join('-') : null);
+
+                                                    if (!productCode || productCode === "undefined") {
+                                                        alert("상품 코드를 인식할 수 없습니다.");
+                                                        return;
+                                                    }
+                                                    
+                                                    // 상세 페이지로 이동할 때 현재 타입 전달
+                                                    navigate(`/stock/plans/${productCode}`, { 
+                                                        state: { type: plansType } 
+                                                    });
+                                                }}
+                                                style={{ cursor: 'pointer' }}
+                                                className={stylePlans.tableRow}
+                                            >
+                                                <td>{index + 1 + (currentPage - 1) * postsPerPage}</td>
+                                                <td>{date}</td>
+                                                <td>{target}</td>
+                                                <td>{product}</td>
+                                                <td>0 / {qty.toLocaleString()}</td> 
+                                                <td>{price.toLocaleString()}</td>
+                                                <td>{(qty * price).toLocaleString()}</td>
+                                                <td>
+                                                    <span className={stylePlans.statusBadge}>
+                                                        {item.BOX_CD ? '대기' : '완료'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
                                 ) : (
-                                    <tr><td colSpan="6">조회된 내역이 없습니다.</td></tr>
+                                    <tr><td colSpan="8" style={{textAlign:'center', padding:'2rem'}}>조회된 내역이 없습니다.</td></tr>
                                 )}
                             </tbody>
                         </table>
+
+                        {/* --- 페이지네이션 UI --- */}
+                        {currentList.length > 0 && (
+                            <div className={stylePlans.pagination}>
+                                <button 
+                                    className={stylePlans.pageMoveBtn}
+                                    disabled={currentPage === 1}
+                                    onClick={() => paginate(currentPage - 1)}
+                                >
+                                    &lt;
+                                </button>
+                                
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <button
+                                        key={i + 1}
+                                        onClick={() => paginate(i + 1)}
+                                        className={`${stylePlans.pageNumber} ${currentPage === i + 1 ? stylePlans.activePage : ''}`}
+                                    >
+                                        {i + 1}
+                                    </button>
+                                ))}
+                                
+                                <button 
+                                    className={stylePlans.pageMoveBtn}
+                                    disabled={currentPage === totalPages || totalPages === 0}
+                                    onClick={() => paginate(currentPage + 1)}
+                                >
+                                    &gt;
+                                </button>
+                            </div>
+                        )}
                     </div>
                 ) : (
-                    <div>
+                    <div className={stylePlans.emptyState}>
                         <p>상단의 버튼을 클릭하여 입고 또는 출고 내역을 확인하세요.</p>
                     </div>
                 )}
             </div>
 
-            {/* 모달 컴포넌트 */}
             {isModalOpen && (
                 <PlanRegister 
                     isOpen={isModalOpen} 

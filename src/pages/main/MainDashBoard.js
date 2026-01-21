@@ -3,6 +3,7 @@ import axios from 'axios';
 import styleMainDashBoard from '../../css/MainDashboard.module.css';
 import StatCard from '../../components/StatCard';
 import serverUrl from "../../db/server.json";
+import { Link, useNavigate } from 'react-router-dom';
 
 const MainDashboard = () => {
   // 1. 초기 상태값에 trend 필드 추가 (DTO 구조와 일치)
@@ -17,6 +18,7 @@ const MainDashboard = () => {
 
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const SERVER_URL = serverUrl.SERVER_URL;
+  const navigate = useNavigate();
 
   const fetchStats = async () => {
     try {
@@ -35,6 +37,8 @@ const MainDashboard = () => {
     const intervalId = setInterval(fetchStats, 10000); // 10초마다 갱신
     return () => clearInterval(intervalId); 
   }, []);
+
+
 
   return (
     <div className={styleMainDashBoard.modernDashboard}>
@@ -72,7 +76,7 @@ const MainDashboard = () => {
         <div className={styleMainDashBoard.dataPanel}>
           <div className={styleMainDashBoard.panelHeader}>
             <h3>최근 입고 현황</h3>
-            <button className={styleMainDashBoard.viewAll}>전체보기</button>
+            <button className={styleMainDashBoard.viewAll} onClick={() => navigate("/productList")}>전체보기</button>
           </div>
           <div className={styleMainDashBoard.customList}>
             {[1, 2, 3].map((i) => (
