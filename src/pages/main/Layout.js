@@ -53,7 +53,6 @@ const Layout = ({ children, user }) => {
     { path: '/ttik', name: '대시보드', icon: '📊' },
     { path: '/productList', name: '상품 관리', icon: '📦' },
     { path: '/stock/plans', name: '입출고 관리', icon: '🔄' },
-    { path: '/register', name: '등록하기', icon: '➕' },
     { path: '/stock/history', name: '이력 조회', icon: '📜' },
     { path: '/brand', name: '브랜드', icon: '🏷️' },
     { path: '/register-admin', name: '관리자 등록', icon: '👤' }
@@ -113,7 +112,7 @@ const Layout = ({ children, user }) => {
           <div className={styleLayout.topBarLeft} style={{ display: 'flex', alignItems: 'center' }}>
             <button className={styleLayout.menuToggle} onClick={() => setIsSidebarOpen(true)}>☰</button>
             <h2 className={styleLayout.sageTitle}>
-              {menus.find(m => m.path === location.pathname)?.name || "QR코드 PDF저장 페이지" }
+              {menus.find(m => m.path === location.pathname)?.name || "시스템" }
             </h2>
           </div>
 
