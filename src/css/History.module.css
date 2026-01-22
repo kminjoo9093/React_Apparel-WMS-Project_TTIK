@@ -1,4 +1,4 @@
-.plansListbox{
+.HistoryListbox{
     padding: 2rem 0;
     padding: 3rem;
     border-radius: 1.5rem;
@@ -7,21 +7,21 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-.plansTitle{
+.HistoryTitle{
     font-weight: 800;
     color: #1e293b;
     letter-spacing: -1px;
     margin-bottom: 0.8rem;
 }
 
-.plansSubTitle{
+.HistorySubTitle{
     font-size: 15px;
     color: #64748b;
     font-weight: 400;
     margin-bottom: 5rem;
 }
 
-.plansBtn {
+.HistoryBtn {
     position: flex;
     padding: 0.82rem 2rem;
     background-color: #f1f5f9;
@@ -33,24 +33,24 @@
     margin-left: 1rem;
 }
 
-.plansBtn:hover{
+.HistoryBtn:hover{
     background-color: #e2e8f0;
 }
 
-.plansTable {
+.HistoryTable {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
     text-align: center;
 }
 
-.plansTable th {
+.HistoryTable th {
     padding: 12px;
     border-bottom: 2px solid #dee2e6;
     font-weight: bold;
 }
 
-.plansTable td {
+.HistoryTable td {
     padding: 12px;
     border-bottom: 1px solid #eee;
     vertical-align: middle;
@@ -92,4 +92,47 @@
 .pageMoveBtn:disabled {
     cursor: not-allowed;
     opacity: 0.5;
+}
+
+.searchBox {
+    display: flex;
+    justify-content: space-between; /* 양 끝 정렬의 핵심 */
+    align-items: center;            /* 세로 중앙 정렬 */
+    width: 100%;
+    padding: 10px 0;
+}
+
+.searchBox label {
+    font-weight: bold;
+    white-space: nowrap; /* 글자가 줄바꿈되지 않게 */
+}
+
+.dateGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;    /* 날짜창 사이 간격 */
+    width: 50%;   /* 적절한 너비 설정 */
+}
+
+.dateInput {
+    width: 200px; /* 고정 너비를 주거나 %로 조절 */
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 20px; /* 이미지처럼 둥글게 */
+}
+
+.searchInput {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 40%;   /* 검색창 전체 너비 */
+    justify-content: flex-end; /* 검색 라벨과 창을 오른쪽으로 밀착 */
+}
+
+.searchInput input {
+    width: 100%;  /* 사용 가능한 공간 다 쓰기 */
+    max-width: 300px; 
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px; /* 이미지 스타일 적용 */
 }
