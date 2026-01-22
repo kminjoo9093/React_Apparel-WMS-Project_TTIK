@@ -164,6 +164,20 @@
     font-size: 1.2rem;
     color: #718096;
 }
+/* 창고 셀렉트 */
+.selectContainer{
+    text-align: center;
+}
+
+.selectBox {
+    display: flex;
+    width: 30rem;
+}
+
+.selectBox select{
+    margin: 0rem 0.5rem;
+}
+
 /* --- 모바일 반응형 스타일 (화면 너비 768px 이하) --- */
 @media (max-width: 768px) {
     .container {
@@ -268,3 +282,4 @@
     color: #718096;
     text-align: center;
 }
+
