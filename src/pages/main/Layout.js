@@ -1,22 +1,99 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styleLayout from '../../css/Layout.module.css';
 import Modal from '../../components/Modal';
 import serverUrl from "../../db/server.json"
 
-const Layout = ({ children, user }) => {
+const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
   const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const navigate = useNavigate();
   const SERVER_URL = serverUrl.SERVER_URL;
-  
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState(""); 
+  const [isNotiOpen, setIsNotiOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const notiRef = useRef(null);
+
   const [modal, setModal] = useState({ 
-    isOpen: false, 
-    title: '', 
-    message: '', 
-    onConfirm: null 
+    isOpen: false, title: '', message: '', onConfirm: null 
   });
 
   const closeModal = () => setModal({ ...modal, isOpen: false });
+
+  // 사이드바를 볼 수 있는 권한 정의
+  const hasSidebarPermission = ['ALL', 'U'].includes(user?.tkcgStorage);
+
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetch(`${SERVER_URL}/ttik/product/list`, {
+          method: 'GET',
+          credentials: 'include', 
+      });
+      if (!response.ok) throw new Error("데이터 로드 실패");
+      const data = await response.json();
+
+      const readIds = JSON.parse(localStorage.getItem('readNotifications') || '[]');
+      const combinedNotis = [];
+      const now = new Date();
+
+      data.forEach(item => {
+        if (readIds.includes(item.productCd)) return;
+        if (item.gdsEnabled !== 'Y') return;
+
+        if (user?.tkcgStorage !== 'ALL' && item.storageName !== user?.tkcgStorage) return;
+
+        const isLowStock = (item.stkQty || 0) <= (item.threshold || 0);
+        const regDate = new Date(item.frstRegDt);
+        const isNewArrival = (now - regDate) < (24 * 60 * 60 * 1000); 
+
+        if (isLowStock) {
+          combinedNotis.push({
+            id: item.productCd,
+            type: 'warning',
+            msg: `[재고부족] ${item.productNm} (${item.stkQty}개)`,
+            time: '실시간'
+          });
+        } else if (isNewArrival) {
+          combinedNotis.push({
+            id: item.productCd,
+            type: 'info',
+            msg: `[신규등록] ${item.productNm} 상품 입고`,
+            time: 'NEW'
+          });
+        }
+      });
+      setNotifications(combinedNotis);
+    } catch (error) {
+      console.error("알림 업데이트 오류:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications(); 
+    const intervalId = setInterval(fetchNotifications, 10000); 
+    return () => clearInterval(intervalId); 
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (notiRef.current && !notiRef.current.contains(e.target)) {
+        setIsNotiOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleNotificationClick = (id, path) => {
+    const readIds = JSON.parse(localStorage.getItem('readNotifications') || '[]');
+    if (!readIds.includes(id)) {
+      const newReadIds = [...readIds, id];
+      localStorage.setItem('readNotifications', JSON.stringify(newReadIds));
+    }
+    setNotifications(prev => prev.filter(n => n.id !== id));
+    if (path) navigate(path);
+  };
 
   const handleLogout = () => {
     setModal({
@@ -29,37 +106,45 @@ const Layout = ({ children, user }) => {
             method: 'POST', 
             credentials: 'include',
           });
-
           if (response.ok) {
             closeModal();
-            // 페이지 전체를 새로고침하며 로그인으로 이동
+            setIsLoggedIn(false);
+            setUser(null);
             window.location.href = '/login'; 
           }
         } catch (error) {
           console.error("로그아웃 실패:", error);
-          setModal({
-            isOpen: true,
-            title: 'Error',
-            message: '로그아웃 중 오류가 발생했습니다.',
-            onConfirm: closeModal
-          });
         }
       },
       onCancel: closeModal 
     });
   };
 
-  const menus = [
-    { path: '/ttik', name: '대시보드', icon: '📊' },
-    { path: '/productList', name: '상품 관리', icon: '📦' },
-    { path: '/stock/plans', name: '입출고 관리', icon: '🔄' },
-    { path: '/stock/history', name: '이력 조회', icon: '📜' },
-    { path: '/brand', name: '브랜드', icon: '🏷️' },
-    { path: '/register-admin', name: '관리자 등록', icon: '👤' }
+  const allMenus = [
+    { path: '/ttik', name: '대시보드', icon: '📊', roles: ['ALL', 'U'] },
+    { path: '/productList', name: '상품 관리', icon: '📦', roles: ['ALL'] },
+    { path: '/stock/plans', name: '입출고 관리', icon: '🔄', roles: ['ALL', 'U'] },
+    { path: '/stock/history', name: '이력 조회', icon: '📜', roles: ['ALL'] },
+    { path: '/brand', name: '브랜드', icon: '🏷️', roles: ['ALL'] },
+    { path: '/register-admin', name: '관리자 등록', icon: '👤', roles: ['ALL'] }
   ];
 
+  // 메뉴 필터링 (ALL, U 권한자만 실제 메뉴 배열을 가짐)
+  const menus = allMenus.filter(m => m.roles.includes(user?.tkcgStorage));
+  
   const closeSidebar = () => setIsSidebarOpen(false);
   
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      if (searchKeyword.trim() === "") {
+        navigate('/productList');
+      } else {
+        navigate(`/productList?search=${encodeURIComponent(searchKeyword)}`);
+      }
+      setSearchKeyword("");
+    }
+  };
+
   return (
     <div className={styleLayout.appContainer}>
       <Modal 
@@ -70,65 +155,108 @@ const Layout = ({ children, user }) => {
         onCancel={modal.onCancel} 
       />
 
-      <div 
-        className={`${isSidebarOpen ? styleLayout.overlayActive : ''}`} 
-        onClick={closeSidebar}
-      ></div>
+      {/* 사이드바 관련 요소들(오버레이, 본체)을 ALL, U 권한일 때만 렌더링 */}
+      {hasSidebarPermission && (
+        <>
+          <div className={`${isSidebarOpen ? styleLayout.overlayActive : ''}`} onClick={closeSidebar}></div>
+          <aside className={`${styleLayout.sidebar} ${isSidebarOpen ? styleLayout.sidebarActive : ''}`}>
+            <div className={styleLayout.sidebarLogo}>
+              <div className={styleLayout.logoMain}> <Link to="/ttik">TTIK</Link></div>
+              <div className={styleLayout.logoSub}>Tap To Inventory Keeping</div>
+            </div>
+            
+            <div className={styleLayout.sidebarProfile}>
+              <div className={styleLayout.profileInfo}>
+                <span style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>
+                  {user?.tkcgStorage === 'ALL' ? 'Main Admin' : 'Warehouse User'}
+                </span>
+                <span className={styleLayout.profileName}>{user?.nickname || '관리자'}</span> 
+              </div>
+            </div>
 
-      <aside className={`${styleLayout.sidebar} ${isSidebarOpen ? styleLayout.sidebarActive : ''}`}>
-        <div className={styleLayout.sidebarLogo}>
-          <div className={styleLayout.logoMain}> <Link to="/ttik">TTIK</Link></div>
-          <div className={styleLayout.logoSub}>Tap To Inventory Keeping</div>
-        </div>
-        
-        <div className={styleLayout.sidebarProfile}>
-          <div className={styleLayout.profileInfo}>
-            <span style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>
-              Warehouse Admin
-            </span>
-            <span className={styleLayout.profileName}>
-              {user?.nickname || '관리자'}
-            </span> 
-          </div>
-        </div>
+            <nav className={styleLayout.sidebarNav}>
+              {menus.map((menu) => (
+                <Link 
+                  key={menu.path} 
+                  to={menu.path}
+                  className={`${styleLayout.navItem} ${location.pathname === menu.path ? styleLayout.active : ''}`}
+                  onClick={closeSidebar}
+                >
+                  <span className={styleLayout.navIcon}>{menu.icon}</span>
+                  <span className={styleLayout.navText}>{menu.name}</span>
+                </Link>
+              ))}
+            </nav>
+          </aside>
+        </>
+      )}
 
-        <nav className={styleLayout.sidebarNav}>
-          {menus.map((menu) => (
-            <Link 
-              key={menu.path} 
-              to={menu.path}
-              className={`${styleLayout.navItem} ${location.pathname === menu.path ? styleLayout.active : ''}`}
-              onClick={closeSidebar}
-            >
-              <span className={styleLayout.navIcon}>{menu.icon}</span>
-              <span className={styleLayout.navText}>{menu.name}</span>
-            </Link>
-          ))}
-        </nav>
-      </aside>
-
-      <div className={styleLayout.mainContent}>
+      {/* 사이드바가 없을 때(a, b 권한) 본문이 꽉 차도록 레이아웃 구성 */}
+      <div className={`${styleLayout.mainContent} ${!hasSidebarPermission ? styleLayout.fullWidth : ''}`}>
         <header className={styleLayout.topBar}>
           <div className={styleLayout.topBarLeft} style={{ display: 'flex', alignItems: 'center' }}>
-            <button className={styleLayout.menuToggle} onClick={() => setIsSidebarOpen(true)}>☰</button>
+            {/* 햄버거 버튼도 ALL, U에게만 노출 */}
+            {hasSidebarPermission && (
+              <button className={styleLayout.menuToggle} onClick={() => setIsSidebarOpen(true)}>☰</button>
+            )}
             <h2 className={styleLayout.sageTitle}>
-              {menus.find(m => m.path === location.pathname)?.name || "시스템" }
+              {allMenus.find(m => m.path === location.pathname)?.name || (user?.tkcgStorage.toUpperCase() + " 모니터링") }
             </h2>
           </div>
 
           <div className={styleLayout.topBarRight}>
             <div className={styleLayout.searchBox}>
               <span className={styleLayout.searchIcon}>🔍</span>
-              <input type="text" placeholder="상품 검색..." />
+              <input 
+                type="text" 
+                placeholder="상품명 또는 코드 검색" 
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                onKeyDown={handleSearch}
+              />
             </div>
 
             <div className={styleLayout.statusGroup}>
-              <div className={styleLayout.notificationBell}>
-                🔔<span className={styleLayout.bellBadge}>3</span>
-              </div>
-              <div className={styleLayout.systemStatus} id="mobile-hide">
-                <span className={styleLayout.statusDot}></span>
-                <span className={styleLayout.statusText}>Live</span>
+              <div className={styleLayout.notificationContainer} ref={notiRef}>
+                <div 
+                  className={`${styleLayout.notificationBell} ${notifications.length > 0 ? styleLayout.hasNoti : ''}`}
+                  onClick={() => setIsNotiOpen(!isNotiOpen)}
+                >
+                  🔔
+                  {notifications.length > 0 && (
+                    <span className={styleLayout.bellBadge}>{notifications.length}</span>
+                  )}
+                </div>
+
+                {isNotiOpen && (
+                  <div className={styleLayout.notiDropdown}>
+                    <div className={styleLayout.notiHeader}>
+                      <span>최근 알림</span>
+                    </div>
+                    <ul className={styleLayout.notiList}>
+                      {notifications.length > 0 ? (
+                        notifications.map((n) => (
+                          <li 
+                            key={n.id} 
+                            className={styleLayout.notiItem} 
+                            onClick={() => handleNotificationClick(n.id, '/productList')}
+                          >
+                            <div className={styleLayout.notiContent}>
+                              <p className={n.type === 'warning' ? styleLayout.textWarn : ''}>
+                                {n.msg}
+                              </p>
+                              <span>{n.time}</span>
+                            </div>
+                          </li>
+                        ))
+                      ) : (
+                        <li className={styleLayout.notiEmpty}>
+                          <p>알림이 없습니다.</p>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
             <button className={styleLayout.logoutBtn} onClick={handleLogout}>로그아웃</button>

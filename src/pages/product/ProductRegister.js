@@ -252,6 +252,7 @@ function ProductRegister(){
         try{
             const res = await fetch(`${URL}/register`, {
                 method: 'POST',
+                credentials: 'include', 
                 headers: {'Content-type': 'application/json'},
                 body: JSON.stringify({
                     "productCd": productCd,

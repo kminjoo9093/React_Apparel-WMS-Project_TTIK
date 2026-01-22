@@ -42,9 +42,9 @@
     flex-shrink: 0;
     border-radius: 100px;
     /* margin-bottom: 1.5rem; */
-    position: absolute;
+    /* position: absolute;
     top: 1.5rem;
-    right: 3rem;
+    right: 3rem; */
     transition: 0.2s;
     background: var(--primary-color) url(/src/resources/images/productList/iconRefresh.svg) no-repeat center / 70% auto;
 }
@@ -108,6 +108,9 @@
     border-radius: 2rem 2rem 0 0;
     background-color: var(--gray-f8);
     border-bottom: 3px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 .filterHeading h3{
     font-size: 500;
@@ -115,17 +118,19 @@
 }
 .filterContents{
     padding: 3rem;
-    padding-top: 6rem;
     text-align: center;
     background: #fff;
     border-radius: 0 0 2rem 2rem;
-    position: relative;
+    /* position: relative; */
 }
 .filterContents > select{
     width: 100%;
     height: 4.5rem;
     min-width: 6rem;
     margin-bottom: 2rem;
+}
+.filterContents > select:last-child{
+    margin-bottom: 0;
 }
 
 /* 상품 리스트 카드 */
@@ -140,25 +145,36 @@
 .productItem{
     /* border: 1px solid #000; */
     border-radius: 20px;
+    transition: 0.3s;
 }
 .productItem:not(:last-child){
     margin-bottom: 3rem;
 }
+.productItem:hover{
+    transform: translateY(-0.5rem);
+    border-color: var(--gray-cb);
+}
+.warning.productItem:hover{
+    border-color: var(--red-cf);
+}
 .itemCard{
     padding: 3rem 1.5rem;
-    display: flex;
+    /* display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-between; */
+    display: grid;
+    grid-template-columns: 5% 55% 40%;
+    align-items: center;
 }
 .itemNo{
-    flex-basis: 5%;
+    /* flex-basis: 5%; */
     text-align: center;
 }
 .itemInfoL{
-    flex-basis: 55%;
+    /* flex-basis: 55%; */
 }
 .itemInfoR{
-    flex-basis: 40%;
+    /* flex-basis: 40%; */
 }
 .itemInfoL{
     display: flex;
@@ -202,6 +218,9 @@
     color: var(--gray-64);
     margin-right: 2rem;
 }
+.itemInfoL .infoLabel{
+    display: block;
+}
 .stkQty{
     font-size: 2rem;
     font-weight: 500;
@@ -225,33 +244,111 @@
 }
 
 
-
-
 /* 태블릿 세로 */
 @media (max-width: 1024px){ 
     .contentWrap{
+        margin-block: 3rem;
         grid-template-columns: 1fr;
         row-gap: 4rem;
     }
     .filterContents{
         display: flex;
+        align-items: center;
         gap: 1.5rem;
+        padding: 2.5rem;
     }
     .filterContents > select{
         width: calc(100% / 4);
+        margin-bottom: 0;
     }
     .btnReset{
         position: static;
     }
 }
 
+
 /* 모바일 세로, 가로 */
 @media (max-width: 768px){
     .productListBox{
         padding: 3rem 1.5rem;
     }
+    .filterContents{
+        flex-direction: column;
+    }
+    .filterContents > select{
+        width: 100%;
+    }
+    .itemCard{
+        padding: 3rem 1.5rem;
+        display: grid;
+        grid-template-columns: 15% 85%;
+        grid-template-rows: 1fr 1fr;
+        align-items: center;
+    }
+    .itemNo{
+        grid-row: span 2;
+        font-size: 1.8rem;
+    }
+    .itemInfoR{
+        padding-left: 2rem;
+    }
+    .prodCd{
+        font-size: 2rem;
+        text-wrap: nowrap;
+    }
+    .proNm{
+        font-size: 1.8rem;
+        text-wrap: nowrap;
+    }
+    .infoLabel{
+        display: block;
+        font-size: 1.6rem;
+    }
+    .itemInfoL .infoLabel{
+        display: inline-block;
+    }
+    .itemInfoL::after{
+        width: 100%;
+        height: 1px;
+        right: 0;
+        top: 100%;
+        /* transform: translateX(-50%); */
+    }
+    .itemInfoL, .itemInfoR{
+        padding-inline: 3rem;
+    }
+    .itemInfoL{
+        gap: 3rem;
+        padding-bottom: 2rem;
+        flex-direction: column;
+    }
+    .itemInfoR{
+        padding-top: 2rem;
+    }
+    .proCdNmWrap{
+        flex: 1;
+    }
+    .stkWrap{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .itemInfoR{
+        /* display: flex;
+        align-items: center;
+        justify-content: space-around
+        ; */
+    }
 }
 
 @media (max-width: 480px){
-
+    .itemCard{
+        grid-template-columns: 10% 90%;
+    }
+    .itemInfoL .infoLabel{
+        display: block;
+    }
+    .itemInfoL, .itemInfoR{
+        padding-inline: 1.5rem;
+    }
 }

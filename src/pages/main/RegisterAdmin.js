@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import style from '../../css/Register.module.css';
+import style from '../../css/RegisterAdmin.module.css';
 import Modal from '../../components/Modal';
 import { useNavigate } from 'react-router-dom';
 import serverUrl from "../../db/server.json"
@@ -10,8 +10,7 @@ const RegisterAdmin = () => {
     password: '',
     confirmPassword: '',
     nickname: '',
-    role: 'ADMIN',
-    storage: [] // 선택된 창고 번호들을 담을 배열
+    storage: '' // 'ALL', 'A', 'B' 문자열 저장
   });
 
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
@@ -19,92 +18,75 @@ const RegisterAdmin = () => {
   const navigate = useNavigate();
   const SERVER_URL = serverUrl.SERVER_URL;
 
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 체크박스 변경 핸들러
   const handleStorageChange = (e) => {
-    const { value, checked } = e.target;
-    let newStorage = [...formData.storage];
-
-    if (checked) {
-      newStorage.push(value); 
-    } else {
-      newStorage = newStorage.filter((item) => item !== value); 
-    }
-    
-    newStorage.sort();
-    setFormData({ ...formData, storage: newStorage });
+    setFormData({ ...formData, storage: e.target.value });
   };
 
   const handleRegister = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // 비밀번호 일치 확인
-  if (formData.password !== formData.confirmPassword) {
-    setModal({
-      isOpen: true,
-      title: 'Input Error',
-      message: '비밀번호가 일치하지 않습니다.',
-      onConfirm: closeModal
-    });
-    return;
-  }
-
-  // 창고 선택 여부 확인
-  if (formData.storage.length === 0) {
-    setModal({
-      isOpen: true,
-      title: 'Input Error',
-      message: '최소 하나 이상의 담당 창고를 선택해주세요.',
-      onConfirm: closeModal
-    });
-    return;
-  }
-
-  // 백엔드 엔티티 구조에 맞게 데이터 변환
-  const submitData = {
-    mngrId: formData.id,                
-    mngrPswd: formData.password,        
-    nickname: formData.nickname,        
-    tkcgStorage: formData.storage.join(', ') 
-  };
-
-  try {
-    const response = await fetch(`${SERVER_URL}/ttik/join`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(submitData),
-      credentials: 'include', 
-    });
-
-    if (response.ok) {
+    if (formData.password !== formData.confirmPassword) {
       setModal({
         isOpen: true,
-        title: 'Registration Success',
-        message: `${submitData.nickname} 관리자 등록이 완료되었습니다.`,
-        onConfirm: () => {
-          closeModal();
-          navigate('/ttik'); 
-        }
+        title: 'Input Error',
+        message: '비밀번호가 일치하지 않습니다.',
+        onConfirm: closeModal
       });
-    } else {
-      const errorMsg = await response.text();
-      throw new Error(errorMsg || '등록 중 오류가 발생했습니다.');
+      return;
     }
-  } catch (error) {
-    setModal({
-      isOpen: true,
-      title: 'Registration Failed',
-      message: error.message,
-      onConfirm: closeModal
-    });
-  }
-};
+
+    if (!formData.storage) {
+      setModal({
+        isOpen: true,
+        title: 'Input Error',
+        message: '담당 권한을 선택해주세요.',
+        onConfirm: closeModal
+      });
+      return;
+    }
+
+    const submitData = {
+      mngrId: formData.id,
+      mngrPswd: formData.password,
+      nickname: formData.nickname,
+      tkcgStorage: formData.storage
+    };
+
+    try {
+      const response = await fetch(`${SERVER_URL}/ttik/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(submitData),
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        setModal({
+          isOpen: true,
+          title: 'Success',
+          message: `${submitData.nickname} 등록이 완료되었습니다.`,
+          onConfirm: () => {
+            closeModal();
+            navigate('/ttik');
+          }
+        });
+      } else {
+        const errorMsg = await response.text();
+        throw new Error(errorMsg || '등록 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      setModal({
+        isOpen: true,
+        title: 'Failed',
+        message: error.message,
+        onConfirm: closeModal
+      });
+    }
+  };
 
   return (
     <div className={style.container}>
@@ -118,13 +100,13 @@ const RegisterAdmin = () => {
 
         <form onSubmit={handleRegister} className={style.form}>
           <div className={style.inputGroup}>
-            <label>관리자 닉네임(담당창고+관리자)</label>
-            <input type="text" name="nickname" placeholder="ex)1창고 관리자" onChange={handleChange} required />
+            <label>관리자 닉네임</label>
+            <input type="text" name="nickname" placeholder="ex) 사무실 관리자 / 창고 이용자" onChange={handleChange} required />
           </div>
 
           <div className={style.inputGroup}>
             <label>관리자 ID</label>
-            <input type="text" name="id" placeholder="접속 아이디를 설정하세요" onChange={handleChange} required />
+            <input type="text" name="id" placeholder="ID를 설정하세요" onChange={handleChange} required />
           </div>
 
           <div className={style.inputGroup}>
@@ -138,21 +120,28 @@ const RegisterAdmin = () => {
           </div>
 
           <div className={`${style.inputGroup} ${style.fullWidth}`}>
-            <label>담당 창고 선택</label>
+            <label>담당 권한 설정</label>
             <div className={style.checkboxContainer}>
-              {[1, 2, 3, 4].map((num) => (
-                <label key={num} className={style.checkboxLabel}>
+              {[
+                { id: 'ALL', label: '전체 관리자 (ALL)' },
+                { id: 'U', label: '이용자' },
+              ].map((opt) => (
+                <label key={opt.id} className={style.checkboxLabel}>
                   <input
-                    type="checkbox"
-                    value={num}
-                    checked={formData.storage.includes(String(num))}
+                    type="radio"
+                    name="storageOption"
+                    value={opt.id}
+                    className={style.customRadio}
+                    checked={formData.storage === opt.id}
                     onChange={handleStorageChange}
                   />
-                  <span>{num}번 창고</span>
+                  <span className={style.checkmark}></span>
+                  <span>{opt.label}</span>
                 </label>
               ))}
             </div>
           </div>
+
           <button type="submit" className={style.submitBtn}>계정 생성하기</button>
         </form>
       </div>
