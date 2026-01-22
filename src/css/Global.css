@@ -66,10 +66,25 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+/* 버튼 공통 스타일 1 */
+.btnSubmit{
+    display: inline-block;
+    padding-inline: 2rem;
+    height: 4.5rem;
+    line-height: 4.5rem;
+    border-radius: 1rem;
+    margin-inline: 1rem;
+    text-wrap: nowrap;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: var(--secondary-color);
+    transition: all 0.3s;
 }
 
-button:active {
+.btnSubmit:hover{
+    background: #2563eb;
+    box-shadow: 0 2rem 4rem rgba(37, 99, 235, 0.3);
 }
 
 /* 컨텐츠 너비, 마진 */

@@ -417,7 +417,7 @@ function ProductRegister(){
                         </div>
                     </fieldset>
                     <div className={styleRegister.formBtnWrap}>
-                        <button type="submit" className={styleRegister.registerBtn}>등록</button>
+                        <button type="submit" className={`${styleRegister.registerBtn} btnSubmit`}>등록</button>
                         {/* <button type="button" className={styleRegister.cancelBtn}>취소</button> */}
                     </div>
                 </form>

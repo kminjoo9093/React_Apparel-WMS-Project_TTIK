@@ -1,0 +1,231 @@
+.contentArea{
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    column-gap: 4rem;
+}
+.mainContentWrap{
+    padding: 3rem;
+    border-radius: 1.5rem;
+    width: 100%; 
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+}
+
+.contentTitle{
+    font-size: 1.8rem;
+    color: var(--gray-64);
+    margin-bottom: 3rem;
+}
+
+.storage input, .storage select{
+    height: 5rem;
+}
+
+/* 좌측 메뉴 선택 */
+.menuArea{
+    /* border: 1px solid #000; */
+    position: sticky;
+    top: 0;
+}
+.menuBox{
+    /* border: 1px solid red; */
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    border-radius: 1.5rem;
+    background-color: #fff;
+    padding: 3rem;
+}
+.menuList{
+    padding-inline: 2.5rem;
+}
+
+.menuList li{
+    border-radius: 10px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    line-height: 3em;
+    text-align: center;
+    color: var(--secondary-color);
+    background-color: var(--gray-e2);
+    margin-block: 2rem;
+    transition: 0.3s;
+    cursor: pointer;
+    border: 3px solid transparent;
+}
+
+.menuList li.selected{
+    background-color: #fff;
+    border: 3px solid var(--primary-color);
+}
+.menu{
+    position: relative;
+}
+.menu::before{
+    content: "";
+    display: inline-block;
+    width: 3rem;
+    aspect-ratio: 1;
+    position: absolute;
+    left: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 2rem auto;
+}
+.menuRegister::before{
+    background-image: url(/src/resources/images/storage/iconPlus.svg);
+    background-size: 2.5rem auto;
+}
+.menuModify::before{
+    background-image: url(/src/resources/images/storage/iconSetting.svg);
+}
+.menuList::before{
+    background-image: url(/src/resources/images/storage/iconSearch.svg);
+}
+.contentRow{
+    display: flex;
+    align-items: center;
+    padding: 4rem;
+    gap: 10rem;
+    border-top: 1px solid var(--gray-e2);
+}
+
+/* 창고 등록 */
+.registerRow{
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+.zoneRackBox{
+    width: 100%;
+    display: flex;
+    gap: 3rem;
+    margin-bottom: 3rem;
+    padding-right: 3rem;
+    position: relative;
+}
+.zoneRackBox > div{
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+.btnPlus, .btnRemove{
+    display: block;
+    width: 4rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+.btnPlus{
+    background: #fff url(/src/resources/images/storage/iconPlus.svg) no-repeat center / 70% auto;
+    margin-top: 3rem;
+    border: 3px solid var(--primary-color);
+}
+.btnPlus:hover{
+    box-shadow: 0 1rem 2rem rgba(37, 100, 235, 0.3);
+}
+.btnRemove{
+    position: absolute;
+    top: 50%;
+    right: -2rem;
+    transform: translateY(-50%) scale(0.8);
+    background: var(--gray-e2) url(/src/resources/images/storage/iconDash.svg) no-repeat center / 50% auto;
+}
+.btnRemove:hover{
+    background: var(--gray-cb) url(/src/resources/images/storage/iconDash.svg) no-repeat center / 50% auto;
+}
+
+/* 창고 수정 */
+.modifyHeading{
+    color: #fff;
+    /* border: 3px solid var(--secondary-color); */
+    /* color: var(--secondary-color); */
+    border-radius: 10px;
+    font-size: 1.8rem;
+    width: 10rem;
+    /* max-width: 8rem; */
+    padding-block: 1em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+    /* margin-right: 3rem; */
+}
+.modifyHeading{
+    background-color: var(--primary-color);
+}
+
+.storageBtnWrap{
+    flex: 1;
+    display: flex;
+    /* justify-content: center; */
+    gap: 3rem;
+}
+
+.btnStorage{
+    display: inline-block;
+    /* min-width: 10rem; */
+    font-size: 2rem;
+    padding: 1.5em 3em;
+    background-color: var(--gray-e2);
+    /* border: 1px solid #000; */
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.btnStorage.selected{
+    background-color: var(--secondary-color);
+    color: #fff;
+}
+
+.modifyRadio{
+    display: none;
+}
+
+.modifyRow{
+    /* background-color: red; */
+    
+}
+
+.modifyRow:first-child{
+    border: none;
+}
+
+.modifyRow.row1{
+    /* display: flex;
+    align-items: center;
+    gap: 5rem; */
+}
+
+.rackStatusWrap{
+    display: inline-flex;
+    gap: 3rem;
+    flex: 1;
+}
+.rackStatusWrap > select{
+    flex-basis: 30%;
+}
+
+.modifyZoneSelect{
+    width: 40%;
+    min-width: 15rem;
+}
+
+.btnSubmitWrap{
+    text-align: center;
+}
+.btnModify{
+    /* height: 5rem; */
+    display: block;
+    margin-block: 3rem 1.5rem;
+    margin-inline: auto;
+}
+
+/* 창고 조회 */

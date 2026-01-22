@@ -289,7 +289,7 @@ function ProductList(){
                 <p>상품 목록을 확인하세요. </p>
             </div>
             <div className={styleList.actionArea}>
-                <Link to="/product/register" className={styleRegister.registerBtn}>상품 등록</Link>
+                <Link to="/product/register" className={`${styleRegister.registerBtn} btnSubmit`}>상품 등록</Link>
             </div>
             <div className={styleList.productListBox}>
                 <div className={styleList.listTopWrap}>
