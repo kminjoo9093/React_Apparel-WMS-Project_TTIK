@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Layout from "../src/pages/main/Layout";
 import MainDashboard from "../src/pages/main/MainDashBoard";
@@ -43,6 +43,16 @@ function Ttik() {
     checkLoginStatus();
   }, []);
 
+  // 특정 권한만 접근 가능한 보호 라우트 컴포넌트
+  const ProtectedRoute = ({ children, allowedRoles }) => {
+    if (!isLoggedIn) return <Navigate to="/login" replace />;
+    if (allowedRoles && !allowedRoles.includes(user?.tkcgStorage)) {
+      // 권한이 없으면 대시보드로 리다이렉트
+      return <Navigate to="/ttik" replace />;
+    }
+    return children;
+  };
+
   if (!isInitialized) return <div>로딩 중...</div>;
 
   return (
@@ -57,11 +67,13 @@ function Ttik() {
           isLoggedIn ? (
             <Layout user={user} setUser={setUser} setIsLoggedIn={setIsLoggedIn}>
               <Routes>
+                {/* 공통 접근 권한 */}
                 <Route path="/ttik" element={<MainDashboard user={user} />} />
                 <Route path="/productList" element={<ProductList />} />
                 <Route path="/brand" element={<Brand />} />
                 <Route path="/stock/plans" element={<Plans />} />
                 <Route path="/stock/plans/:productCd" element={<StockDetail />} />
+                <Route path="/register" element={<ProductRegister />} />
                 <Route path="/product/register" element={<ProductRegister />} />
                 <Route path="/register-admin" element={<RegisterAdmin />} />
                 <Route path="/product/productDetail" element={<ProductDetail />} />
@@ -69,6 +81,17 @@ function Ttik() {
                 <Route path="/product/productArchive" element={<ProductArchive />} />
                 <Route path="/stock/plans/qr/print" element={<QRsave />} />
                 <Route path="/stock/history" element={<History />} />
+
+                {/* 전체 관리자(ALL)만 접근 가능 */}
+                <Route 
+                  path="/register-admin" 
+                  element={
+                    <ProtectedRoute allowedRoles={['ALL','A','B']}>
+                      <RegisterAdmin />
+                    </ProtectedRoute>
+                  } 
+                />
+
                 <Route path="/" element={<Navigate to="/ttik" replace />} />
                 <Route path="*" element={<Error404Page />} />
               </Routes>

@@ -87,11 +87,11 @@ const QRsave = () => {
     setProgress(0);
     const userId = `user_${Date.now()}`;
     // 전달해주신 API_BASE 주소 유지
-    const API_BASE = "https://192.168.0.11:3001";
+    // const API_BASE = "https://192.168.0.11:3001";
 
     const progressTimer = setInterval(async () => {
         try {
-            const res = await fetch(`${API_BASE}/test/labels/status/${userId}`);
+            const res = await fetch(`${SERVER_URL}/test/labels/status/${userId}`);
             if (res.ok) {
                 const currentProgress = await res.json();
                 // 원본 로직: 서버 진행률을 그대로 setProgress에 반영
@@ -114,8 +114,9 @@ const QRsave = () => {
             productCode: printConfig.productId
         }));
 
-        const response = await fetch(`${API_BASE}/test/labels/download/${userId}`, {
+        const response = await fetch(`${SERVER_URL}/test/labels/download/${userId}`, {
             method: 'POST',
+            credentials: 'include', 
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(labelDataList)
         });
