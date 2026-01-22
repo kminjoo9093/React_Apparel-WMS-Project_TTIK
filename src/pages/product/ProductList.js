@@ -21,9 +21,8 @@ function ProductList(){
         brandCd: "",
         categoryCd: "",
         seasonCd: "",
-        // 대시보드에서 ?status=부족 으로 왔다면 초기값을 "부족"으로 설정
         stkStatus: new URLSearchParams(location.search).get('status') || "",
-        keyword: ""
+        keyword: new URLSearchParams(location.search).get('search') || "" 
     });
 
     const [filteredProductList, setFilteredProductList] = useState([]);
@@ -34,6 +33,20 @@ function ProductList(){
     const indexOfLast = currentPage * postsPerPage;
     const indexOfFirst = indexOfLast - postsPerPage;
     const currentProducts = filteredProductList.slice(indexOfFirst, indexOfLast);
+
+    //추가 -- 레이아웃에서 상품명(코드) 검색시 이동할때 받는 함수 
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const urlSearch = params.get('search') || "";
+        const urlStatus = params.get('status') || "";
+
+        setSearchFilters(prev => ({
+            ...prev,
+            keyword: urlSearch,
+            stkStatus: urlStatus
+        }));
+        setCurrentPage(1); // 검색 시 1페이지로
+    }, [location.search]);
 
     // 공통 데이터 페치 함수
     async function getData(url){
@@ -70,7 +83,13 @@ function ProductList(){
     useEffect(()=>{
         const getProductList = async () => {    
             try{
-                const res = await fetch(`${SERVER_URL}/ttik/product/list`);
+                const res = await fetch(`${SERVER_URL}/ttik/product/list`, {
+                method: 'GET',
+                credentials: 'include', 
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
                 if(res.ok){
                     const data = await res.json();
                     setProductList(data);
@@ -104,9 +123,11 @@ function ProductList(){
             const isMatchStkStatus = status === searchFilters.stkStatus || searchFilters.stkStatus === "";
 
             // 키워드 검색 (상품코드 또는 상품명)
+            const searchLower = searchFilters.keyword.toLowerCase();
             const isMatchKeyword = searchFilters.keyword === ""
-                                || product.productCd.toLowerCase().includes(searchFilters.keyword.toLowerCase())
-                                || product.productNm.toLowerCase().includes(searchFilters.keyword.toLowerCase());
+                                || product.productCd.toLowerCase().includes(searchLower)
+                                || product.productNm.toLowerCase().includes(searchLower)
+                                || product.brandNm.toLowerCase().includes(searchLower);    // 추가 브랜드명 포함
 
             return isMatchBrand && isMatchCategory && isMatchSeason && isMatchStkStatus && isMatchKeyword;
         });
