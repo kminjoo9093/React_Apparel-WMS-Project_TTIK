@@ -54,7 +54,7 @@ const handleSave = async () => {
 
     try {
       // 💡 이제 변수 에러(ts2451)가 없으니까 서버로 데이터가 제대로 날아가.
-      const response = await axios.post('http://localhost:3001/api/product/update', finalData);
+      const response = await axios.post('https://localhost:3001/ttik/product/update', finalData);
       
       if (response.status === 200) {
         alert(fromArchive ? "복구 및 수정 완료!" : "수정 완료!");
@@ -63,7 +63,7 @@ const handleSave = async () => {
       }
     } catch (error) {
       console.error("연동 실패 원인:", error);
-      alert("서버 연동 실패! 백엔드가 켜져 있는지 확인해봐.");
+      alert("서버 연동 실패! 백엔드가 켜져 있는지 확인 부탁드립니다.");
     }
   };
   return (

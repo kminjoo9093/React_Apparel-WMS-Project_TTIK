@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import BrandRegister from '../Brand/BrandRegister';
+import BrandRegister from './BrandRegister';
 import styleBrand from "../../css/Brand.module.css";
 
 function BrandList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    // 브랜드 리스트 받아오기
     const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const postsPerPage = 10; // 한페이지에 10개씩
+    const postsPerPage = 10; 
 
     const [searchTerm, setSearchTerm] = useState(""); 
     const [selectedIds, setSelectedIds] = useState([]);
 
+    // 1. 검색 필터링 로직
     const filteredBrands = brands.filter((brand) => {
         const nameMatch = brand.brandNm?.toLowerCase().includes(searchTerm.toLowerCase());
         const telMatch = brand.telNo?.includes(searchTerm);
@@ -21,22 +20,20 @@ function BrandList() {
         return nameMatch || telMatch || brNoMatch;
     });
 
+    // 2. 페이지네이션 계산 로직
+    const indexOfLast = currentPage * postsPerPage;
+    const indexOfFirst = indexOfLast - postsPerPage;
+    // 필터링된 결과에서 현재 페이지 분량만 추출
+    const currentBrands = filteredBrands.slice(indexOfFirst, indexOfLast);
+    const totalPages = Math.ceil(filteredBrands.length / postsPerPage);
+
     const fetchBrandList = async () => {
         setLoading(true);
         try {
-
-            const response = await fetch('http://localhost:3001/ttik/brand/list'); 
-            
-            const contentType = response.headers.get("content-type");
-            
-            if (!response.ok) {
-                throw new Error('서버 응답 에러.');
-            }
-
+            const response = await fetch('https://localhost:3001/ttik/brand/list'); 
+            if (!response.ok) throw new Error('서버 응답 에러.');
             const data = await response.json();
-            console.log("성공! 서버 데이터:", data);
             setBrands(data);
-
         } catch (error) {
             console.error("Fetch 에러:", error);
         } finally {
@@ -57,17 +54,13 @@ function BrandList() {
             alert("삭제할 브랜드를 선택해 주세요.");
             return;
         }
-
         if (window.confirm(`선택한 ${selectedIds.length}개의 브랜드를 삭제하시겠습니까?`)) {
             try {
-                const response = await fetch('http://localhost:3001/ttik/brand/delete', {
+                const response = await fetch('https://localhost:3001/ttik/brand/delete', {
                     method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(selectedIds), 
                 });
-
                 if (response.ok) {
                     alert("삭제되었습니다.");
                     setBrands(prev => prev.filter(brand => !selectedIds.includes(brand.brandSn)));
@@ -86,22 +79,15 @@ function BrandList() {
         setSelectedIds([]);
     }, [currentPage]);
 
-    const indexOfLast = currentPage * postsPerPage;
-    const indexOfFirst = indexOfLast - postsPerPage;
-    const currentBrands = filteredBrands.slice(indexOfFirst, indexOfLast);
-    const totalPages = Math.ceil(filteredBrands.length / postsPerPage);
-
-    const handlePageChange = (page) => setCurrentPage(page);
-
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
-        setCurrentPage(1);
+        setCurrentPage(1); // 검색 시 1페이지로 이동
     };
 
     return (
-        <div className="container">
+        <div> 
             <h1 className={styleBrand.brandTitle}>Brand</h1>
-            <p className={styleBrand.brandSubTitle}>브랜드 관리</p>
+            <p className={styleBrand.brandSubTitle}>브랜드를 관리 하세요.</p>
 
             <div className={styleBrand.brandListbox}>
                 <div className={styleBrand.searchBox}>
@@ -117,7 +103,6 @@ function BrandList() {
                     <button className={styleBrand.brandBtn} onClick={handleDelete} >삭제</button>
                 </div>
 
-                {/* 모달 컴포넌트 호출 */}
                 <BrandRegister 
                     isOpen={isModalOpen} 
                     onClose={() => setIsModalOpen(false)} 
@@ -139,7 +124,7 @@ function BrandList() {
                             </thead>
                             <tbody>
                                 {currentBrands.length > 0 ? (
-                                    currentBrands.map((brand, index) => (
+                                    currentBrands.map((brand) => (
                                         <tr key={brand.brandSn}>
                                             <td>
                                                 <input 
@@ -153,7 +138,6 @@ function BrandList() {
                                             </td>
                                             <td>{brand.brNo}</td>
                                             <td>{brand.telNo}</td>
-
                                         </tr>
                                     ))
                                 ) : (
@@ -166,23 +150,36 @@ function BrandList() {
                     )}
                 </div>
 
-                <div className="pagination" style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "20px" }}>
-                    {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((page) => (
-                    <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        style={{
-                        padding: "5px 10px",
-                        backgroundColor: page === currentPage ? "#333" : "#fff",
-                        color: page === currentPage ? "#fff" : "#333",
-                        border: "1px solid #ccc",
-                        cursor: "pointer"
-                        }}
-                    >
-                        {page}
-                    </button>
-                    ))}
-                </div>
+                {/* 3. 페이지네이션 UI (변수명 currentBrands로 수정) */}
+                {filteredBrands.length > 0 && (
+                    <div className={styleBrand.pagination}>
+                        <button 
+                            className={styleBrand.pageMoveBtn}
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                        >
+                            &lt;
+                        </button>
+                        
+                        {[...Array(totalPages)].map((_, i) => (
+                            <button
+                                key={i + 1}
+                                onClick={() => setCurrentPage(i + 1)}
+                                className={`${styleBrand.pageNumber} ${currentPage === i + 1 ? styleBrand.activePage : ''}`}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+                        
+                        <button 
+                            className={styleBrand.pageMoveBtn}
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                        >
+                            &gt;
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

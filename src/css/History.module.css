@@ -1,0 +1,95 @@
+.plansListbox{
+    padding: 2rem 0;
+    padding: 3rem;
+    border-radius: 1.5rem;
+    width: 100%; 
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.plansTitle{
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -1px;
+    margin-bottom: 0.8rem;
+}
+
+.plansSubTitle{
+    font-size: 15px;
+    color: #64748b;
+    font-weight: 400;
+    margin-bottom: 5rem;
+}
+
+.plansBtn {
+    position: flex;
+    padding: 0.82rem 2rem;
+    background-color: #f1f5f9;
+    color: #475569;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 1rem;
+}
+
+.plansBtn:hover{
+    background-color: #e2e8f0;
+}
+
+.plansTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.plansTable th {
+    padding: 12px;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: bold;
+}
+
+.plansTable td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding-bottom: 10px;
+}
+
+.pageNumber {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.activePage {
+    background-color: var(--primary-color) !important; /* 또는 강조하고 싶은 색상 */
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.pageMoveBtn {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.pageMoveBtn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}

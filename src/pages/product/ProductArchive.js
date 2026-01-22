@@ -93,7 +93,7 @@ const ProductArchive = () => {
 
       try {
         // 서버 API 호출 (DELETE 요청으로 실제 DB 데이터 삭제)
-        await axios.delete(`http://localhost:3001/api/product/archive/${gds_cd}`);
+        await axios.delete(`https://localhost:3001/api/product/archive/${gds_cd}`);
         
         // UI 갱신
         setArchiveList(prev => prev.filter(item => item.gds_cd !== gds_cd));

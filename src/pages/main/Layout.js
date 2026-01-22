@@ -51,11 +51,10 @@ const Layout = ({ children, user }) => {
 
   const menus = [
     { path: '/ttik', name: '대시보드', icon: '📊' },
-    { path: '/products', name: '상품 관리', icon: '📦' },
-    { path: '/product/productDetail', name: '상품 상세', icon: '📦' },
-    { path: '/inventory', name: '입출고 관리', icon: '🔄' },
-    { path: '/register', name: '등록하기', icon: '➕' },
-    { path: '/history', name: '이력 조회', icon: '📜' },
+    { path: '/productList', name: '상품 관리', icon: '📦' },
+    { path: '/stock/plans', name: '입출고 관리', icon: '🔄' },
+    { path: '/product/productDetail', name: '상품 상세 조회', icon: '🔄' },
+    { path: '/stock/history', name: '이력 조회', icon: '📜' },
     { path: '/brand', name: '브랜드', icon: '🏷️' },
     { path: '/register-admin', name: '관리자 등록', icon: '👤' }
   ];
@@ -114,7 +113,7 @@ const Layout = ({ children, user }) => {
           <div className={styleLayout.topBarLeft} style={{ display: 'flex', alignItems: 'center' }}>
             <button className={styleLayout.menuToggle} onClick={() => setIsSidebarOpen(true)}>☰</button>
             <h2 className={styleLayout.sageTitle}>
-              {menus.find(m => m.path === location.pathname)?.name || "시스템"}
+              {menus.find(m => m.path === location.pathname)?.name || "시스템" }
             </h2>
           </div>
 

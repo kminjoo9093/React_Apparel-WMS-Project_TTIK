@@ -13,7 +13,7 @@ const ProductDetail = () => {
   const fetchProductData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:3001/api/product/list');
+      const response = await axios.get('https://localhost:3001/ttik/product/list01');
       if (response.data && Array.isArray(response.data)) {
         setCardList(response.data);
       }
@@ -41,7 +41,7 @@ const ProductDetail = () => {
       const confirmMessage = `[${product.gds_nm}] \n재고가 0입니다. 관리 제외 품목(Archive)으로 이동시킬까요?`;
       if (window.confirm(confirmMessage)) {
         try {
-          await axios.post('http://localhost:3001/api/product/disable', { 
+          await axios.post('https://localhost:3001/ttik/product/disable', { 
             gds_cd: product.gds_cd,
             gds_enabled: 'N'
           });
@@ -117,6 +117,7 @@ const ProductDetail = () => {
                   <div className={style['info-item']}><span className={style['info-label']}>카테고리</span><span className={style['info-value']}>{product.gds_cat_nm}</span></div>
                   <div className={style['info-item']}><span className={style['info-label']}>최초 등록일</span><span className={style['info-value']}>{product.frst_reg_dt}</span></div>
                   <div className={style['info-item']}><span className={style['info-label']}>사이즈</span><span className={style['info-value']}>{product.size_nm}</span></div>
+                  <div className={style['info-item']}><span className={style['info-label']}>입수 수량</span><span className={style['info-value']}>{product.inbox_qty} EA</span></div>
                   <div className={style['info-item']}><span className={style['info-label']}>임계치</span><span className={style['info-value']} style={{color: '#e11d48', fontWeight: 'bold'}}>{product.threshold} EA</span></div>
                   <div className={style['info-item']}>
                     <span className={style['info-label']}>현재 재고</span>

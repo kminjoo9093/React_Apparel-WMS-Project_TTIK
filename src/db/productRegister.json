@@ -1,0 +1,389 @@
+{
+  "brands": [
+    {
+      "name": "나이키",
+      "code": "01",
+      "id": "5fe4"
+    },
+    {
+      "name": "아디다스",
+      "code": "02",
+      "id": "86c0"
+    },
+    {
+      "name": "아식스",
+      "code": "03",
+      "id": "9908"
+    }
+  ],
+  "category": [
+    {
+      "catNm": "상의",
+      "catCd": "TP",
+      "id": "9b33"
+    },
+    {
+      "catNm": "하의",
+      "catCd": "BT",
+      "id": "69ff"
+    },
+    {
+      "catNm": "악세서리",
+      "catCd": "AC",
+      "id": "ac0b"
+    },
+    {
+      "catNm": "신발",
+      "catCd": "SH",
+      "id": "e849"
+    }
+  ],
+  "season": [
+    {
+      "seasonSn": 202501,
+      "seasonCd": "25S",
+      "seasonNm": "2025 S/S",
+      "id": "954b"
+    },
+    {
+      "seasonSn": 202502,
+      "seasonCd": "25F",
+      "seasonNm": "2025 F/W",
+      "id": "b229"
+    },
+    {
+      "seasonSn": 202401,
+      "seasonCd": "24S",
+      "seasonNm": "2024 S/S",
+      "id": "fe32"
+    },
+    {
+      "id": "2f0e",
+      "year": "2027",
+      "season": "S",
+      "seasonSn": "202701",
+      "seasonCd": "27S",
+      "seasonNm": "2027 S/S"
+    },
+    {
+      "id": "4f26",
+      "year": "2023",
+      "season": "F",
+      "seasonSn": 202302,
+      "seasonCd": "23F",
+      "seasonNm": "2023 F/W"
+    },
+    {
+      "id": "1573",
+      "year": "2023",
+      "season": "F",
+      "seasonSn": 202302,
+      "seasonCd": "23F",
+      "seasonNm": "2023 F/W"
+    },
+    {
+      "id": "52d9",
+      "year": "2023",
+      "season": "F",
+      "seasonSn": 202302,
+      "seasonCd": "23F",
+      "seasonNm": "2023 F/W"
+    },
+    {
+      "id": "bf3d",
+      "year": "2024",
+      "season": "F",
+      "seasonSn": 202402,
+      "seasonCd": "24F",
+      "seasonNm": "2024 F/W"
+    },
+    {
+      "id": "768e",
+      "year": "2024",
+      "season": "F",
+      "seasonSn": 202402,
+      "seasonCd": "24F",
+      "seasonNm": "2024 F/W"
+    },
+    {
+      "id": "4cb9",
+      "year": "2028",
+      "season": "S",
+      "seasonSn": 202801,
+      "seasonCd": "28S",
+      "seasonNm": "2028 S/S"
+    },
+    {
+      "id": "c35c",
+      "year": "2000",
+      "season": "S",
+      "seasonSn": 200001,
+      "seasonCd": "00S",
+      "seasonNm": "2000 S/S"
+    },
+    {
+      "id": "8c8f",
+      "year": "2025",
+      "season": "S",
+      "seasonSn": 202501,
+      "seasonCd": "25S",
+      "seasonNm": "2025 S/S"
+    }
+  ],
+  "size": {
+    "W": {
+      "TP": [
+        {
+          "sizeCd": "WFR01",
+          "sizeNm": "FREE"
+        },
+        {
+          "sizeCd": "WXS01",
+          "sizeNm": "XS"
+        },
+        {
+          "sizeCd": "WS001",
+          "sizeNm": "S"
+        },
+        {
+          "sizeCd": "WM001",
+          "sizeNm": "M"
+        },
+        {
+          "sizeCd": "WL001",
+          "sizeNm": "L"
+        },
+        {
+          "sizeCd": "WXL01",
+          "sizeNm": "XL"
+        },
+        {
+          "sizeCd": "2XL01",
+          "sizeNm": "XXL"
+        },
+        {
+          "sizeCd": "W4401",
+          "sizeNm": "80"
+        },
+        {
+          "sizeCd": "W8501",
+          "sizeNm": "85"
+        }
+      ],
+      "BT": [
+        {
+          "sizeCd": "WFR02",
+          "sizeNm": "FREE"
+        },
+        {
+          "sizeCd": "WXS02",
+          "sizeNm": "XS"
+        },
+        {
+          "sizeCd": "WS002",
+          "sizeNm": "S"
+        },
+        {
+          "sizeCd": "WM002",
+          "sizeNm": "M"
+        },
+        {
+          "sizeCd": "WL002",
+          "sizeNm": "L"
+        },
+        {
+          "sizeCd": "WXL02",
+          "sizeNm": "XL"
+        },
+        {
+          "sizeCd": "W2XL2",
+          "sizeNm": "XXL"
+        },
+        {
+          "sizeCd": "WW242",
+          "sizeNm": "24"
+        },
+        {
+          "sizeCd": "WW252",
+          "sizeNm": "25"
+        },
+        {
+          "sizeCd": "WW262",
+          "sizeNm": "26"
+        },
+        {
+          "sizeCd": "WW272",
+          "sizeNm": "27"
+        },
+        {
+          "sizeCd": "WW282",
+          "sizeNm": "28"
+        }
+      ]
+    },
+    "M": {
+      "TP": [
+        {
+          "sizeCd": "MFR01",
+          "sizeNm": "FREE"
+        },
+        {
+          "sizeCd": "MS001",
+          "sizeNm": "S"
+        },
+        {
+          "sizeCd": "MM001",
+          "sizeNm": "M"
+        },
+        {
+          "sizeCd": "ML001",
+          "sizeNm": "L"
+        },
+        {
+          "sizeCd": "MXL01",
+          "sizeNm": "XL"
+        },
+        {
+          "sizeCd": "M2XL1",
+          "sizeNm": "XXL"
+        },
+        {
+          "sizeCd": "M1001",
+          "sizeNm": "100"
+        },
+        {
+          "sizeCd": "M1151",
+          "sizeNm": "115"
+        }
+      ],
+      "BT": [
+        {
+          "sizeCd": "MFR02",
+          "sizeNm": "FREE"
+        },
+        {
+          "sizeCd": "MS002",
+          "sizeNm": "S"
+        },
+        {
+          "sizeCd": "MM002",
+          "sizeNm": "M"
+        },
+        {
+          "sizeCd": "ML002",
+          "sizeNm": "L"
+        },
+        {
+          "sizeCd": "MW282",
+          "sizeNm": "28"
+        },
+        {
+          "sizeCd": "MW302",
+          "sizeNm": "30"
+        },
+        {
+          "sizeCd": "MW342",
+          "sizeNm": "34"
+        },
+        {
+          "sizeCd": "MW362",
+          "sizeNm": "36"
+        }
+      ]
+    }
+  },
+  "productMaster": [
+    {
+      "id": "674e",
+      "boxCd": "010101",
+      "productCd": "25S-T01-001",
+      "brandCd": "01",
+      "sizeCd": "M02",
+      "catCd": "BT",
+      "seasonCd": "24S",
+      "productNm": "스몰 로고 트랙팬츠",
+      "lmtQty": "20",
+      "price": "75000",
+      "threshold": "40"
+    },
+    {
+      "id": "6443",
+      "boxCd": "",
+      "productCd": "25S-T01-001",
+      "brandCd": "01",
+      "sizeCd": "M01",
+      "catCd": "TP",
+      "seasonCd": "25F",
+      "productNm": "ㄹㄴㅁㅇㅎ",
+      "lmtQty": 123,
+      "price": 1231,
+      "threshold": 23
+    },
+    {
+      "id": "cbd9",
+      "boxCd": "",
+      "productCd": "25S-T01-001",
+      "brandCd": "",
+      "sizeCd": "W24",
+      "catCd": "BT",
+      "seasonCd": "27S",
+      "productNm": "dsfgf",
+      "lmtQty": 12,
+      "price": 121,
+      "threshold": 2
+    },
+    {
+      "id": "a59b",
+      "productCd": "0125F-TPWS001-W001",
+      "boxCd": "0125F-TPWS001-W001-B30",
+      "brandCd": "01",
+      "sizeCd": "WS001",
+      "catCd": "TP",
+      "seasonCd": "25F",
+      "productNm": "스몰 로고 트랙팬츠",
+      "lmtQty": 30,
+      "price": 48000,
+      "threshold": 30
+    },
+    {
+      "id": "9b2b",
+      "productCd": "0227S-BTWS002-W001",
+      "boxCd": "0227S-BTWS002-W001-B40",
+      "brandCd": "02",
+      "sizeCd": "WS002",
+      "catCd": "BT",
+      "seasonCd": "27S",
+      "productNm": "스몰 로고 트랙팬츠",
+      "lmtQty": 40,
+      "price": 50000,
+      "threshold": 30
+    },
+    {
+      "id": "65e5",
+      "productCd": "0125F-BTWXL02-W001",
+      "brandCd": "01",
+      "sizeCd": "WXL02",
+      "catCd": "BT",
+      "seasonCd": "25F",
+      "productNm": "스몰 로고 트랙팬츠",
+      "lmtQty": 50,
+      "price": 55000,
+      "threshold": 50,
+      "initStock": 0
+    },
+    {
+      "id": "bc77",
+      "productCd": "0327S-TPWFR01-W001",
+      "styleNo": "W001",
+      "productNm": "스몰 로고 트랙팬츠",
+      "brandCd": "03",
+      "sizeCd": "WFR01",
+      "catCd": "TP",
+      "seasonCd": "27S",
+      "inboxQty": 50,
+      "price": 42000,
+      "threshold": 50,
+      "initStock": 5
+    }
+  ]
+}
