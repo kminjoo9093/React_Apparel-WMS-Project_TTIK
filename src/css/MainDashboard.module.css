@@ -10,7 +10,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Welcome Section 페이지 최상단 타이틀 영역입니다. */
+/* Welcome Section */
 .welcomeSection {
   margin-bottom: 4.8rem;
 }
@@ -29,7 +29,7 @@
   font-weight: 400;
 }
 
-/* Stats Grid 요약 정보 카드들이 가로로 배치되는 영역입니다. */
+/* Stats Grid */
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -54,12 +54,10 @@
   border-color: #cbd5e1;
 }
 
-/* 카드 내부 요소 */
 .cardLabel { font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
 .cardValue { font-size: 36px; font-weight: 800; color: #1e293b; margin: 1.2rem 0; }
 .cardUnit  { font-size: 18px; font-weight: 500; margin-left: 0.6rem; color: #94a3b8; }
 
-/* 트렌드 표시 (전월 대비) */
 .cardFooter { display: flex; align-items: center; gap: 0.8rem; }
 .trend { font-size: 13px; font-weight: 700; }
 .trend.up   { color: #10b981; }
@@ -67,37 +65,18 @@
 .trendLabel { font-size: 13px; color: #94a3b8; }
 
 @keyframes urgentPulse {
-  0% {
-    box-shadow: 0 0.4rem 2.4rem rgba(255, 77, 79, 0.1);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 1.2rem 4rem rgba(255, 77, 79, 0.25);
-    transform: scale(1.02); 
-    border-color: #ff7875;
-  }
-  100% {
-    box-shadow: 0 0.4rem 2.4rem rgba(255, 77, 79, 0.1);
-    transform: scale(1); 
-  }
+  0% { box-shadow: 0 0.4rem 2.4rem rgba(255, 77, 79, 0.1); transform: scale(1); }
+  50% { box-shadow: 0 1.2rem 4rem rgba(255, 77, 79, 0.25); transform: scale(1.02); border-color: #ff7875; }
+  100% { box-shadow: 0 0.4rem 2.4rem rgba(255, 77, 79, 0.1); transform: scale(1); }
 }
-/* 재고 부족 강조 */
+
 .modernCard.warning {
   background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
   border: 2px solid #ff4d4f; 
-  box-shadow: 0 1rem 3rem rgba(255, 77, 79, 0.15); 
-  animation: urgentPulse 2s infinite ease-in-out; /* 긴급 애니메이션 */
+  animation: urgentPulse 2s infinite ease-in-out;
 }
-.modernCard.warning .cardLabel {
-  color: #cf1322; 
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.modernCard.warning .cardValue {
-  color: #a8071a; 
-}
+.modernCard.warning .cardLabel { color: #cf1322; display: flex; align-items: center; gap: 0.6rem; }
+.modernCard.warning .cardValue { color: #a8071a; }
 
 .warningGlow {
   position: absolute;
@@ -109,11 +88,12 @@
   pointer-events: none;
 }
 
-/* Content Grid 최근 입출고 리스트가 담기는 영역입니다. */
+/* Content Grid */
 .contentGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 3.2rem;
+  align-items: stretch; 
+  transition: all 0.3s ease;
 }
 
 .dataPanel {
@@ -122,12 +102,15 @@
   border-radius: 2.4rem;
   border: 1px solid rgba(226, 232, 240, 0.6);
   box-shadow: 0 0.4rem 2.4rem rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
 }
 
 .panelHeader {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 2.4rem;
 }
 
@@ -147,7 +130,6 @@
 
 .viewAll:hover { background: #e2e8f0; }
 
-/* List Items Style 패널 내부의 개별 리스트 항목입니다. */
 .listItem {
   display: flex;
   justify-content: space-between;
@@ -157,136 +139,112 @@
 }
 
 .listItem:last-child { border-bottom: none; }
-
 .itemInfo { display: flex; flex-direction: column; gap: 0.6rem; }
 .itemName { font-size: 15px; font-weight: 600; color: #334155; }
 .itemDate { font-size: 12px; color: #94a3b8; }
-
-.itemQty { font-size: 16px; font-weight: 700; }
 .itemQtyPlus  { font-size: 16px; font-weight: 700; color: #2563eb; }
 .itemQtyMinus { font-size: 16px; font-weight: 700; color: #ef4444; }
 
-/* 타이틀과 탭을 가로로 배치하기 위한 flex */
-.welcomeFlex {
+.welcomeFlex { display: flex; justify-content: space-between; align-items: flex-end; }
+.updateTime { font-size: 13px !important; color: #94a3b8 !important; margin-top: 4px; }
+
+.storageTabs { display: flex; background: #f1f5f9; padding: 0.5rem; border-radius: 1.4rem; gap: 0.4rem; }
+.tabBtn { padding: 0.8rem 2rem; border-radius: 1rem; border: none; background: transparent; color: #64748b; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; }
+.tabBtn:hover { color: #1e293b; }
+.tabBtn.activeTab { background: #ffffff; color: #2563eb; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
+
+.rackGrid { display: flex; flex-direction: column; gap: 12px; padding: 10px 0; max-height: 400px; overflow-y: auto; }
+.rackRow { display: flex; align-items: center; gap: 10px; }
+.rowLabel { width: 40px; font-weight: 800; color: #1e293b; font-size: 1.2rem; text-align: center;  }
+.rackList { display: flex; gap: 0.1rem; flex-wrap: wrap; }
+.rackBox {
+  width: 5.2rem; 
+  height: 3.8rem;
+  border-radius: 6px 6px 2px 2px; 
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.updateTime {
-  font-size: 13px !important;
-  color: #94a3b8 !important;
-  margin-top: 4px;
-}
-
-/* 창고 선택 탭 스타일 */
-.storageTabs {
-  display: flex;
-  background: #f1f5f9;
-  padding: 0.5rem;
-  border-radius: 1.4rem;
-  gap: 0.4rem;
-}
-
-.tabBtn {
-  padding: 0.8rem 2rem;
-  border-radius: 1rem;
-  border: none;
-  background: transparent;
-  color: #64748b;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tabBtn:hover {
-  color: #1e293b;
-}
-
-/* 활성화된 탭 스타일 */
-.tabBtn.activeTab {
-  background: #ffffff;
-  color: #2563eb;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* 모바일 및 태블릿 반응형 스타일 */
-/* 1. 태블릿 사이즈 (최대 1024px) */
-@media (max-width: 1024px) {
-  .modernDashboard {
-    padding: 2rem; /* 좌우 여백 확보 */
-  }
-
-  .statsGrid {
-    grid-template-columns: repeat(2, 1fr); /* 3열에서 2열로 변경 */
-    gap: 2rem;
-  }
-}
-
-/* 2. 모바일 사이즈 (최대 768px) */
-@media (max-width: 768px) {
-  .welcomeSection h1 {
-    font-size: 24px; /* 타이틀 크기 축소 */
-  }
-
-  /* 통계 카드를 한 줄에 하나씩 배치 */
-  .statsGrid {
-    grid-template-columns: 1fr;
-    gap: 1.6rem;
-    margin-bottom: 3.2rem;
-  }
-
-  /* 하단 입출고 패널을 한 줄에 하나씩 배치 */
-  .contentGrid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-
-  .modernCard, .dataPanel {
-    padding: 2rem; /* 내부 패딩 축소 */
-  }
-
-  .cardValue {
-    font-size: 28px; /* 숫자 크기 조절 */
-  }
-
-  .panelHeader h3 {
-    font-size: 16px;
-  }
-
-  .welcomeFlex {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2rem;
-  }
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700; 
+  letter-spacing: -0.3px;
   
-  .storageTabs {
-    width: 100%;
-    justify-content: space-between;
-  }
+  position: relative;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.3);
+}
 
-  .tabBtn {
-    flex: 1;
-    padding: 1rem;
+.sttsY { 
+  background-color: #f0f4ff; 
+  color: #3b82f6; 
+  box-shadow: 0 3px 0 #3b82f6; 
+} 
+
+.sttsN { 
+  background-color: #fee2e2; 
+  color: #ef4444; 
+  box-shadow: 0 3px 0 #ef4444;
+}
+
+.enabledN { 
+  background-color: #f1f5f9; 
+  color: #94a3b8;
+  box-shadow: 0 2px 0 black;
+}
+
+.rackBox:hover {
+  transform: translateY(-4px); 
+  filter: brightness(0.95);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1), 0 3px 0 currentColor;
+  z-index: 10; 
+}
+
+.rackBox:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 currentColor;
+}
+
+.rackBox::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 6px 6px 0 0;
+}
+
+.customList, .rackGrid { flex: 1; }
+
+.titleWithLegend { display: flex; flex-direction: column; gap: 0.8rem; }
+.legend { display: flex; gap: 1.2rem; align-items: center; }
+.legendItem { display: flex; align-items: center; gap: 0.4rem; font-size: 12px; font-weight: 600; color: #64748b; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+@media (max-width: 1200px) {
+  .contentGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 
-/* 초소형 모바일 */
+@media (max-width: 1024px) {
+  .modernDashboard { padding: 2rem; }
+  .statsGrid { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+}
+
+@media (max-width: 768px) {
+  .welcomeSection h1 { font-size: 24px; }
+  .statsGrid, .contentGrid { grid-template-columns: 1fr !important; }
+  .modernCard, .dataPanel { padding: 2rem; min-height: auto; }
+  .cardValue { font-size: 28px; }
+  .welcomeFlex { flex-direction: column; align-items: flex-start; gap: 2rem; }
+  .storageTabs { width: 100%; justify-content: space-between; overflow-x: auto; }
+  .tabBtn { flex: 1; padding: 1rem; }
+}
+
 @media (max-width: 48rem) {
-  .welcomeSection {
-    margin-bottom: 2.4rem;
-  }
-
-  .listItem {
-    padding: 1.6rem 0;
-  }
-
-  .itemName {
-    font-size: 14px;
-    max-width: 15rem; /* 텍스트가 너무 길면 생략 처리하기 위함 */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+  .welcomeSection { margin-bottom: 2.4rem; }
+  .listItem { padding: 1.6rem 0; }
+  .itemName { font-size: 14px; max-width: 15rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }

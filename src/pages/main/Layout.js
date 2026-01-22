@@ -21,7 +21,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
 
   const closeModal = () => setModal({ ...modal, isOpen: false });
 
-  // 사이드바를 볼 수 있는 권한 정의
+  // 사이드바 노출 권한 정의: ALL(전체관리자), U(창고이용자)
   const hasSidebarPermission = ['ALL', 'U'].includes(user?.tkcgStorage);
 
   const fetchNotifications = async () => {
@@ -129,9 +129,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
     { path: '/register-admin', name: '관리자 등록', icon: '👤', roles: ['ALL'] }
   ];
 
-  // 메뉴 필터링 (ALL, U 권한자만 실제 메뉴 배열을 가짐)
   const menus = allMenus.filter(m => m.roles.includes(user?.tkcgStorage));
-  
   const closeSidebar = () => setIsSidebarOpen(false);
   
   const handleSearch = (e) => {
@@ -155,7 +153,6 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
         onCancel={modal.onCancel} 
       />
 
-      {/* 사이드바 관련 요소들(오버레이, 본체)을 ALL, U 권한일 때만 렌더링 */}
       {hasSidebarPermission && (
         <>
           <div className={`${isSidebarOpen ? styleLayout.overlayActive : ''}`} onClick={closeSidebar}></div>
@@ -191,11 +188,9 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
         </>
       )}
 
-      {/* 사이드바가 없을 때(a, b 권한) 본문이 꽉 차도록 레이아웃 구성 */}
       <div className={`${styleLayout.mainContent} ${!hasSidebarPermission ? styleLayout.fullWidth : ''}`}>
         <header className={styleLayout.topBar}>
           <div className={styleLayout.topBarLeft} style={{ display: 'flex', alignItems: 'center' }}>
-            {/* 햄버거 버튼도 ALL, U에게만 노출 */}
             {hasSidebarPermission && (
               <button className={styleLayout.menuToggle} onClick={() => setIsSidebarOpen(true)}>☰</button>
             )}
@@ -232,6 +227,16 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
                   <div className={styleLayout.notiDropdown}>
                     <div className={styleLayout.notiHeader}>
                       <span>최근 알림</span>
+                      {/* 누락되었던 테스트용 초기화 버튼 복구 */}
+                      <button 
+                        onClick={() => {
+                          localStorage.removeItem('readNotifications');
+                          window.location.reload();
+                        }}
+                        style={{ fontSize: '10px', color: '#ef4444', cursor: 'pointer', border: 'none', background: 'none' }}
+                      >
+                        [테스트 초기화]
+                      </button>
                     </div>
                     <ul className={styleLayout.notiList}>
                       {notifications.length > 0 ? (
@@ -251,7 +256,9 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
                         ))
                       ) : (
                         <li className={styleLayout.notiEmpty}>
-                          <p>알림이 없습니다.</p>
+                          <div className={styleLayout.emptyIcon}>✨</div>
+                          <p>지금은 모든 재고가 충분해요!</p>
+                          <span>새로운 알림이 오면 알려드릴게요.</span>
                         </li>
                       )}
                     </ul>
