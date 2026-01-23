@@ -126,7 +126,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
     { path: '/stock/plans', name: '입출고 관리', icon: '🔄', roles: ['ALL', 'U'] },
     { path: '/stock/history', name: '이력 조회', icon: '📜', roles: ['ALL'] },
     { path: '/brand', name: '브랜드', icon: '🏷️', roles: ['ALL'] },
-    { path: '/register-admin', name: '관리자 등록', icon: '👤', roles: ['ALL'] }
+    { path: '/register/admin', name: '관리자 등록', icon: '👤', roles: ['ALL'] }
   ];
 
   const menus = allMenus.filter(m => m.roles.includes(user?.tkcgStorage));

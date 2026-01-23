@@ -6,7 +6,8 @@ import serverUrl from "../../db/server.json";
 import { useNavigate } from 'react-router-dom';
 
 const MainDashboard = ({ user }) => { 
-  const initialStorage = user?.tkcgStorage === 'ALL' ? 'ALL' : user?.tkcgStorage;
+  const isSpecialUser = user?.tkcgStorage === 'ALL' || user?.tkcgStorage === 'U';
+  const initialStorage = isSpecialUser ? 'ALL' : user?.tkcgStorage;
 
   const [stats, setStats] = useState({
     totalProducts: 0, totalTrend: 0,
@@ -25,7 +26,8 @@ const MainDashboard = ({ user }) => {
   const fetchStorages = useCallback(async () => {
     try {
       const response = await axios.get(`${SERVER_URL}/ttik/dashboard/storages`, { withCredentials: true });
-      if (user?.tkcgStorage === 'ALL') {
+      
+      if (user?.tkcgStorage === 'ALL' || user?.tkcgStorage === 'U') {
         setStorageList(['ALL', ...response.data]);
       } else {
         setStorageList(response.data);
@@ -38,16 +40,18 @@ const MainDashboard = ({ user }) => {
   const fetchStats = useCallback(async () => {
     try {
       const response = await axios.get(`${SERVER_URL}/ttik/dashboard/stats`, {
-        params: { storageName: selectedStorage },
+        params: { 
+          storageName: selectedStorage 
+        },
         withCredentials: true 
       });
+      
       setStats(response.data);
       setLastUpdated(new Date());
     } catch (error) {
       console.error("데이터 동기화 실패:", error);
     }
   }, [SERVER_URL, selectedStorage]);
-
   const fetchRacks = useCallback(async () => {
     try {
       const response = await axios.get(`${SERVER_URL}/ttik/dashboard/racks`, {
@@ -71,8 +75,8 @@ const MainDashboard = ({ user }) => {
   const groupedRacks = useMemo(() => {
     const groups = {};
     rackData.forEach(rack => {
-      const parts = rack.rackNm.split('-'); // "1-가" 형태
-      const level = parts[0]; // 첫 번째 요소가 층수 (1)
+      const parts = rack.rackNm.split('-'); // 1-A 형태
+      const level = parts[0]; // 첫 번째 요소가 층수
       if (!groups[level]) groups[level] = [];
       groups[level].push(rack);
     });
@@ -94,7 +98,7 @@ const MainDashboard = ({ user }) => {
             <p className={styleMainDashBoard.updateTime}>(최근 업데이트: {lastUpdated.toLocaleTimeString()})</p>
           </div>
           <div className={styleMainDashBoard.storageTabs}>
-            {user?.tkcgStorage === 'ALL' ? (
+            {(user?.tkcgStorage === 'ALL' || user?.tkcgStorage === 'U') ? (
               storageList.map((type) => (
                 <button
                   key={type}
@@ -181,13 +185,13 @@ const MainDashboard = ({ user }) => {
             
             <div className={styleMainDashBoard.rackGrid} style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '2rem', overflowX: 'auto', paddingBottom: '10px' }}>
               {Object.keys(groupedRacks).length > 0 ? (
-                // 구역(A, B, C)을 가로로 나열
+                // 구역을 가로로 나열
                 Object.keys(groupedRacks).sort().map(area => (
                   <div key={area} style={{ display: 'flex', flexDirection: 'column-reverse', alignItems: 'center', gap: '8px' }}>
                     {/* 하단 구역 라벨 */}
                     <span className={styleMainDashBoard.rowLabel} style={{ marginTop: '8px', border: 'none', width: 'auto' }}>{area}</span>
                     
-                    {/* 층수를 아래에서 위로 쌓음 (1F -> 2F -> 3F) */}
+                    {/* 층수를 아래에서 위로 */}
                     <div style={{ display: 'flex', flexDirection: 'column-reverse', gap: '5px' }}>
                       {groupedRacks[area].sort((a, b) => Number(a.rackNm.split('-')[0]) - Number(b.rackNm.split('-')[0])).map(rack => (
                         <div 

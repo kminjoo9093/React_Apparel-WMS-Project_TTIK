@@ -10,8 +10,8 @@ const RegisterAdmin = () => {
     password: '',
     confirmPassword: '',
     nickname: '',
-    storage: '', // 'ALL', 'U', 'MONITOR'
-    monitorStorage: '' // 모니터용일 때 입력받을 창고명 (예: C)
+    storage: '', 
+    monitorStorage: '' 
   });
 
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
@@ -50,7 +50,6 @@ const RegisterAdmin = () => {
       return;
     }
 
-    // 모니터용 선택 시 창고명 입력 확인
     if (formData.storage === 'MONITOR' && !formData.monitorStorage) {
       setModal({
         isOpen: true,
@@ -65,7 +64,6 @@ const RegisterAdmin = () => {
       mngrId: formData.id,
       mngrPswd: formData.password,
       nickname: formData.nickname,
-      // MONITOR면 입력한 창고명을, 아니면 선택한 값(ALL/U)을 전송
       tkcgStorage: formData.storage === 'MONITOR' ? formData.monitorStorage : formData.storage
     };
 
@@ -138,7 +136,7 @@ const RegisterAdmin = () => {
               {[
                 { id: 'ALL', label: '전체 관리자 (ALL)' },
                 { id: 'U', label: '이용자' },
-                { id: 'MONITOR', label: '모니터용' }, // 모니터용 옵션 추가
+                { id: 'MONITOR', label: '모니터용' }, // 모니터용 추가
               ].map((opt) => (
                 <label key={opt.id} className={style.checkboxLabel}>
                   <input
@@ -156,7 +154,7 @@ const RegisterAdmin = () => {
             </div>
           </div>
 
-          {/* 모니터용 선택 시 나타나는 추가 입력창 (기존 inputGroup 스타일 계승) */}
+          {/* 모니터용 선택 시 나타나는 추가 입력창 */}
           {formData.storage === 'MONITOR' && (
             <div className={style.inputGroup} style={{ marginTop: '1rem' }}>
               <label>모니터링 대상 창고명</label>

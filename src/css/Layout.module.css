@@ -67,7 +67,6 @@
   line-height: 1.5;
 }
 
-/* '관리자'라는 텍스트 앞에 작은 포인트 */
 .profileName::before {
   content: '●';
   color: #10b981; 
@@ -76,7 +75,6 @@
   vertical-align: middle;
 }
 
-/* 하단 메뉴와의 간격 확보 */
 .sidebarNav {
   margin-top: 1rem;
   padding: 0 0.8rem;
@@ -289,7 +287,7 @@
   animation: floating 3s ease-in-out infinite;
 }
 
-/* 아이콘 둥둥 떠다니는 애니메이션 */
+/* 아이콘 떠다니는 애니메이션 */
 @keyframes floating {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-5px); }
@@ -300,18 +298,18 @@
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #475569; /* 진한 회색 */
+  color: #475569; 
 }
 
 /* 하단 서브 텍스트 */
 .notiEmpty span {
   margin-top: 6px;
   font-size: 12px;
-  color: #94a3b8; /* 연한 회색 */
+  color: #94a3b8; 
   line-height: 1.4;
 }
 
-/* (선택 사항) 리스트 전체에 부드러운 스크롤 바 추가 */
+/* 리스트 전체에 부드러운 스크롤 바 추가 */
 .notiList::-webkit-scrollbar {
   width: 6px;
 }
@@ -329,7 +327,7 @@
     /* 사이드바: 평소에는 왼쪽으로 숨김 */
     .sidebar {
         position: fixed;
-        left: -26rem; /* 숨김 */
+        left: -26rem; 
         top: 0;
         bottom: 0;
         z-index: 999;
