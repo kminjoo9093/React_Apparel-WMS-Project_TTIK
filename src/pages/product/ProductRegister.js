@@ -252,6 +252,7 @@ function ProductRegister(){
         try{
             const res = await fetch(`${URL}/register`, {
                 method: 'POST',
+                credentials: 'include', 
                 headers: {'Content-type': 'application/json'},
                 body: JSON.stringify({
                     "productCd": productCd,
@@ -304,7 +305,7 @@ function ProductRegister(){
                                 <select name="brand" id="brand" value={brandCd} onChange={(e)=>setBrandCd(e.target.value)}>
                                     <option value="">선택하세요</option>
                                     {
-                                        brandList.map((record) => (
+                                        brandList?.map((record) => (
                                             <option key={record.brandSn} value={record.brandSn}>{record.brandNm}</option>
                                         ))
                                     }
@@ -332,7 +333,7 @@ function ProductRegister(){
                                 <select name="season" id="season" value={seasonCd} onChange={(e)=>setSeasonCd(e.target.value)}>
                                     <option value="">선택하세요</option>
                                     {
-                                        seasonList.map((record, index) => (
+                                        seasonList?.map((record, index) => (
                                             <option key={index} value={record.seasonCd}>{record.seasonNm}</option>
                                         ))
                                     }
@@ -345,7 +346,7 @@ function ProductRegister(){
                                 <select name="category" id="category" value={category} onChange={changedCategory}>
                                     <option value="">선택하세요</option>
                                     {
-                                        categoryList.map((record) => (
+                                        categoryList?.map((record) => (
                                             <option key={record.catCd} value={record.catCd}>{record.catNm}</option>
                                         ))
                                     }

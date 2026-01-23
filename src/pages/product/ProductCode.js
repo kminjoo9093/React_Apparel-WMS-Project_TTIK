@@ -16,7 +16,13 @@ function ProductCode({onClose, productCd, setProductCd}){
 
         //fetch
         try{
-            const res = await fetch(`${SERVER_URL}/ttik/product/exist/${productCd}`);
+            const res = await fetch(`${SERVER_URL}/ttik/product/exist/${productCd}`, {
+                method: 'GET',
+                credentials: 'include', 
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
             if(!res.ok){
                 throw new Error(`Error : ${res.status}`);
             }

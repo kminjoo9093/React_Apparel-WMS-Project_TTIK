@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styleBrand from "../../css/Brand.module.css";
+import serverUrl from "../../db/server.json";
 
 function BrandRegister({ isOpen, onClose, onRegisterSuccess }) {
     const [brNo, setBrNo] = useState("");
@@ -8,6 +9,7 @@ function BrandRegister({ isOpen, onClose, onRegisterSuccess }) {
     const [Tel, setTel] = useState("");
     const [telError, setTelError] = useState(""); 
     const [brand, setBrand] = useState("");
+    const SERVER_URL = serverUrl.SERVER_URL;
 
     const handleCheck = useCallback(async () => {
         const serviceKey = "nYrvOHdHDUUOV%2Fb8t4ddcrtVY02lgsfE%2BNmWpM%2F88LynhtxTOqBYkJZWbBCccrjZGcvSysLZVipV0g069cKT2A%3D%3D";
@@ -69,8 +71,9 @@ function BrandRegister({ isOpen, onClose, onRegisterSuccess }) {
         }
 
         try {
-            const response = await fetch('https://localhost:3001/ttik/brand/register', {
+            const response = await fetch(`${SERVER_URL}/ttik/brand/register`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     brandNm: brand,

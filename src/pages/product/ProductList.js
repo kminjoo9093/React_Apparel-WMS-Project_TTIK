@@ -22,12 +22,9 @@ function ProductList(){
         brandCd: "",
         categoryCd: "",
         seasonCd: "",
-        // 대시보드에서 ?status=부족 으로 왔다면 초기값을 "부족"으로 설정
         stkStatus: new URLSearchParams(location.search).get('status') || "",
-        keyword: ""
-    })
-
-
+        keyword: new URLSearchParams(location.search).get('search') || "" 
+    });
     const [filteredProductList, setFilteredProductList] = useState([]);
 
     // 페이지네이션 관련 로직
@@ -134,6 +131,20 @@ function ProductList(){
         }
     }
 
+    //추가 -- 레이아웃에서 상품명(코드) 검색시 이동할때 받는 함수 
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const urlSearch = params.get('search') || "";
+        const urlStatus = params.get('status') || "";
+
+        setSearchFilters(prev => ({
+            ...prev,
+            keyword: urlSearch,
+            stkStatus: urlStatus
+        }));
+        setCurrentPage(1); // 검색 시 1페이지로
+    }, [location.search]);
+
     // 공통 데이터 페치 함수
     async function getData(url){
         try{
@@ -188,7 +199,14 @@ function ProductList(){
                     fetchUrl = `${URL}/list`; //PC
                 }
 
-                const res = await fetch(fetchUrl);
+                const res = await fetch(fetchUrl, {
+                    method: 'GET',
+                    credentials: 'include', // 세션 쿠키 전송 (필수)
+                    headers: {
+                        'Accept': 'application/json', // JSON 응답 선호 명시
+                        'Content-Type': 'application/json'
+                    }
+                });
                 console.log("응답 상태:", res.status);
                 if(res.ok){
                     const data = await res.json();
@@ -240,9 +258,11 @@ function ProductList(){
             const isMatchStkStatus = status === searchFilters.stkStatus || searchFilters.stkStatus === "";
 
             // 키워드 검색 (상품코드 또는 상품명)
+            const searchLower = searchFilters.keyword.toLowerCase();
             const isMatchKeyword = searchFilters.keyword === ""
-                                || product.productCd.toLowerCase().includes(searchFilters.keyword.toLowerCase())
-                                || product.productNm.toLowerCase().includes(searchFilters.keyword.toLowerCase());
+                                || product.productCd.toLowerCase().includes(searchLower)
+                                || product.productNm.toLowerCase().includes(searchLower)
+                                || product.brandNm.toLowerCase().includes(searchLower);    // 추가 브랜드명 포함
 
             return isMatchBrand && isMatchCategory && isMatchSeason && isMatchStkStatus && isMatchKeyword;
         });
@@ -314,19 +334,19 @@ function ProductList(){
                             <div className={styleList.filterContents}>
                                 <select name="brandCd" id="brand" value={searchFilters.brandCd} onChange={handleFilterChange}>
                                     <option value="">브랜드</option>
-                                    {brandList.map((record) => (
+                                    {brandList?.map((record) => (
                                         <option key={record.brandSn} value={record.brandSn}>{record.brandNm}</option>
                                     ))}
                                 </select>
                                 <select name="categoryCd" value={searchFilters.categoryCd} onChange={handleFilterChange}>
                                     <option value="">카테고리</option>
-                                    {categoryList.map((record) => (
+                                    {categoryList?.map((record) => (
                                         <option key={record.catCd} value={record.catCd}>{record.catNm}</option>
                                     ))}
                                 </select>
                                 <select name="seasonCd" value={searchFilters.seasonCd} onChange={handleFilterChange}>
                                     <option value="">시즌</option>
-                                    {seasonList.map((record, index) => (
+                                    {seasonList?.map((record, index) => (
                                         <option key={index} value={record.seasonCd}>{record.seasonNm}</option>
                                     ))}
                                 </select>
@@ -344,7 +364,7 @@ function ProductList(){
                         </div>
                         <ul className={styleList.productList}>
                             {
-                                currentProducts.map((product, index) => (
+                                currentProducts?.map((product, index) => (
                                     <li className={`${styleList.productItem} ${handleStkStatus(product.stkQty, product.threshold) ? "" : styleList.warning}`} key={product.productCd}>
                                         <a href="#" 
                                         className={`${styleList.itemCard} `

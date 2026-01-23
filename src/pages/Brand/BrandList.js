@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import BrandRegister from './BrandRegister';
 import styleBrand from "../../css/Brand.module.css";
+import serverUrl from "../../db/server.json";
 
 function BrandList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,10 +28,19 @@ function BrandList() {
     const currentBrands = filteredBrands.slice(indexOfFirst, indexOfLast);
     const totalPages = Math.ceil(filteredBrands.length / postsPerPage);
 
+    const SERVER_URL = serverUrl.SERVER_URL;
+    
+
     const fetchBrandList = async () => {
         setLoading(true);
         try {
-            const response = await fetch('https://localhost:3001/ttik/brand/list'); 
+            const response = await fetch(`${SERVER_URL}/ttik/brand/list`, {
+                method: 'GET',
+                credentials: 'include', 
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }); 
             if (!response.ok) throw new Error('서버 응답 에러.');
             const data = await response.json();
             setBrands(data);
@@ -56,8 +66,9 @@ function BrandList() {
         }
         if (window.confirm(`선택한 ${selectedIds.length}개의 브랜드를 삭제하시겠습니까?`)) {
             try {
-                const response = await fetch('https://localhost:3001/ttik/brand/delete', {
+                const response = await fetch(`${SERVER_URL}/ttik/brand/delete`, {
                     method: 'DELETE',
+                    credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(selectedIds), 
                 });

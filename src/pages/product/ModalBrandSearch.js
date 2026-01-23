@@ -30,7 +30,13 @@ function ModalBrandSearch({onClose, setBrandCd}){
         if(inputVal.length === 0) return;
 
         try{
-            const res = await fetch(`${SERVER_URL}/ttik/brand/search?keyword=${inputVal}`);
+            const res = await fetch(`${SERVER_URL}/ttik/brand/search?keyword=${inputVal}`, {
+                method: 'GET',
+                credentials: 'include', 
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
             if(res.ok){
                 const data = await res.json();
                 console.log("브랜드 검색 결과 --> ", data)

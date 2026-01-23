@@ -14,7 +14,7 @@ function Storage(){
         <div className={styleStorage.storage}>
              <div className={styleMainDashBoard.welcomeSection}>
                 <h1>Storage</h1>
-                <p>창고 관리</p>
+                <p>창고 정보를 조회하고 관리하세요.</p>
             </div>
             <div className={styleStorage.contentArea}>
                 <div className={styleStorage.menuArea}>

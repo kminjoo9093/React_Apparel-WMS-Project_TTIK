@@ -26,6 +26,7 @@ function ProductSeason({onClose, setSeasonList}){
             const res = await fetch(`${SERVER_URL}/ttik/product/seasonRegister`, {
                 method: "POST",
                 headers: {'Content-type': 'application/json'},
+                credentials: 'include', 
                 body: JSON.stringify({
                     "year": year,
                     "season": season,

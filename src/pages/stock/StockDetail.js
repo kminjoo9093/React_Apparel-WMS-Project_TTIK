@@ -11,6 +11,7 @@ function StockDetail() {
     const SERVER_URL = serverUrl.SERVER_URL;
 
     const planType = location.state?.type || "InBound"; 
+    const planYmd = location.state?.planYmd;
 
     const [product, setProduct] = useState(null);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
@@ -25,17 +26,31 @@ function StockDetail() {
 
     useEffect(() => {
         const fetchDetail = async () => {
-            try {
-                const res = await fetch(`${SERVER_URL}/ttik/product/${productCd}?type=${planType}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setProduct(data);
+        try {
+            const url = `${SERVER_URL}/ttik/productdetail/product/${productCd}?type=${planType}${planYmd ? `&planYmd=${planYmd}` : ''}`;
+            
+            // 수정 포인트: 두 번째 인자로 옵션 객체 추가
+            const res = await fetch(url, {
+                method: 'GET',
+                credentials: 'include', // 세션 쿠키를 서버로 전송
+                headers: {
+                    'Accept': 'application/json' // JSON 데이터를 받겠다고 명시
                 }
-            } catch (error) { console.error("데이터 로드 실패", error); }
-        };
-        if(productCd) fetchDetail();
-    }, [productCd, SERVER_URL, planType]);
+            });
 
+            if (res.ok) {
+                const data = await res.json();
+                setProduct(data);
+            } else {
+                    // 401이나 403 에러 발생 시 로그 확인용
+                    console.error("서버 응답 상태 에러:", res.status);
+                    }
+                } catch (error) { 
+                    console.error("데이터 로드 실패", error); 
+                }
+            };
+            if(productCd) fetchDetail();
+        }, [productCd, SERVER_URL, planType, planYmd]);
     const handleCheckItem = (barcode) => {
         setCheckedItems(prev => {
             const newSet = new Set(prev);
@@ -58,6 +73,14 @@ function StockDetail() {
     const selectedTotalQty = scanHistory
         .filter(h => checkedItems.has(h.barcode))
         .reduce((sum, h) => sum + h.increment, 0);
+    
+    // 1. 선택된 항목들 중 박스(Box) 스캔 횟수 계산
+    const selectedBoxCount = scanHistory
+        .filter(h => checkedItems.has(h.barcode) && h.isBox).length;
+
+    // 2. 선택된 항목들 중 낱개(Single) 스캔 횟수 계산 (참고용)
+    const selectedSingleCount = scanHistory
+        .filter(h => checkedItems.has(h.barcode) && !h.isBox).length;
 
     const playBeep = () => {
         if (!audioContextRef.current) audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
@@ -242,23 +265,45 @@ function StockDetail() {
                 <div className={styles.leftCol}>
                     <div className={styles.card}>
                         <div className={styles.cardTitle}>📊 검수 현황 (선택됨)</div>
-                        <div className={styles.statGrid}>
-                            <div className={styles.statItem} style={{ background: '#f0f7ff' }}>
-                                <span className={styles.statLabel}>선택 수량</span>
+                        <div className={styles.statGrid} style={{ 
+                            display: 'grid', 
+                            gridTemplateColumns: 'repeat(3, 1fr)', // 3열로 변경
+                            gap: '10px' 
+                        }}>
+                            {/* 박스 수량 */}
+                            <div className={styles.statItem} style={{ background: '#fff5f5', border: '1px solid #feb2b2' }}>
+                                <span className={styles.statLabel}>박스 수</span>
+                                <span className={styles.statValue} style={{ color: '#e53e3e' }}>{selectedBoxCount}</span>
+                                <small>BOX</small>
+                            </div>
+
+                            {/* 선택 총 수량 (낱개 합산) */}
+                            <div className={styles.statItem} style={{ background: '#f0f7ff', border: '1px solid #bee3f8' }}>
+                                <span className={styles.statLabel}>선택 총량</span>
                                 <span className={styles.statValue} style={{ color: '#3182ce' }}>{selectedTotalQty}</span>
                                 <small>EA</small>
                             </div>
-                            <div className={styles.statItem} style={{ background: '#f0fff4' }}>
-                                <span className={styles.statLabel}>지시 예정량</span>
+
+                            {/* 지시 예정량 (총 수량) */}
+                            <div className={styles.statItem} style={{ background: '#f0fff4', border: '1px solid #c6f6d5' }}>
+                                <span className={styles.statLabel}>지시 예정</span>
                                 <span className={styles.statValue} style={{ color: '#38a169' }}>{product.stkQty}</span>
                                 <small>EA</small>
                             </div>
                         </div>
-                        <div className={styles.progressBarWrapper}>
+
+                        {/* 진행률 바 */}
+                        <div className={styles.progressBarWrapper} style={{ marginTop: '20px' }}>
                             <div 
                                 className={styles.progressBar} 
-                                style={{ width: `${Math.min((selectedTotalQty / (product.stkQty || 1)) * 100, 100)}%` }}
+                                style={{ 
+                                    width: `${Math.min((selectedTotalQty / (product.stkQty || 1)) * 100, 100)}%`,
+                                    backgroundColor: selectedTotalQty === product.stkQty ? '#38a169' : '#3182ce'
+                                }}
                             ></div>
+                        </div>
+                        <div style={{ textAlign: 'right', fontSize: '0.85rem', color: '#718096', marginTop: '5px' }}>
+                            진행률: {Math.floor((selectedTotalQty / (product.stkQty || 1)) * 100)}%
                         </div>
                     </div>
                     
