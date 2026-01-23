@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Html5QrcodeScanner } from "html5-qrcode";
 import serverUrl from "../../db/server.json";
@@ -20,7 +20,6 @@ function StockDetail() {
 
     const isProcessing = useRef(false);
     const scannerRef = useRef(null);
-    // 실시간 수량 체크를 위한 가장 정확한 참조 데이터
     const scanHistoryRef = useRef([]); 
     const audioContextRef = useRef(null);
 
@@ -29,12 +28,11 @@ function StockDetail() {
         try {
             const url = `${SERVER_URL}/ttik/productdetail/product/${productCd}?type=${planType}${planYmd ? `&planYmd=${planYmd}` : ''}`;
             
-            // 수정 포인트: 두 번째 인자로 옵션 객체 추가
             const res = await fetch(url, {
                 method: 'GET',
-                credentials: 'include', // 세션 쿠키를 서버로 전송
+                credentials: 'include', 
                 headers: {
-                    'Accept': 'application/json' // JSON 데이터를 받겠다고 명시
+                    'Accept': 'application/json' 
                 }
             });
 
@@ -42,7 +40,6 @@ function StockDetail() {
                 const data = await res.json();
                 setProduct(data);
             } else {
-                    // 401이나 403 에러 발생 시 로그 확인용
                     console.error("서버 응답 상태 에러:", res.status);
                     }
                 } catch (error) { 
@@ -69,18 +66,18 @@ function StockDetail() {
         }
     };
 
-    // 화면 표시용 (선택된 수량)
+    // 화면 표시용 
     const selectedTotalQty = scanHistory
         .filter(h => checkedItems.has(h.barcode))
         .reduce((sum, h) => sum + h.increment, 0);
     
-    // 1. 선택된 항목들 중 박스(Box) 스캔 횟수 계산
+    // 선택된 항목들 중 박스 스캔 횟수 계산
     const selectedBoxCount = scanHistory
         .filter(h => checkedItems.has(h.barcode) && h.isBox).length;
 
-    // 2. 선택된 항목들 중 낱개(Single) 스캔 횟수 계산 (참고용)
-    const selectedSingleCount = scanHistory
-        .filter(h => checkedItems.has(h.barcode) && !h.isBox).length;
+    // 선택된 항목들 중 낱개 스캔 횟수 계산 
+    // const selectedSingleCount = scanHistory
+    //     .filter(h => checkedItems.has(h.barcode) && !h.isBox).length;
 
     const playBeep = () => {
         if (!audioContextRef.current) audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
@@ -95,13 +92,13 @@ function StockDetail() {
     };
 
     const handleBarcodeScanned = (fullBarcode) => {
-        // 1. 중복 스캔 방지 (Ref 사용)
+        // 중복 스캔 방지 
         if (scanHistoryRef.current.some(h => h.barcode === fullBarcode)) {
             alert("이미 스캔된 고유 번호입니다: " + fullBarcode);
             return;
         }
 
-        // 2. 바코드 파싱
+        // 바코드 파싱
         const parts = fullBarcode.split('-');
         let productId = "";
         let incrementValue = 1;
@@ -126,16 +123,14 @@ function StockDetail() {
             return;
         }
 
-        // 3. 실시간 수량 합산 및 초과 체크 (Ref를 기준으로 직접 계산)
+        // 실시간 수량 합산 및 초과 체크
         const currentSum = scanHistoryRef.current.reduce((sum, item) => sum + item.increment, 0);
         const limitQty = product?.stkQty || 0;
 
         if (currentSum + incrementValue > limitQty) {
             alert(`❌ 초과 차단! 더 이상 스캔할 수 없습니다.\n(예정: ${limitQty} / 현재: ${currentSum} / 추가시도: ${incrementValue})`);
-            return; // 리스트에 추가하지 않고 종료
+            return; 
         }
-
-        // 4. 모든 조건 통과 시 데이터 반영
         playBeep();
         
         const newLog = {
@@ -146,7 +141,6 @@ function StockDetail() {
             time: new Date().toLocaleTimeString()
         };
 
-        // Ref와 State를 동시에 업데이트하여 정합성 유지
         scanHistoryRef.current = [newLog, ...scanHistoryRef.current];
         setScanHistory([...scanHistoryRef.current]);
         setCheckedItems(prev => new Set(prev).add(fullBarcode));
@@ -267,7 +261,7 @@ function StockDetail() {
                         <div className={styles.cardTitle}>📊 검수 현황 (선택됨)</div>
                         <div className={styles.statGrid} style={{ 
                             display: 'grid', 
-                            gridTemplateColumns: 'repeat(3, 1fr)', // 3열로 변경
+                            gridTemplateColumns: 'repeat(3, 1fr)', 
                             gap: '10px' 
                         }}>
                             {/* 박스 수량 */}
