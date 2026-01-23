@@ -309,7 +309,7 @@ function ProductList(){
                 <p>상품 목록을 확인하세요. </p>
             </div>
             <div className={styleList.actionArea}>
-                <Link to="/product/register" className={styleRegister.registerBtn}>상품 등록</Link>
+                <Link to="/product/register" className={`${styleRegister.registerBtn} btnSubmit`}>상품 등록</Link>
             </div>
             <div className={styleList.productListBox}>
                 <div className={styleList.listTopWrap}>
@@ -334,19 +334,19 @@ function ProductList(){
                             <div className={styleList.filterContents}>
                                 <select name="brandCd" id="brand" value={searchFilters.brandCd} onChange={handleFilterChange}>
                                     <option value="">브랜드</option>
-                                    {brandList.map((record) => (
+                                    {brandList?.map((record) => (
                                         <option key={record.brandSn} value={record.brandSn}>{record.brandNm}</option>
                                     ))}
                                 </select>
                                 <select name="categoryCd" value={searchFilters.categoryCd} onChange={handleFilterChange}>
                                     <option value="">카테고리</option>
-                                    {categoryList.map((record) => (
+                                    {categoryList?.map((record) => (
                                         <option key={record.catCd} value={record.catCd}>{record.catNm}</option>
                                     ))}
                                 </select>
                                 <select name="seasonCd" value={searchFilters.seasonCd} onChange={handleFilterChange}>
                                     <option value="">시즌</option>
-                                    {seasonList.map((record, index) => (
+                                    {seasonList?.map((record, index) => (
                                         <option key={index} value={record.seasonCd}>{record.seasonNm}</option>
                                     ))}
                                 </select>
@@ -364,7 +364,7 @@ function ProductList(){
                         </div>
                         <ul className={styleList.productList}>
                             {
-                                currentProducts.map((product, index) => (
+                                currentProducts?.map((product, index) => (
                                     <li className={`${styleList.productItem} ${handleStkStatus(product.stkQty, product.threshold) ? "" : styleList.warning}`} key={product.productCd}>
                                         <a href="#" 
                                         className={`${styleList.itemCard} `
