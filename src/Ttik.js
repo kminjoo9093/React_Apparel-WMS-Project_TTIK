@@ -16,6 +16,7 @@ import Plans from "../src/pages/stock/StockPlans";
 import QRsave from "./pages/qrcode/QRsave";
 import History from "../src/pages/stock/StockHistory";
 import StockDetail from "./pages/stock/StockDetail";
+import Storage from "./pages/storage/Storage";
 
 function Ttik() {
   const [user, setUser] = useState(null); 
@@ -81,6 +82,8 @@ function Ttik() {
                 <Route path="/product/productArchive" element={<ProductArchive />} />
                 <Route path="/stock/plans/qr/print" element={<QRsave />} />
                 <Route path="/stock/history" element={<History />} />
+                <Route path="/storage" element={<Storage />} />
+
 
                 {/* 전체 관리자(ALL)만 접근 가능 */}
                 <Route 
@@ -91,7 +94,6 @@ function Ttik() {
                     </ProtectedRoute>
                   } 
                 />
-
                 <Route path="/" element={<Navigate to="/ttik" replace />} />
                 <Route path="*" element={<Error404Page />} />
               </Routes>
