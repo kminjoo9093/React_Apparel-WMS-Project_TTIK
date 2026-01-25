@@ -122,7 +122,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
 
   const allMenus = [
     { path: '/ttik', name: '대시보드', icon: '📊', roles: ['ALL', 'U'] },
-    { path: '/productList', name: '상품 관리', icon: '📦', roles: ['ALL'] },
+    { path: '/product/list', name: '상품 관리', icon: '📦', roles: ['ALL'] },
     { path: '/stock/plans', name: '입출고 관리', icon: '🔄', roles: ['ALL', 'U'] },
     { path: '/stock/history', name: '이력 조회', icon: '📜', roles: ['ALL'] },
     { path: '/brand', name: '브랜드', icon: '🏷️', roles: ['ALL'] },
@@ -138,9 +138,9 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
       if (searchKeyword.trim() === "") {
-        navigate('/productList');
+        navigate('/product/list');
       } else {
-        navigate(`/productList?search=${encodeURIComponent(searchKeyword)}`);
+        navigate(`/product/list?search=${encodeURIComponent(searchKeyword)}`);
       }
       setSearchKeyword("");
     }
@@ -240,7 +240,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
                           <li 
                             key={n.id} 
                             className={styleLayout.notiItem} 
-                            onClick={() => handleNotificationClick(n.id, '/productList')}
+                            onClick={() => handleNotificationClick(n.id, '/product/list')}
                           >
                             <div className={styleLayout.notiContent}>
                               <p className={n.type === 'warning' ? styleLayout.textWarn : ''}>

@@ -70,11 +70,11 @@ function Ttik() {
               <Routes>
                 {/* 공통 접근 권한 */}
                 <Route path="/ttik" element={<MainDashboard user={user} />} />
-                <Route path="/productList" element={<ProductList />} />
+                <Route path="/product/list" element={<ProductList />} /> 
                 <Route path="/brand" element={<Brand />} />
                 <Route path="/stock/plans" element={<Plans />} />
                 <Route path="/stock/plans/:productCd" element={<StockDetail />} />
-                <Route path="/register" element={<ProductRegister />} />
+                {/* <Route path="/register" element={<ProductRegister />} /> */}
                 <Route path="/product/register" element={<ProductRegister />} />
                 <Route path="/register-admin" element={<RegisterAdmin />} />
                 <Route path="/product/productDetail" element={<ProductDetail />} />

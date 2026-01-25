@@ -1,6 +1,6 @@
 .contentArea{
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1fr 2.5fr;
     column-gap: 4rem;
 }
 .mainContentWrap{
@@ -37,9 +37,6 @@
     border-radius: 1.5rem;
     background-color: #fff;
     padding: 3rem;
-}
-.menuList{
-    padding-inline: 2.5rem;
 }
 
 .menuList li{
@@ -89,14 +86,26 @@
 .contentRow{
     display: flex;
     align-items: center;
+    /* justify-content: space-between; */
     padding: 4rem;
-    gap: 10rem;
+    gap: 3rem;
     border-top: 1px solid var(--gray-e2);
 }
 
 /* 창고 조회 */
+.listTopWrap{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+}
+
 .notice{
     color: var(--gray-64);
+}
+
+.listFilter{
+    width: 15rem;
 }
 
 .storageTable {
@@ -223,6 +232,7 @@
     font-size: 1.8rem;
     width: 10rem;
     padding-block: 0.5em;
+    /* margin-right: 2rem; */
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -231,15 +241,28 @@
 
 .storageBtnWrap{
     flex: 1;
-    display: flex;
+    /* display: flex;
+    flex-wrap: wrap; */
+
+    /* gap: 2rem; */
+    /* justify-content: space-between; */
     /* justify-content: center; */
-    gap: 3rem;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 2rem;
+}
+
+.storageBtnWrap > div{
+    width: 100%;
 }
 
 .btnStorage{
     display: inline-block;
     font-size: 2rem;
-    padding: 1em 3em;
+    /* padding: 1em 3em; */
+    width: 100%;
+    padding-block: 1em;
     background-color: var(--gray-e2);
     border-radius: 10px;
     display: inline-flex;
@@ -262,7 +285,7 @@
 }
 
 .contentRow.row3{
-    align-items: flex-end;
+    /* align-items: flex-end; */
     border-top: none;
     padding-top: 0;
 }
@@ -339,7 +362,13 @@
 }
 
 .addContents{
-    
+    display: flex;
+    gap: 3rem;
+    width: 100%;
+}
+
+.addItem{
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;

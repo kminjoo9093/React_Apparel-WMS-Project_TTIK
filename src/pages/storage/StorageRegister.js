@@ -2,9 +2,11 @@ import { style } from "framer-motion/client";
 import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import styleRegister from "../../css/ProductRegister.module.css";
+import serverUrl from "../../db/server.json";
 
-function StorageRegister(){
+function StorageRegister({storageList}){
 
+    const SERVER_URL = serverUrl.SERVER_URL;
     const [storageNm, setStorageNm] = useState("");
     const [zoneList, setZoneList] = useState([{zone: 1, rack: ""}]);
 
@@ -16,7 +18,7 @@ function StorageRegister(){
     }
 
     const handleRemoveBtn = (indexToRemove) => {
-        setZoneList(prev => prev.filter((item, index) => index != indexToRemove));
+        setZoneList(prev => prev.filter((item, index) => index !== indexToRemove));
     }
 
     // 숫자 입력 유효성 검사 - 선반 층수
@@ -39,7 +41,7 @@ function StorageRegister(){
         setErrorMsg(prev => isInvalid ? "0 이상의 숫자를 입력하세요." : "");
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         let value = storageNm;
@@ -64,10 +66,50 @@ function StorageRegister(){
         } 
 
         //창고명 존재 여부 검사
+        const hasStorage = storageList.some(storage => (
+            storage.storageNm === storageNm
+        ));
+        if(hasStorage) {
+            alert("이미 등록된 창고입니다.");
+            return;
+        }
 
-        //제출
+        //서버에 등록 요청
+        const submitData = {
+            "storageNm" : storageNm,
+            "zones" : zoneList.map(item => ({
+                "zoneNo": item.zone,
+                "rackCount": item.rack
+            }))
+        }
+
+        console.log(submitData);
+
+        try{
+            const res = await fetch(`${SERVER_URL}/ttik/storage/register`, {
+                method: 'POST',
+                credentials: 'include', 
+                headers: {'Content-type': 'application/json'},
+                body: JSON.stringify(submitData)
+            })
+            if(res.ok){
+                alert("등록이 완료되었습니다.");
+                setStorageNm("");
+                setZoneList([{zone: 1, rack: ""}]);
+
+                const data = await res.json();
+                console.log(data);
+            }
+            
+        } catch(error){
+            console.log(error);
+        }
 
     }
+
+
+
+
 
     return (
         <>

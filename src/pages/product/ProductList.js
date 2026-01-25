@@ -30,7 +30,7 @@ function ProductList(){
     // 페이지네이션 관련 로직
     const [currentPage, setCurrentPage] = useState(1);
     const postsPerPage = 10; // 한페이지에 10개씩 (Pc)
-
+    const [totalPages, setTotalPages] = useState(null);
     const indexOfLast = currentPage * postsPerPage;
     const indexOfFirst = indexOfLast - postsPerPage;
 
@@ -95,7 +95,7 @@ function ProductList(){
             // if (observerTarget.current) observer.unobserve(observerTarget.current);
             if (observerTarget.current) observer.disconnect();
         };
-    }, [isMobile, hasMore, productList]) //isLoading
+    }, [isMobile, hasMore, productList]) //isLoading productList
 
     //모바일 두번째 이후 데이터 요청
     const getNextData = async (lastItemDate, lastItemProCd) => {
@@ -110,7 +110,10 @@ function ProductList(){
         let fetchUrl = `${URL}/list/scroll?size=5${filterQuery}`;
 
         try{
-            const response = await fetch(fetchUrl);
+            const response = await fetch(fetchUrl, {
+                method: 'GET',
+                credentials: 'include'
+            });
             if(response.ok){
                 const nextDataList = await response.json();
                 console.log("다음 목록 리스트 --> ", nextDataList);
@@ -145,10 +148,13 @@ function ProductList(){
         setCurrentPage(1); // 검색 시 1페이지로
     }, [location.search]);
 
-    // 공통 데이터 페치 함수
+    // 공통 데이터 요청 함수
     async function getData(url){
         try{
-            const res = await fetch(url); 
+            const res = await fetch(url, {
+                method: 'GET',
+                credentials: 'include'
+            }); 
             if(!res.ok) throw new Error(`Error : ${res.status}`);
             const data = await res.json();
             return data || [];
@@ -173,11 +179,26 @@ function ProductList(){
 
 
     //재고 상태 판단 - 없음 추가하기
-    function handleStkStatus(stkQty, threshold){
-        return stkQty > threshold; // true: 정상, false: 부족
+    function handleStkStatus(stkQty, threshold, enabled){
+
+        let stkStatus = "";
+
+        if(enabled === "W"){
+            if(stkQty === 0){
+                stkStatus = "입고 대기";
+            }
+        } else {
+            if(stkQty > threshold){  // true: 정상, false: 부족
+                stkStatus = "정상";
+            } else {
+                stkStatus = "부족";
+            }
+        }
+
+        return stkStatus;
     }
 
-    // 상품 전체 목록 불러오기 (1분마다 갱신 기능 포함)
+    // 상품 전체 목록 불러오기
     useEffect(()=>{
         const getProductList = async () => {    
 
@@ -254,7 +275,7 @@ function ProductList(){
             const isMatchSeason = product.seasonCd === searchFilters.seasonCd || searchFilters.seasonCd === "";
 
             // 재고 상태 필터 (정상/부족)
-            const status = handleStkStatus(product.stkQty, product.threshold) ? "정상" : "부족";
+            const status = handleStkStatus(product.stkQty, product.threshold, product.gdsEnabled);
             const isMatchStkStatus = status === searchFilters.stkStatus || searchFilters.stkStatus === "";
 
             // 키워드 검색 (상품코드 또는 상품명)
@@ -365,7 +386,12 @@ function ProductList(){
                         <ul className={styleList.productList}>
                             {
                                 currentProducts?.map((product, index) => (
-                                    <li className={`${styleList.productItem} ${handleStkStatus(product.stkQty, product.threshold) ? "" : styleList.warning}`} key={product.productCd}>
+                                    <li key={product.productCd}
+                                        className={`${styleList.productItem} 
+                                        ${handleStkStatus(product.stkQty, product.threshold, product.gdsEnabled) === "부족" 
+                                            ? styleList.warning 
+                                            : ""}`} 
+                                    >
                                         <a href="#" 
                                         className={`${styleList.itemCard} `
                                         }>
@@ -390,10 +416,13 @@ function ProductList(){
                                                 </div>
                                                 <div className={styleList.itemInfoR}>
                                                     <div className={styleList.stkWrap}>
-                                                        <div className={styleList.stkQty}><span className={styleList.infoLabel}>현재 재고 수량</span>{product.stkQty}</div>
+                                                        <div className={styleList.stkQty}>
+                                                            <span className={styleList.infoLabel}>현재 재고 수량</span>
+                                                            {product.stkQty}
+                                                        </div>
                                                         <div className={`${styleList.stkStatus}`}>
                                                             <span className={styleList.infoLabel}>재고 상태</span>
-                                                            {handleStkStatus(product.stkQty, product.threshold) ? "정상" : "부족"}
+                                                            {handleStkStatus(product.stkQty, product.threshold, product.gdsEnabled)}
                                                         </div>
                                                     </div>
                                                     <div className={styleList.date}>
@@ -422,6 +451,7 @@ function ProductList(){
                             : (
                                 <Pagination 
                                     targetList={filteredProductList} 
+                                    totalPages={totalPages}
                                     postsPerPage={postsPerPage}
                                     currentPage={currentPage}
                                     setCurrentPage={setCurrentPage}

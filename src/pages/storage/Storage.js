@@ -1,14 +1,42 @@
 import styleMainDashBoard from '../../css/MainDashboard.module.css';
 import styleStorage from "../../css/Storage.module.css";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import StorageModify from './StorageModify';
 import StorageList from './StorageList';
 import StorageRegister from './StorageRegister';
 import styleList from "../../css/ProductList.module.css";
+import serverUrl from "../../db/server.json";
 
 function Storage(){
 
+    const SERVER_URL = serverUrl.SERVER_URL;
     const [view, setView] = useState("list");
+    const [storageList, setStorageList] = useState([]);
+
+
+    //현재 존재하는 창고 리스트
+    useEffect(()=>{
+        const getStorageData = async () => {
+            try{
+                const res = await fetch(`${SERVER_URL}/ttik/storage/allStorages`, {
+                    method: 'GET',
+                    credentials: 'include', 
+                })
+
+                if(res.ok){
+                    const storageData = await res.json();
+                    console.log(storageData);
+
+                    setStorageList(storageData);
+                }
+            } catch(error){
+                console.log(error);
+                return [];
+            }
+            
+        }
+        getStorageData();
+    }, [])
 
     return (
         <div className={styleStorage.storage}>
@@ -34,9 +62,9 @@ function Storage(){
                 </div>
 
                 <div className={styleStorage.mainContentWrap}>
-                    {view === "register" && <StorageRegister />}
-                    {view === "modify" && <StorageModify />}
-                    {view === "list" && <StorageList />}
+                    {view === "register" && <StorageRegister storageList={storageList} />}
+                    {view === "modify" && <StorageModify storageList={storageList} />}
+                    {view === "list" && <StorageList storageList={storageList} />}
                 </div>
             </div>
         </div>

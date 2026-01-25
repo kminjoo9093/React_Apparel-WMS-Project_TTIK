@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styleRegister from "../../css/ProductRegister.module.css";
 import styleMainDashBoard from '../../css/MainDashboard.module.css';
 import ModalFrame from "./ModalFrame";
@@ -11,7 +12,7 @@ function ProductRegister(){
 
     const SERVER_URL = serverUrl.SERVER_URL;
     const URL = `${SERVER_URL}/ttik/product`;
-
+    const navigate = useNavigate();
 
     // 입력값
     const [brandCd, setBrandCd] = useState("");
@@ -57,7 +58,10 @@ function ProductRegister(){
 
     async function getData(url){
         try{
-            const res = await fetch(url); 
+            const res = await fetch(url, {
+                method: 'GET',
+                credentials: 'include', 
+            }); 
             if(!res.ok){
                 throw new Error(`Error : ${res.status}`);
             }
@@ -168,7 +172,10 @@ function ProductRegister(){
         if(!target || !category) return;
 
          const fetchData = async () => {
-            const sizeData = await getData(`${URL}/size?target=${target}&category=${category}`);
+            const sizeData = await getData(`${URL}/size?target=${target}&category=${category}`, {
+                method: 'GET',
+                credentials: 'include', 
+            });
             
             if(sizeData){
                 setSizeMap(sizeData);
@@ -187,6 +194,7 @@ function ProductRegister(){
         try{
             const res = await fetch(`${SERVER_URL}/ttik/productCode`, {
                 method: 'POST',
+                credentials: 'include', 
                 headers: {'Content-type': 'application/json'},
                 body: JSON.stringify({
                     "styleNo": styleNo,
@@ -284,6 +292,8 @@ function ProductRegister(){
 
                 const data = await res.json();
                 console.log(data);
+
+                navigate("/product/list");
             }
         } catch(error){
             alert("등록 실패 입력한 정보를 확인하세요.")
