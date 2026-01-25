@@ -13,6 +13,11 @@ function StorageList({storageList:storageOptions=[]}){
     const [isLoading, setIsLoading] = useState(true);
     const [storageFilter, setStorageFilter] = useState("");
     const [filteredList, setFilteredList] = useState([]);
+    const [selectedRack, setSelectedRack] = useState("");
+    const [rackDetailList, setRackDetailList] = useState([]);
+
+    const [detailRackNm, setDetailRackNm] = useState("");
+    const [boxCount, setBoxCount] = useState(null);
 
     // 페이지네이션
     const [currentPage, setCurrentPage] = useState(1);
@@ -22,10 +27,37 @@ function StorageList({storageList:storageOptions=[]}){
     const indexOfLast = currentPage * postsPerPage;
     const indexOfFirst = indexOfLast - postsPerPage;
 
-    const openDetailModal = () => {
-        console.log("정보 확인");
+    const handleRackClick = (rackSn)=>{
+        setSelectedRack(rackSn);
         setIsOpen(true);
     }
+
+    useEffect(()=>{
+        const openDetailModal = async () => {
+            console.log("정보 확인");
+            // setIsOpen(true);
+
+            //rackSn으로 상세 정보 요청
+            try{
+                const res = await fetch(`${SERVER_URL}/ttik/storage/rack/detail?rackSn=${selectedRack}`, {
+                        method: 'GET',
+                        credentials: 'include',
+                    })
+
+                    if(res.ok){
+                        const data = await res.json();
+                        setRackDetailList(data);
+                        setDetailRackNm(data.rackNm);
+                        setBoxCount(data.boxQty);
+                        console.log("창고 랙 디테일 리스트-->", data);
+                    } 
+                } catch(error) {
+                    console.log("창고 랙 디테일 받아오기 실패 : ", error);
+                }
+        }
+        openDetailModal();
+    }, [selectedRack])
+    
 
     const onCloseModal = () => {
         setIsOpen(false);
@@ -90,7 +122,10 @@ function StorageList({storageList:storageOptions=[]}){
                 <select name="storageFilter" 
                         value={storageFilter} 
                         className={styleStorage.listFilter}
-                        onChange={(e)=>setStorageFilter(e.target.value)}>
+                        onChange={(e)=>{
+                            setStorageFilter(e.target.value)
+                            setCurrentPage(1)
+                        }}>
                     <option value="">창고 선택</option>
                     {
                         storageOptions.map((item)=>(
@@ -116,7 +151,7 @@ function StorageList({storageList:storageOptions=[]}){
                             <div className={styleStorage.loading}>데이터를 불러오는 중입니다</div>
                             :
                         storageList?.map((data, index)=>(
-                            <tr key={data.rackSn} onClick={openDetailModal}>
+                            <tr key={data.rackSn} onClick={()=>handleRackClick(data.rackSn)}>
                                 <td>{(currentPage-1)*postsPerPage + index + 1}</td>
                                 <td>{data.storageNm}</td>
                                 <td>{data.rackNm}</td>
@@ -141,7 +176,7 @@ function StorageList({storageList:storageOptions=[]}){
                 <div className={styleModal.modalOverlay}>
                     <div className={`${styleProdModal.modal} ${styleStorage.storageModal}`} style={{height: "auto", maxWidth: "90rem"}}>
                         <div className={styleProdModal.modalInner} style={{alignItems: "stretch"}}>
-                            <h3 className={styleStorage.rackHeading}>Rack : A1-1<span> (수량 : 2개) </span></h3>
+                            <h3 className={styleStorage.rackHeading}>Rack : {detailRackNm}<span> (수량 : {boxCount}개) </span></h3>
                             <table className={styleStorage.storageTable}>
                                 <thead>
                                     <tr>
@@ -153,36 +188,26 @@ function StorageList({storageList:storageOptions=[]}){
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr onClick={openDetailModal}>
-                                        <td>1</td>
-                                        <td>12345678</td>
-                                        <td>조거팬츠</td>
-                                        <td>A1-1</td>
-                                        <td>
-                                            <select name="newLoc">
-                                                <option value="">변경 안함</option>
-                                                <option value="">A1-2</option>
-                                                <option value="">A1-3</option>
-                                                <option value="">A2-3</option>
-                                                <option value="">B1-1</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>12121212</td>
-                                        <td>빅 로고 롱 슬리브</td>
-                                        <td>A1-1</td>
-                                        <td>
-                                            <select name="newLoc">
-                                                <option value="">변경 안함</option>
-                                                <option value="">A1-2</option>
-                                                <option value="">A1-3</option>
-                                                <option value="">A2-3</option>
-                                                <option value="">B1-1</option>
-                                            </select>
-                                        </td>
-                                    </tr>
+                                     {
+                                        rackDetailList?.boxes?.map((box, index) => (
+                                             <tr key={index}>
+                                                <td>{index + 1}</td>
+                                                <td>{box.boxQr}</td>
+                                                <td>{box.productNm}</td>
+                                                <td>{detailRackNm}</td>
+                                                <td>
+                                                    <select name="newLoc">
+                                                        <option value="">변경 안함</option>
+                                                        {
+                                                            rackDetailList.availableRacks?.map(rack=>(
+                                                                <option value={rack.availableRackSn}>{rack.availableRackNm}</option>
+                                                            ))
+                                                        }
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    }
                                 </tbody>
                             </table>
                             <button type="submit" className="btnSubmit">확인</button>
