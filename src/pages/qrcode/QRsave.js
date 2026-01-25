@@ -25,7 +25,10 @@ const QRsave = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch(`${SERVER_URL}/ttik/product/list`);
+                const response = await fetch(`${SERVER_URL}/ttik/product/list`, {
+                    method: 'GET',
+                    credentials: 'include', 
+                });
                 if (response.ok) {
                     const data = await response.json();
                     // DTO 필드명에 맞춰 매핑 (productCd -> id, productNm -> name)

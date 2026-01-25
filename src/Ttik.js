@@ -76,7 +76,7 @@ function Ttik() {
                 <Route path="/stock/plans/:productCd" element={<StockDetail />} />
                 {/* <Route path="/register" element={<ProductRegister />} /> */}
                 <Route path="/product/register" element={<ProductRegister />} />
-                <Route path="/register-admin" element={<RegisterAdmin />} />
+                <Route path="/register/admin" element={<RegisterAdmin />} />
                 <Route path="/product/productDetail" element={<ProductDetail />} />
                 <Route path="/product/productModify" element={<ProductModify />} />
                 <Route path="/product/productArchive" element={<ProductArchive />} />

@@ -7,14 +7,12 @@
     align-items: flex-start;
 }
 
-/* 왼쪽: 설정창 (고정) */
 .leftSection {
     flex: 0 0 420px;
     position: sticky;
     top: 20px;
 }
 
-/* 오른쪽: 미리보기창 */
 .rightSection {
     flex: 1;
     background: #f1f5f9;
@@ -69,7 +67,7 @@
     padding: 0 1.2rem !important;
     border-radius: 1.2rem !important;
     background-color: #fff !important;
-    border: 2px solid #e2e8f0; /* 글로벌 스타일 대응 */
+    border: 2px solid #e2e8f0; 
 }
 
 .flexRow {
@@ -128,7 +126,6 @@
     transform: translateY(-2px);
 }
 
-/* --- 인쇄 대기 영역 (요청하신 디자인) --- */
 .printNoticeBox {
     text-align: center;
     margin-bottom: 2.5rem;
@@ -157,7 +154,7 @@
     box-shadow: none;
 }
 
-/* 프로그레스 바 */
+/* 진행률 바 */
 .progressWrapper {
     margin: 30px auto 0;
     max-width: 450px;
@@ -175,7 +172,6 @@
 .progressBarFill {
     background-color: #007bff;
     height: 100%;
-    /* transition 시간을 0.4s에서 0.8s로 늘리고 cubic-bezier를 추가해 부드럽게 이동 */
     transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     background-image: linear-gradient(
         45deg, 
