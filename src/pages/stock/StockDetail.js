@@ -10,6 +10,15 @@ function StockDetail() {
     const location = useLocation();
     const SERVER_URL = serverUrl.SERVER_URL;
 
+    const [selectOptions, setSelectOptions] = useState({
+        storages: [], zones: [], racks: []
+    });
+    const [selections, setSelections] = useState({
+        storage: '',
+        zone: '',
+        rack: ''
+    });
+
     const planType = location.state?.type || "InBound"; 
     const planYmd = location.state?.planYmd;
 
@@ -22,6 +31,17 @@ function StockDetail() {
     const scannerRef = useRef(null);
     const scanHistoryRef = useRef([]); 
     const audioContextRef = useRef(null);
+
+    // 창고 카테고리 상위 변경시 초기화
+    const handleSelectChange = (e) => {
+        const { name, value } = e.target;
+        setSelections(prev => {
+            const next = { ...prev, [name]: value };
+            if (name === 'storage') { next.zone = ''; next.rack = ''; }
+            if (name === 'zone') { next.rack = ''; }
+            return next;
+        });
+    };
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -56,6 +76,24 @@ function StockDetail() {
             return newSet;
         });
     };
+
+    //창고 리스트 불러오기
+    useEffect(() => {
+        const fetchSelectData = async () => {
+            try {
+                // PlanRegister에서 사용했던 기초정보 API와 동일한 엔드포인트
+                // const response = await fetch(`${SERVER_URL}/ttik/register-info`); - 수정
+                const response = await fetch(`${SERVER_URL}/ttik/plans/register-info`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setSelectOptions(data); // storages, zones, racks가 한꺼번에 저장됨
+                }
+            } catch (error) {
+                console.error("기초 데이터 로드 실패:", error);
+            }
+        };
+        fetchSelectData();
+    }, [SERVER_URL]);
 
     const handleAllCheck = (e) => {
         if (e.target.checked) {
@@ -151,6 +189,13 @@ function StockDetail() {
             alert("등록할 항목을 선택해주세요.");
             return;
         }
+
+        //창고 선택 확인
+        if (!selections.storage) {
+            alert("창고(Storage)를 선택해주세요.");
+            return;
+        }
+
         if (window.confirm(`선택한 ${checkedItems.size}건(총 ${selectedTotalQty}개)을 등록하시겠습니까?`)) {
             navigate('/stock/plans', { state: { activeTab: planType } });
         }
@@ -198,6 +243,64 @@ function StockDetail() {
                         <p className={styles.productNameRow}>{product.productNm}</p>
                     </div>
                 </div>
+
+                <div className={styles.selectContainer}>
+                    <h3 style={{marginBottom:'1rem'}}>🛅 창고 선택</h3>
+                    <div className={styles.selectBox}>
+                        {/* 창고(Storage) */}
+                        <select name="storage" value={selections.storage} onChange={handleSelectChange}>
+                            <option value="">동</option>
+                            {selectOptions.storages?.map(s => (
+                                <option key={s.STR_CD} value={s.STR_CD}>{s.STR_NM}</option>
+                            ))}
+                        </select>
+
+                        {/* 1. 구역(Zone) - '동'이 선택되지 않았을 때 비활성화 */}
+                        <select 
+                            name="zone" 
+                            value={selections.zone} 
+                            onChange={handleSelectChange}
+                            disabled={!selections.storage} // storage 값이 없으면 클릭 불가
+                            style={{ backgroundColor: !selections.storage ? '#f7fafc' : 'white' }} // 비활성화 시 색상 변경(선택)
+                        >
+                            <option value="">구역</option>
+                            {selectOptions.zones
+                                ?.filter(z => {
+                                    const storageKey = z.STORAGE_SN || z.STR_CD; 
+                                    return !selections.storage || String(storageKey) === String(selections.storage);
+                                })
+                                .map(z => (
+                                    <option key={z.ZONE_SN || z.ZONE_CD} value={z.ZONE_SN || z.ZONE_CD}>
+                                        {z.ZONE_NM}
+                                    </option>
+                                ))
+                            }
+                        </select>
+
+                        {/* 2. 선반(Rack) - '구역'이 선택되지 않았을 때 비활성화 */}
+                        <select 
+                            name="rack" 
+                            value={selections.rack} 
+                            onChange={handleSelectChange}
+                            disabled={!selections.zone} // zone 값이 없으면 클릭 불가
+                            style={{ backgroundColor: !selections.zone ? '#f7fafc' : 'white' }}
+                        >
+                            <option value="">선반</option>
+                            {selectOptions.racks
+                                ?.filter(r => {
+                                    const zoneKey = r.ZONE_SN || r.ZONE_CD;
+                                    return !selections.zone || String(zoneKey) === String(selections.zone);
+                                })
+                                .map(r => (
+                                    <option key={r.RACK_SN || r.RACK_CD} value={r.RACK_SN || r.RACK_CD}>
+                                        {r.RACK_NM}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                    </div>
+                </div>
+
                 <div className={styles.btnGroup}>
                     <button className={`${styles.btn} ${styles.btnBack}`} onClick={() => navigate('/stock/plans', { state: { activeTab: planType } })}>← 뒤로</button>
                     <button 

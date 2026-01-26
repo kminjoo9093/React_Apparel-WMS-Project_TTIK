@@ -126,6 +126,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
     { path: '/stock/plans', name: '입출고 관리', icon: '🔄', roles: ['ALL', 'U'] },
     { path: '/stock/history', name: '이력 조회', icon: '📜', roles: ['ALL'] },
     { path: '/brand', name: '브랜드', icon: '🏷️', roles: ['ALL'] },
+    { path: '/partner', name: '거래처', icon: '💼', roles: ['ALL'] },
     { path: '/storage', name: '창고 관리', icon: '🕋', roles: ['ALL', 'U'] },
     { path: '/register-admin', name: '관리자 등록', icon: '👤', roles: ['ALL'] }
   ];
