@@ -72,9 +72,12 @@ function ProductCode({onClose, productCd, setProductCd}){
                 <div className={styleProdModal.inputGroup}>
                     <input className={styleProdModal.productCdInput} type="text" value={productCd} readOnly></input>
                     <button className={styleProdModal.checkBtn} onClick={checkDuplicate}>중복 체크</button>
+                    <div className={styleProdModal.noticeArea}>
+                        <span className={`${styleProdModal.notice} ${styleProdModal.available}`} style={{ visibility: isDuplicate === false ? 'visible' : 'hidden'}}>사용 가능</span>
+                        <span className={`${styleProdModal.notice} ${styleProdModal.duplicate}`} style={{ visibility: isDuplicate === true ? 'visible' : 'hidden'}}>중복된 코드</span>
+                    </div>
                 </div>
-                <span className={`${styleProdModal.notice} ${styleProdModal.available}`} style={{ visibility: isDuplicate === false ? 'visible' : 'hidden'}}>사용 가능</span>
-                <span className={`${styleProdModal.notice} ${styleProdModal.duplicate}`} style={{ visibility: isDuplicate === true ? 'visible' : 'hidden'}}>중복된 코드</span>
+                
                 <button className={`btnSubmit ${styleProdModal.registerBtn}`} disabled={!isChecked}>등록</button>
             </form>
         </div>

@@ -32,8 +32,8 @@ function Pagination({totalPages, currentPage, setCurrentPage, blockSize}){
 
     return (
             <div className={styles.paginationContainer}>
-                <button onClick={goFirst} disabled={currentPage === 1}> {"<<"} </button>
-                <button onClick={goPrev} disabled={currentPage === 1}>{"<"}</button>
+                <button onClick={goFirst} disabled={currentPage === 1} className={styles.navButton}> {"<<"} </button>
+                <button onClick={goPrev} disabled={currentPage === 1} className={styles.navButton}>{"<"}</button>
                 {pageNumbers.map((page) => (
                 <button
                     key={page}
@@ -43,8 +43,8 @@ function Pagination({totalPages, currentPage, setCurrentPage, blockSize}){
                     {page}
                 </button>
                 ))}
-                <button onClick={goNext} disabled={currentPage === totalPages}>{">"}</button>
-                <button onClick={goLast} disabled={currentPage === totalPages}>{">>"}</button>
+                <button onClick={goNext} disabled={currentPage === totalPages} className={styles.navButton}>{">"}</button>
+                <button onClick={goLast} disabled={currentPage === totalPages} className={styles.navButton}>{">>"}</button>
             </div>
     )
 }
