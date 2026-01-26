@@ -57,7 +57,9 @@ function ProductRegister(){
 
     async function getData(url){
         try{
-            const res = await fetch(url); 
+            const res = await fetch(url, {
+                method: 'GET',
+                credentials: 'include', }); 
             if(!res.ok){
                 throw new Error(`Error : ${res.status}`);
             }
@@ -187,6 +189,7 @@ function ProductRegister(){
         try{
             const res = await fetch(`${SERVER_URL}/ttik/productCode`, {
                 method: 'POST',
+                credentials: 'include', 
                 headers: {'Content-type': 'application/json'},
                 body: JSON.stringify({
                     "styleNo": styleNo,

@@ -52,6 +52,7 @@ const MainDashboard = ({ user }) => {
       console.error("데이터 동기화 실패:", error);
     }
   }, [SERVER_URL, selectedStorage]);
+  
   const fetchRacks = useCallback(async () => {
     try {
       const response = await axios.get(`${SERVER_URL}/ttik/dashboard/racks`, {
@@ -190,7 +191,6 @@ const MainDashboard = ({ user }) => {
                   <div key={area} style={{ display: 'flex', flexDirection: 'column-reverse', alignItems: 'center', gap: '8px' }}>
                     {/* 하단 구역 라벨 */}
                     <span className={styleMainDashBoard.rowLabel} style={{ marginTop: '8px', border: 'none', width: 'auto' }}>{area}</span>
-                    
                     {/* 층수를 아래에서 위로 */}
                     <div style={{ display: 'flex', flexDirection: 'column-reverse', gap: '5px' }}>
                       {groupedRacks[area].sort((a, b) => Number(a.rackNm.split('-')[0]) - Number(b.rackNm.split('-')[0])).map(rack => (
@@ -198,6 +198,7 @@ const MainDashboard = ({ user }) => {
                           key={rack.rackSn} 
                           className={`${styleMainDashBoard.rackBox} ${getRackClass(rack)}`} 
                           title={rack.rackNm}
+                          onClick={() => navigate('/storage')}
                           style={{ margin: 0 }} 
                         >
                           {rack.rackNm.split('-')[0]}F
