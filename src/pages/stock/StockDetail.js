@@ -85,7 +85,8 @@ function StockDetail() {
         const fetchSelectData = async () => {
             try {
                 // PlanRegister에서 사용했던 기초정보 API와 동일한 엔드포인트
-                const response = await fetch(`${SERVER_URL}/ttik/register-info`);
+                // const response = await fetch(`${SERVER_URL}/ttik/register-info`); - 수정
+                const response = await fetch(`${SERVER_URL}/ttik/plans/register-info`);
                 if (response.ok) {
                     const data = await response.json();
                     setSelectOptions(data); // storages, zones, racks가 한꺼번에 저장됨
@@ -260,17 +261,21 @@ function StockDetail() {
                             ))}
                         </select>
 
-                        {/* 구역(Zone) - 선택한 창고에 해당하는 구역만 필터링 */}
-                        <select name="zone" value={selections.zone} onChange={handleSelectChange}>
+                        {/* 1. 구역(Zone) - '동'이 선택되지 않았을 때 비활성화 */}
+                        <select 
+                            name="zone" 
+                            value={selections.zone} 
+                            onChange={handleSelectChange}
+                            disabled={!selections.storage} // storage 값이 없으면 클릭 불가
+                            style={{ backgroundColor: !selections.storage ? '#f7fafc' : 'white' }} // 비활성화 시 색상 변경(선택)
+                        >
                             <option value="">구역</option>
                             {selectOptions.zones
                                 ?.filter(z => {
-                                    // 서버에서 내려오는 데이터의 키값이 STORAGE_SN인지 STR_CD인지 확인 필요
                                     const storageKey = z.STORAGE_SN || z.STR_CD; 
                                     return !selections.storage || String(storageKey) === String(selections.storage);
                                 })
                                 .map(z => (
-                                    // XML 기준 구역코드는 ZONE_SN일 확률이 높음
                                     <option key={z.ZONE_SN || z.ZONE_CD} value={z.ZONE_SN || z.ZONE_CD}>
                                         {z.ZONE_NM}
                                     </option>
@@ -278,8 +283,14 @@ function StockDetail() {
                             }
                         </select>
 
-                        {/* 선반(Rack) - 선택한 구역에 해당하는 선반만 필터링 */}
-                        <select name="rack" value={selections.rack} onChange={handleSelectChange}>
+                        {/* 2. 선반(Rack) - '구역'이 선택되지 않았을 때 비활성화 */}
+                        <select 
+                            name="rack" 
+                            value={selections.rack} 
+                            onChange={handleSelectChange}
+                            disabled={!selections.zone} // zone 값이 없으면 클릭 불가
+                            style={{ backgroundColor: !selections.zone ? '#f7fafc' : 'white' }}
+                        >
                             <option value="">선반</option>
                             {selectOptions.racks
                                 ?.filter(r => {

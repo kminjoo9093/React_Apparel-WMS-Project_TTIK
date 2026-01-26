@@ -11,6 +11,7 @@ import ProductDetail from "../src/pages/product/ProductDetail";
 import ProductModify from "../src/pages/product/ProductModify";
 import ProductArchive from "../src/pages/product/ProductArchive";
 import Brand from "../src/pages/brand/BrandList";
+import Partner from "../src/pages/partner/PartnerList";
 import ProductList from "./pages/product/ProductList";
 import Plans from "../src/pages/stock/StockPlans";
 import QRsave from "./pages/qrcode/QRsave";
@@ -71,6 +72,7 @@ function Ttik() {
                 <Route path="/ttik" element={<MainDashboard user={user} />} />
                 <Route path="/productList" element={<ProductList />} />
                 <Route path="/brand" element={<Brand />} />
+                <Route path="/partner" element={<Partner />} />
                 <Route path="/stock/plans" element={<Plans />} />
                 <Route path="/stock/plans/:productCd" element={<StockDetail />} />
                 <Route path="/register" element={<ProductRegister />} />
