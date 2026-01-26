@@ -25,7 +25,7 @@
   margin-bottom: 20px;
   line-height: 1;
   text-shadow: 
-    4px 4px 0px #475569,   /* 글자 뒤의 빳빳한 면 효과 */
+    4px 4px 0px #475569,   
     1rem 1rem 2rem rgba(0, 0, 0, 0.2); 
     
   transition: transform 0.3s ease;
@@ -48,7 +48,7 @@
 .sloganShifter {
   display: flex;
   flex-direction: column;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); /* 아주 매끄러운 가속도 */
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
 }
 
 /* 아래로 이동하며 전환 */

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import styles from "../css/Pagination.module.css";
 
-function Pagination({targetList, postsPerPage, currentPage, setCurrentPage, blockSize}){
+function Pagination({totalPages, currentPage, setCurrentPage, blockSize}){
     // const [currentPage, setCurrentPage] = useState(1);
     // const postsPerPage = 10; // 한페이지에 10개씩
 
-    const totalPages = Math.ceil(targetList.length / postsPerPage);
+    // const totalPages = Math.ceil(targetList.length / postsPerPage);
 
     const currentBlock = Math.floor((currentPage - 1) / blockSize);
     const startPage = currentBlock * blockSize + 1;

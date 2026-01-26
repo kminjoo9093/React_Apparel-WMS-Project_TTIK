@@ -17,6 +17,7 @@ import Plans from "../src/pages/stock/StockPlans";
 import QRsave from "./pages/qrcode/QRsave";
 import History from "../src/pages/stock/StockHistory";
 import StockDetail from "./pages/stock/StockDetail";
+import Storage from "./pages/storage/Storage";
 
 function Ttik() {
   const [user, setUser] = useState(null); 
@@ -70,19 +71,21 @@ function Ttik() {
               <Routes>
                 {/* 공통 접근 권한 */}
                 <Route path="/ttik" element={<MainDashboard user={user} />} />
-                <Route path="/productList" element={<ProductList />} />
+                <Route path="/product/list" element={<ProductList />} /> 
                 <Route path="/brand" element={<Brand />} />
                 <Route path="/partner" element={<Partner />} />
                 <Route path="/stock/plans" element={<Plans />} />
                 <Route path="/stock/plans/:productCd" element={<StockDetail />} />
-                <Route path="/register" element={<ProductRegister />} />
+                {/* <Route path="/register" element={<ProductRegister />} /> */}
                 <Route path="/product/register" element={<ProductRegister />} />
-                <Route path="/register-admin" element={<RegisterAdmin />} />
+                <Route path="/register/admin" element={<RegisterAdmin />} />
                 <Route path="/product/productDetail" element={<ProductDetail />} />
                 <Route path="/product/productModify" element={<ProductModify />} />
                 <Route path="/product/productArchive" element={<ProductArchive />} />
                 <Route path="/stock/plans/qr/print" element={<QRsave />} />
                 <Route path="/stock/history" element={<History />} />
+                <Route path="/storage" element={<Storage />} />
+
 
                 {/* 전체 관리자(ALL)만 접근 가능 */}
                 <Route 
@@ -93,7 +96,6 @@ function Ttik() {
                     </ProtectedRoute>
                   } 
                 />
-
                 <Route path="/" element={<Navigate to="/ttik" replace />} />
                 <Route path="*" element={<Error404Page />} />
               </Routes>

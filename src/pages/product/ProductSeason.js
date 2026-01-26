@@ -77,7 +77,7 @@ function ProductSeason({onClose, setSeasonList}){
                         <option value="F">F/W</option>
                     </select>
                 </div>             
-                <button type="submit" className={`${styleRegister.registerBtn}`}>등록</button>
+                <button type="submit" className="btnSubmit">등록</button>
             </form>
         </div>
     )

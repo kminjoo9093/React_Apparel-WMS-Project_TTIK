@@ -10,7 +10,8 @@ const RegisterAdmin = () => {
     password: '',
     confirmPassword: '',
     nickname: '',
-    storage: '' // 'ALL', 'A', 'B' 문자열 저장
+    storage: '', 
+    monitorStorage: '' 
   });
 
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
@@ -49,11 +50,21 @@ const RegisterAdmin = () => {
       return;
     }
 
+    if (formData.storage === 'MONITOR' && !formData.monitorStorage) {
+      setModal({
+        isOpen: true,
+        title: 'Input Error',
+        message: '모니터링할 창고 이름을 입력해주세요.',
+        onConfirm: closeModal
+      });
+      return;
+    }
+
     const submitData = {
       mngrId: formData.id,
       mngrPswd: formData.password,
       nickname: formData.nickname,
-      tkcgStorage: formData.storage
+      tkcgStorage: formData.storage === 'MONITOR' ? formData.monitorStorage : formData.storage
     };
 
     try {
@@ -125,6 +136,7 @@ const RegisterAdmin = () => {
               {[
                 { id: 'ALL', label: '전체 관리자 (ALL)' },
                 { id: 'U', label: '이용자' },
+                { id: 'MONITOR', label: '모니터용' }, // 모니터용 추가
               ].map((opt) => (
                 <label key={opt.id} className={style.checkboxLabel}>
                   <input
@@ -141,6 +153,21 @@ const RegisterAdmin = () => {
               ))}
             </div>
           </div>
+
+          {/* 모니터용 선택 시 나타나는 추가 입력창 */}
+          {formData.storage === 'MONITOR' && (
+            <div className={style.inputGroup} style={{ marginTop: '1rem' }}>
+              <label>모니터링 대상 창고명</label>
+              <input 
+                type="text" 
+                name="monitorStorage" 
+                placeholder="ex) C" 
+                value={formData.monitorStorage}
+                onChange={handleChange} 
+                required 
+              />
+            </div>
+          )}
 
           <button type="submit" className={style.submitBtn}>계정 생성하기</button>
         </form>
