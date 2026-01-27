@@ -2,14 +2,17 @@
     display: flex;
     justify-content: center;
     gap: 10px;
-    marginTop: 20px;
+    margin-Top: 4rem;
 }
 
 .pageButton {
-    padding: 5px 10px;
-    border: 1px solid #ccc;
     cursor: pointer;
+    padding: 5px 10px;
+    width: 3.2rem;
+    height: 3.2rem;
+    border: 1px solid #ddd;
     background-color: #fff;
+    border-radius: 4px;
     color: #333;
     transition: all 0.2s ease;
 }
@@ -20,20 +23,21 @@
 }
 
 .activeButton {
-    background-color: #333;
+    background-color: var(--primary-color); 
     color: #fff;
-    border-color: #333;
+    border-color: var(--primary-color);
     font-weight: bold;
 }
 
 .navButton {
     padding: 5px 10px;
-    border: 1px solid #ccc;
     cursor: pointer;
-    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    border-radius: 4px;
 }
 
 .navButton:disabled {
     cursor: not-allowed;
-    color: #ccc;
+    opacity: 0.5;
 }

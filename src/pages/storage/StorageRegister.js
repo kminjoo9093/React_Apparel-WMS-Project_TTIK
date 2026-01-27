@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Modal from "../../components/Modal";
 import serverUrl from "../../db/server.json";
 
-function StorageRegister({storageList}){
+function StorageRegister({storageList, onUpdate}){
 
     const SERVER_URL = serverUrl.SERVER_URL;
     const [storageNm, setStorageNm] = useState("");
