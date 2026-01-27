@@ -6,9 +6,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 function StockPlans() {
     const navigate = useNavigate();
-    const location = useLocation(); // useState보다 위에 선언해야 초기값으로 사용 가능합니다.
+    const location = useLocation(); 
 
-    // 1. 초기값 설정: 상세페이지에서 뒤로가기 시 전달한 activeTab 확인, 없으면 "InBound"
     const [plansType, setPlansType] = useState(location.state?.activeTab || "InBound");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [inboundList, setInboundList] = useState([]);
@@ -26,7 +25,13 @@ function StockPlans() {
         setLoading(true);
         try {
             const endpoint = plansType === "InBound" ? "inbound" : "outbound";
-            const response = await fetch(`${SERVER_URL}/ttik/${endpoint}/list`);
+            const response = await fetch(`${SERVER_URL}/ttik/plans/${endpoint}/list`, {
+                method: 'GET',
+                credentials: 'include', 
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
             if (!response.ok) throw new Error('서버 응답 에러.');
 
             const data = await response.json();
@@ -41,14 +46,13 @@ function StockPlans() {
         }
     };
     
-    // 탭(plansType)이 변경될 때마다 데이터 재호출
     useEffect(() => {
         fetchStockPlanList();
     }, [plansType]);
 
     const handleTypeChange = (type) => {
         setPlansType(type);
-        setCurrentPage(1); // 타입 변경 시 첫 페이지로 리셋
+        setCurrentPage(1); 
     };
 
     // --- 페이지네이션 로직 ---
@@ -98,8 +102,8 @@ function StockPlans() {
                 </div>
                 
                 {plansType ? (
-                    <div className={stylePlans.tableContainer}>
-                        <div className={stylePlans.tableHeader}>
+                    <div>
+                        <div>
                             <h3>{plansType === "InBound" ? "📦 입고 예정 목록" : "🚚 출고 예정 목록"}</h3>
                         </div>
 
@@ -107,7 +111,7 @@ function StockPlans() {
                             <thead>
                                 <tr>
                                     <th>순번</th>
-                                    <th>날짜</th>
+                                    <th>예정 날짜</th>
                                     <th>{plansType === "InBound" ? "입고처" : "출고처"}</th>
                                     <th>상품명</th>
                                     <th>수량</th>
@@ -135,10 +139,10 @@ function StockPlans() {
                                             <tr 
                                                 key={item.IN_PLAN_SN || item.OUT_PLAN_SN || index} 
                                                 onClick={() => {
-                                                    // 1. 우선순위 1: API에서 직접 내려주는 GDS_CD 확인
+                                                    // API에서 직접 내려주는 GDS_CD 확인
                                                     let productCode = item.GDS_CD || item.gdsCd;
 
-                                                    // 2. 우선순위 2: GDS_CD가 없다면 BOX_LIST에서 추출 
+                                                    // GDS_CD가 없다면 BOX_LIST에서 추출 
                                                     if (!productCode && item.BOX_LIST) {
                                                         const firstBox = item.BOX_LIST.split(',')[0].trim();
                                                         const parts = firstBox.split('-');
@@ -146,7 +150,7 @@ function StockPlans() {
                                                             productCode = parts.slice(0, 3).join('-');
                                                         }
                                                     }
-                                                    // 3. 우선순위 3: 그 외 BOX_CD 확인
+                                                    // 그 외 BOX_CD 확인
                                                     if (!productCode && item.BOX_CD) {
                                                         productCode = item.BOX_CD.split('-').slice(0, 3).join('-');
                                                     }
@@ -159,20 +163,20 @@ function StockPlans() {
                                                     }
                                                     
                                                     // 상세 페이지로 이동
-                                                    navigate(`/stock/plans/${productCode}`, { 
-                                                        state: { type: plansType } 
-                                                    });
+                                                   navigate(`/stock/plans/${productCode}`, { 
+                                                                state: { 
+                                                                    type: plansType, 
+                                                                    planYmd: date    
+                                                                } 
+                                                            });
                                                 }}
-                                                style={{ cursor: 'pointer' }}
                                                 className={stylePlans.tableRow}
                                             >
-                                            {/* <tr key={item.IN_PLAN_SN || item.OUT_PLAN_SN || index}> */}
                                                 <td>{index + 1 + (currentPage - 1) * postsPerPage}</td>
                                                 <td>{date}</td>
                                                 <td>{target}</td>
-                                                <td>{product}</td>
-                                                {/* <td>0 / {qty.toLocaleString()}</td>  */}
-                                                <td>{0}/{qty.toLocaleString()}</td>
+                                                <td>{product}</td> 
+                                                <td>{0}/{qty.toLocaleString()}</td> 
                                                 <td>{price.toLocaleString()}</td>
                                                 <td>{(qty * price).toLocaleString()}</td>
                                                 <td>

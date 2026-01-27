@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import style from '../../css/ProductModify.module.css'; 
+import serverUrl from "../../db/server.json" 
 
 const ProductModify = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const SERVER_URL = serverUrl.SERVER_URL;
 
   const [product, setProduct] = useState({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -26,59 +28,53 @@ const ProductModify = () => {
     setProduct({ ...product, [field]: value });
   };
   
-  // 💡 여기서 'saveData' 중복 선언된 걸 'finalData' 하나로 완전히 풀었어!
-const handleSave = async () => {
-  if (!window.confirm("변경 내용을 DB에 최종 저장하시겠습니까?")) return;
+  const handleSave = async () => {
+    if (!window.confirm("변경 내용을 DB에 최종 저장하시겠습니까?")) return;
+    const fromArchive = location.state?.fromArchive;
 
-  const fromArchive = location.state?.fromArchive;
-
-  // 변수 선언은 딱 한 번만!
-  const finalData = {
-    ...product,
-// 1. 상태값 처리: 보관함에서 왔으면 'Y'로 확실히 변경
+    const finalData = {
+      ...product,
       gds_enabled: fromArchive ? 'Y' : (product.gds_enabled || 'Y'),
-      
-      // 2. 필수 코드 데이터 (Oracle DB 규격 매핑)
       gds_cd: product.gds_cd,
       gds_nm: product.gds_nm,
       season_cd: product.season_cd,
       brand_sn: product.brand_sn,
       gds_cat_cd: product.gds_cat_cd,
       size_cd: product.size_cd,
-
-      // 3. 숫자 타입 데이터 보정
       untprc: Number(product.untprc) || 0,
       threshold: Number(product.threshold) || 0,
       inbox_qty: Number(product.inbox_qty) || 0
     };
 
     try {
-      // 💡 이제 변수 에러(ts2451)가 없으니까 서버로 데이터가 제대로 날아가.
-      const response = await axios.post('https://localhost:3001/ttik/product/update', finalData);
-      
+      const response = await axios.post(`${SERVER_URL}/ttik/product/update`, finalData);
       if (response.status === 200) {
         alert(fromArchive ? "복구 및 수정 완료!" : "수정 완료!");
-        // 연동 성공 후 상세 페이지로 이동
-        navigate('/product/productDetail', { state: { product: finalData } });
+        navigate(`/product/productDetail/${finalData.gds_cd}`, { state: { product: finalData } });
       }
     } catch (error) {
-      console.error("연동 실패 원인:", error);
-      alert("서버 연동 실패! 백엔드가 켜져 있는지 확인 부탁드립니다.");
+      alert("서버 연동 실패!");
     }
   };
+
   return (
+    /* 📍 기존의 넓은 패딩과 중앙 정렬 디자인 그대로 유지 */
     <div style={{ padding: '60px', width: '1100px', margin: '0 auto', background: '#fff', borderRadius: '30px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
-      {/* UI 디자인은 100% 네가 만든 그대로야 */}
+      
       <div style={{ marginBottom: '50px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px' }}>
           <span style={{ color: '#64748b', fontWeight: 'bold', fontSize: '18px' }}>CODE: {product.gds_cd}</span>
-          <button 
+          
+          {/* 📍 코드 변경 버튼 - 삭제 안 하고 주석 처리만 함 */}
+          {/* <button 
             onClick={() => { setTempCode(product.gds_cd); setIsPopupOpen(true); }}
             style={{ padding: '4px 12px', fontSize: '13px', cursor: 'pointer', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f8fafc' }}
           >
             코드 변경
-          </button>
+          </button> 
+          */}
         </div>
+
         <input 
           type="text"
           value={product.gds_nm || ""}
@@ -104,12 +100,14 @@ const handleSave = async () => {
         </div>
       </div>
 
+      {/* 📍 하단 꽉 차는 큰 버튼들 그대로 보존 */}
       <div style={{ display: 'flex', gap: '20px' }}>
         <button onClick={() => navigate(-1)} style={{ flex: 1, height: '50px', fontSize: '1.8rem', fontWeight: 'bold', borderRadius: '15px', background: '#f1f5f9', color: '#64748b', border: 'none', cursor: 'pointer' }}>취 소</button>
         <button onClick={handleSave} style={{ flex: 1, height: '50px', fontSize: '1.8rem', fontWeight: 'bold', borderRadius: '15px', background: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}>수 정 완 료</button>
       </div>
 
-      {isPopupOpen && (
+      {/* 📍 팝업 영역 - 주석 처리만 함 */}
+      {/* {isPopupOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', padding: '40px', borderRadius: '24px', width: '450px', textAlign: 'center' }}>
             <h4 style={{ fontSize: '24px', marginBottom: '15px' }}>상품 코드 변경</h4>
@@ -130,6 +128,7 @@ const handleSave = async () => {
           </div>
         </div>
       )}
+      */}
     </div>
   );
 };

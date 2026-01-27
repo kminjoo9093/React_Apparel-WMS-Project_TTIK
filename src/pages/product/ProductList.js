@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom'; // URL 파라미터 감지용
+
+import { useEffect, useState, useRef } from 'react';
+import { useLocation, Link } from 'react-router-dom'; // URL 파라미터 감지용
 import styleMainDashBoard from '../../css/MainDashboard.module.css';
 import styleList from "../../css/ProductList.module.css";
 import styleRegister from "../../css/ProductRegister.module.css";
@@ -21,19 +22,128 @@ function ProductList(){
         brandCd: "",
         categoryCd: "",
         seasonCd: "",
-        // 대시보드에서 ?status=부족 으로 왔다면 초기값을 "부족"으로 설정
         stkStatus: new URLSearchParams(location.search).get('status') || "",
-        keyword: ""
+        keyword: new URLSearchParams(location.search).get('search') || "" 
     });
-
     const [filteredProductList, setFilteredProductList] = useState([]);
 
     // 페이지네이션 관련 로직
     const [currentPage, setCurrentPage] = useState(1);
-    const postsPerPage = 10;
+    const postsPerPage = 10; // 한페이지에 10개씩 (Pc)
+
     const indexOfLast = currentPage * postsPerPage;
     const indexOfFirst = indexOfLast - postsPerPage;
-    const currentProducts = filteredProductList.slice(indexOfFirst, indexOfLast);
+
+    const scrollRef = useRef(null);
+    // const [visibleCount, setVisibleCount] = useState(5); // 모바일에서 한번에 보여줄 개수
+    const [isLoading, setIsLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true); //더 가져올 데이터가 있는지
+
+    // 1. 관찰할 대상을 가리킬 Ref 생성
+    const observerTarget = useRef(null);
+
+    //모바일 무한 스크롤
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    // 모바일 감지
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    //화면에 보여줄 리스트 개수
+    const currentProducts = isMobile 
+                            ? productList //Mobile
+                            : filteredProductList.slice(indexOfFirst, indexOfLast); //PC
+
+    useEffect(()=>{
+
+        if (!isMobile || !hasMore) return; // || isLoading
+
+        //모바일 일때 상품 리스트 초기화
+        // setProductList([]); 
+
+        const observer = new IntersectionObserver((entries) => {
+            if(entries[0].isIntersecting){
+                console.log("바닥 감지");
+
+                if(productList.length > 0){
+                    //모바일 리스트 fetch
+                    const currentLastItem = currentProducts[currentProducts.length - 1];
+                    const lastItemDate = currentLastItem?.frstRegDt;
+                    const lastItemProCd = currentLastItem?.productCd;
+                    console.log("마지막 날짜 확인 ==> ", lastItemDate);
+                    if(lastItemDate){
+                        getNextData(lastItemDate, lastItemProCd);
+                    }
+                }
+                
+
+            }
+        }, { threshold: 0.5 } // 대상이 100% 다 보였을 때 실행
+        );
+
+
+        // 4. 관찰 시작
+        if (observerTarget.current) {
+            observer.observe(observerTarget.current);
+        }
+
+        // 5. 언마운트 시 관찰 중단
+        return () => {
+            // if (observerTarget.current) observer.unobserve(observerTarget.current);
+            if (observerTarget.current) observer.disconnect();
+        };
+    }, [isMobile, hasMore, productList]) //isLoading
+
+    //모바일 두번째 이후 데이터 요청
+    const getNextData = async (lastItemDate, lastItemProCd) => {
+
+        if (isLoading || !hasMore) return;
+        setIsLoading(true);
+
+        const encodedDate = encodeURIComponent(lastItemDate);
+
+        const { brandCd, categoryCd, seasonCd, stkStatus, keyword } = searchFilters;
+        const filterQuery = `&lastDate=${encodedDate}&lastProCd=${lastItemProCd}&brandCd=${brandCd}&catCd=${categoryCd}&seasonCd=${seasonCd}&stkStatus=${stkStatus}&keyword=${encodeURIComponent(keyword)}`;
+        let fetchUrl = `${URL}/list/scroll?size=5${filterQuery}`;
+
+        try{
+            const response = await fetch(fetchUrl);
+            if(response.ok){
+                const nextDataList = await response.json();
+                console.log("다음 목록 리스트 --> ", nextDataList);
+                
+                
+                if(nextDataList.length === 0){
+                    setHasMore(false);
+                    return;
+                } 
+                // setVisibleCount((prev) => prev + nextDataList.length);
+                setProductList((prev) => [...prev, ...nextDataList]);
+            }
+        } catch(error){
+            console.log("데이터 요청 실패 : ", error);
+            return [];
+        } finally {
+            setIsLoading(false); // 로딩 종료를 반드시 해줘야 다시 Observer가 작동함
+        }
+    }
+
+    //추가 -- 레이아웃에서 상품명(코드) 검색시 이동할때 받는 함수 
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const urlSearch = params.get('search') || "";
+        const urlStatus = params.get('status') || "";
+
+        setSearchFilters(prev => ({
+            ...prev,
+            keyword: urlSearch,
+            stkStatus: urlStatus
+        }));
+        setCurrentPage(1); // 검색 시 1페이지로
+    }, [location.search]);
 
     // 공통 데이터 페치 함수
     async function getData(url){
@@ -61,7 +171,8 @@ function ProductList(){
         fetchData();
     }, []);
 
-    // 재고 상태 판단 함수
+
+    //재고 상태 판단 - 없음 추가하기
     function handleStkStatus(stkQty, threshold){
         return stkQty > threshold; // true: 정상, false: 부족
     }
@@ -69,23 +180,66 @@ function ProductList(){
     // 상품 전체 목록 불러오기 (1분마다 갱신 기능 포함)
     useEffect(()=>{
         const getProductList = async () => {    
+
+            setIsLoading(true); // 로딩 시작
+
             try{
-                const res = await fetch(`${SERVER_URL}/ttik/product/list`);
+                let fetchUrl = "";
+
+                if(isMobile){
+                    // fetchUrl = `${URL}/list/scroll?size=5`;
+                    // 모바일: 필터 조건을 쿼리 스트링으로 변환하여 5개만 요청
+                    const { brandCd, categoryCd, seasonCd, stkStatus, keyword } = searchFilters;
+                    const filterQuery = `&brandCd=${brandCd}&catCd=${categoryCd}&seasonCd=${seasonCd}&stkStatus=${stkStatus}&keyword=${encodeURIComponent(keyword)}`;
+                    fetchUrl = `${URL}/list/scroll?size=5${filterQuery}`;
+                    
+                    // 모바일에서 필터가 바뀌면 '더보기' 상태도 초기화해줘야 함
+                    setHasMore(true);
+                } else {
+                    fetchUrl = `${URL}/list`; //PC
+                }
+
+                const res = await fetch(fetchUrl, {
+                    method: 'GET',
+                    credentials: 'include', // 세션 쿠키 전송 (필수)
+                    headers: {
+                        'Accept': 'application/json', // JSON 응답 선호 명시
+                        'Content-Type': 'application/json'
+                    }
+                });
+                console.log("응답 상태:", res.status);
                 if(res.ok){
                     const data = await res.json();
+                    // console.log(data);
+
                     setProductList(data);
+                    if(isMobile) {
+                        // setVisibleCount(prev => prev + data.length);
+                        if (data.length === 0) setHasMore(false); // 가져온 데이터가 요청한 size(5개)보다 적으면 더 가져올 게 없다고 판단
+                    }
                 }
             } catch (error){
                 console.log("데이터 요청 실패 - ", error);
+
+                return [];
+            } finally {
+                setIsLoading(false); 
             }
         }
 
-        getProductList(); // 즉시 실행
-        const timer = setInterval(getProductList, 60000); // 1분마다 반복
-        return () => clearInterval(timer);
-    }, [SERVER_URL]);
+        // 즉시 한 번 실행
+        getProductList();
 
-    // [핵심] 필터 & 검색 로직
+        // 1분마다 반복 실행
+        // const timer = setInterval(getProductList, 60000);
+
+        // 컴포넌트가 사라질 때 타이머 해제
+        // return () => clearInterval(timer);
+
+    }, [isMobile, searchFilters])
+
+
+    //필터 & 검색
     useEffect(()=>{
         // 모든 필터가 비어있으면 전체 리스트 표시
         if(!searchFilters.brandCd && !searchFilters.categoryCd && !searchFilters.seasonCd && !searchFilters.stkStatus && !searchFilters.keyword){
@@ -104,9 +258,11 @@ function ProductList(){
             const isMatchStkStatus = status === searchFilters.stkStatus || searchFilters.stkStatus === "";
 
             // 키워드 검색 (상품코드 또는 상품명)
+            const searchLower = searchFilters.keyword.toLowerCase();
             const isMatchKeyword = searchFilters.keyword === ""
-                                || product.productCd.toLowerCase().includes(searchFilters.keyword.toLowerCase())
-                                || product.productNm.toLowerCase().includes(searchFilters.keyword.toLowerCase());
+                                || product.productCd.toLowerCase().includes(searchLower)
+                                || product.productNm.toLowerCase().includes(searchLower)
+                                || product.brandNm.toLowerCase().includes(searchLower);    // 추가 브랜드명 포함
 
             return isMatchBrand && isMatchCategory && isMatchSeason && isMatchStkStatus && isMatchKeyword;
         });
@@ -120,9 +276,18 @@ function ProductList(){
         setSearchFilters(prev => ({
             ...prev,
             [name]: value
-        }));
-        setCurrentPage(1); // 필터 변경 시 1페이지로 이동
-    }
+        }))
+
+        if(isMobile){
+            setProductList([]); //초기화
+            setHasMore(true); //초기화
+            // setVisibleCount(5); // 모바일 뷰 초기화 추가
+            // 이후 useEffect가 searchFilters 변경을 감지하여 
+            // 다시 처음 5개를 fetch하게 됩니다.
+        }
+        setCurrentPage(1);
+    };
+    
 
     // 필터 초기화 핸들러
     const handleReset = (e) => {
@@ -144,7 +309,7 @@ function ProductList(){
                 <p>상품 목록을 확인하세요. </p>
             </div>
             <div className={styleList.actionArea}>
-                <button className={styleRegister.registerBtn}>상품 등록</button>
+                <Link to="/product/register" className={styleRegister.registerBtn}>상품 등록</Link>
             </div>
             <div className={styleList.productListBox}>
                 <div className={styleList.listTopWrap}>
@@ -164,6 +329,7 @@ function ProductList(){
                         <div className={styleList.filterCard}>
                             <div className={styleList.filterHeading}>
                                 <h3>검색 필터 설정</h3>
+                                <button className={styleList.btnReset} onClick={handleReset}></button>
                             </div>
                             <div className={styleList.filterContents}>
                                 <select name="brandCd" id="brand" value={searchFilters.brandCd} onChange={handleFilterChange}>
@@ -189,7 +355,6 @@ function ProductList(){
                                     <option value="정상">정상</option>
                                     <option value="부족">부족</option>
                                 </select>
-                                <button className={styleList.btnReset} onClick={handleReset}></button>
                             </div>
                         </div>
                     </div>
@@ -198,52 +363,72 @@ function ProductList(){
                             [ 총 {filteredProductList.length}개 상품 ]
                         </div>
                         <ul className={styleList.productList}>
-                            {currentProducts.map((product, index) => (
-                                <li className={`${styleList.productItem} ${handleStkStatus(product.stkQty, product.threshold) ? "" : styleList.warning}`} key={product.productCd}>
-                                    <div className={styleList.itemCard}>
-                                        <div className={styleList.itemNo}>
-                                            {indexOfFirst + index + 1}
-                                        </div>
-                                        <div className={styleList.itemInfoL}>
-                                            <div className={styleList.brand}>{product.brandNm}</div>
-                                            <div>
-                                                <div className={styleList.proCd}>
-                                                    <span className={styleList.infoLabel} style={{display: 'block', marginBottom: "0.5rem"}}>상품코드</span>
-                                                    {product.productCd}
+                            {
+                                currentProducts.map((product, index) => (
+                                    <li className={`${styleList.productItem} ${handleStkStatus(product.stkQty, product.threshold) ? "" : styleList.warning}`} key={product.productCd}>
+                                        <Link to={`/product/productDetail/${product.productCd}`} 
+                                            className={styleList.itemCard}
+                                            >
+                                            <div className={styleList.itemNo}>
+                                                {isMobile 
+                                                    ? index + 1  // 모바일은 누적 리스트이므로 인덱스 그대로 사용
+                                                    : (currentPage - 1) * postsPerPage + index + 1 // PC는 페이지 번호 고려
+                                                }
+                                            </div>
+                                            {/* <div className={styleList.itemAlignMo}> */}
+                                                <div className={styleList.itemInfoL}>
+                                                    <div className={styleList.brand}>{product.brandNm}</div>
+                                                    <div className={styleList.proCdNmWrap}>
+                                                        <div className={styleList.proCd}>
+                                                            <span className={styleList.infoLabel} style={{marginBottom: "0.5rem"}}>상품코드</span>
+                                                            {product.productCd}
+                                                        </div>
+                                                        <div className={styleList.proNm}>
+                                                            <span className={styleList.infoLabel}>상품명</span>{product.productNm}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div className={styleList.proNm}>
-                                                    <span className={styleList.infoLabel} style={{display: 'block'}}>상품명</span>{product.productNm}
+                                                <div className={styleList.itemInfoR}>
+                                                    <div className={styleList.stkWrap}>
+                                                        <div className={styleList.stkQty}><span className={styleList.infoLabel}>현재 재고 수량</span>{product.stkQty}</div>
+                                                        <div className={`${styleList.stkStatus}`}>
+                                                            <span className={styleList.infoLabel}>재고 상태</span>
+                                                            {handleStkStatus(product.stkQty, product.threshold) ? "정상" : "부족"}
+                                                        </div>
+                                                    </div>
+                                                    <div className={styleList.date}>
+                                                        <span className={styleList.infoLabel}>등록일</span>
+                                                        {product.frstRegDt.split('T')[0]}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div className={styleList.itemInfoR}>
-                                            <div className={styleList.stkQty}>
-                                                <span className={styleList.infoLabel}>현재 재고 수량</span>
-                                                {product.stkQty}
-                                            </div>
-                                            <div className={`${styleList.stkStatus}`}>
-                                                <span className={styleList.infoLabel}>재고 상태</span>
-                                                {handleStkStatus(product.stkQty, product.threshold) ? "정상" : "부족"}
-                                            </div>
-                                            <div className={styleList.date}>
-                                                <span className={styleList.infoLabel}>등록일</span>
-                                                {product.frstRegDt.split('T')[0]}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            ))}
+                                            {/* </div> */}
+
+                                            
+                                        </Link>
+                                    </li>
+                                ))
+                            }
                         </ul>
                     </div>
                 </div>
 
-                <Pagination 
-                    targetList={filteredProductList} 
-                    postsPerPage={postsPerPage}
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                    blockSize={5}
-                />
+                {
+                    isMobile ? (
+                                /* 모바일용: 스크롤 감지 타겟 */
+                                <div ref={observerTarget} style={{ height: "60px", textAlign: "center" }}>
+                                    {isLoading ? "상품을 불러오는 중입니다..." : 
+                                        !hasMore ? "모든 상품을 다 불러왔습니다." : "상품을 불러오는 중입니다..."}
+                                </div>)
+                            : (
+                                <Pagination 
+                                    targetList={filteredProductList} 
+                                    postsPerPage={postsPerPage}
+                                    currentPage={currentPage}
+                                    setCurrentPage={setCurrentPage}
+                                    blockSize={5}
+                                />
+                            )
+                }
             </div>
         </div>
     )

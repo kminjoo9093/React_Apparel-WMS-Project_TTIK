@@ -1,48 +1,28 @@
+/* --- PC 버전 (기존 디자인 유지) --- */
 .card-stack-wrapper {
+    position: relative;
+    padding-top: 20px;
     width: 100%;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    position: relative;
-    padding-top: 20px;
     background-color: #f8f9fa;
 }
 
 .detail-card {
     background: white;
+    width: 92%;
+    max-width: 1050px;
+    margin-left: auto;
+    margin-right: auto;
     border-radius: 40px;
+    padding: 45px 55px;
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
     border: 1px solid #eee;
-    /* 중요: 기존 -220px 유지하여 카드 겹침 효과 적용 */
-    margin-top: -200px; 
+    /* 📍 JS에서 margin을 따로 안 줬다면 이게 먹힐 거야 */
+    margin-top: 50px; 
     transition: transform 0.3s ease;
-}
-
-/* 첫 번째 카드나 단일 카드는 너무 올라가지 않도록 보정 (선택 사항) */
-.detail-card:first-child {
-    margin-top: 50px;
-}
-
-/* PC 버전에서는 페이지 내부에 포함된 하단바를 숨김 (MainLayout 사이드바와 충돌 방지) */
-.sidebar {
-    display: none;
-}
-
-.stepper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 24px;
-}
-
-.step-badge {
-    background: #0d1b3e;
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
 }
 
 .info-grid {
@@ -59,101 +39,80 @@
     border-bottom: 1px solid #f0f0f0;
 }
 
-.info-label {
-    color: #777;
-    font-weight: 500;
-}
-
-.info-value {
-    color: #333;
-    font-weight: 600;
-}
-
-.continue-btn {
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.continue-btn:hover {
-    filter: brightness(1.1);
-    transform: translateY(-2px);
-}
-
+/* --- 📍 모바일 반응형 (768px 이하) --- */
 @media (max-width: 768px) {
-    /* 1. 컨테이너 및 카드 위치 초기화 */
+    /* JS의 width: 1100px, padding: 60px 등을 강제로 해제 */
+    .card-stack-wrapper > div[style*="width: 1100px"],
     .card-stack-wrapper {
-        padding-top: 10px;
-        height: auto;
-        padding-bottom: 100px; /* 하단바 여백 확보 */
-    }
-
-    .detail-card {
-        margin-top: 0 !important; /* 중요: 마이너스 마진 제거하여 카드 나열 */
-        border-radius: 20px;
-        padding: 20px;
-        width: 92%;
-        margin-left: auto;
-        margin-right: auto;
-        position: relative !important;
-        top: 0 !important;
-    }
-
-    /* 2. 정보 그리드: 가로 2열 -> 세로 1열 (수정 페이지 가독성) */
-    .info-grid {
-        grid-template-columns: 1fr; 
-        gap: 10px;
-    }
-
-    /* 3. 입력 필드 최적화: 라벨과 값을 위아래로 배치 */
-    .info-item {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 15px 0;
-    }
-
-    .info-label {
-        margin-bottom: 8px;
-        font-size: 14px;
-    }
-
-    .info-value {
-        width: 100%; /* 입력창이 있다면 가로 꽉 차게 */
-    }
-
-    /* 4. 페이지 내부 하단 탭 바 활성화 (기존 코드 유지용) */
-    .sidebar {
-        display: flex;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 65px;
-        background: #0d1b3e;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 1000;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .sidebar li span {
-        display: none;
-    }
-
-    /* 5. 버튼 그룹: 세로로 쌓기 */
-    .button-group {
-        display: flex;
-        flex-direction: column; 
-        gap: 12px;
-        margin-top: 20px;
-    }
-
-    .continue-btn, .cancel-btn { 
         width: 100% !important;
-        height: 50px !important;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        padding: 10px 0 120px !important; /* 하단바 여백 */
+        display: block !important;
+    }
+
+    .detail-card,
+    div[style*="width: 1100px"] {
+        width: 92% !important;
+        max-width: none !important;
+        margin: 20px auto !important;
+        padding: 25px 20px !important;
+        border-radius: 20px !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+
+    /* 제목 폰트 (3rem) 줄이기 */
+    input[style*="font-size: 3rem"] {
+        font-size: 1.8rem !important;
+    }
+
+    /* 가로 2열 그리드 해제 */
+    .info-grid,
+    div[style*="display: flex"][style*="gap: 100px"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    /* 라벨과 입력창 위아래 배치 */
+    .info-item,
+    div[style*="justify-content: space-between"] {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 15px 0 !important;
+        width: 100% !important;
+    }
+
+    /* 입력창 너비 100% 강제 */
+    .info-value, 
+    .info-item input, 
+    div[style*="width: 60%"] {
+        width: 100% !important;
+        min-width: 100% !important;
+        font-size: 16px !important;
+        text-align: left !important; /* 모바일은 왼쪽 정렬이 편함 */
+    }
+
+    /* 하단 버튼 그룹 세로 정렬 */
+    div[style*="display: flex"][style*="gap: 20px"] {
+        flex-direction: column !important;
+        gap: 10px !important;
+        margin-top: 20px !important;
+    }
+
+    /* 버튼 크기 키우기 */
+    button[style*="flex: 1"] {
+        width: 100% !important;
+        height: 55px !important;
+        margin: 0 !important;
+    }
+
+    /* 모바일 하단바 */
+    .sidebar {
+        display: flex !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        background: #0d1b3e !important;
+        z-index: 2000 !important;
     }
 }

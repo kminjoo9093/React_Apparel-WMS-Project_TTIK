@@ -2,51 +2,38 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import style from '../../css/ProductArchive.module.css';
+import serverUrl from "../../db/server.json";
 
 const ProductArchive = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const SERVER_URL = serverUrl.SERVER_URL;
   
-  // 1. 상태 초기화
   const [archiveList, setArchiveList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // 2. 상세 페이지에서 넘어온 상품 추가
-  useEffect(() => {
-    if (location.state && location.state.product) {
-      const newProduct = location.state.product;
-      setArchiveList(prevList => {
-        const isExist = prevList.some(item => item.gds_cd === newProduct.gds_cd);
-        if (isExist) return prevList;
-        return [{
-          ...newProduct,
-          archiveDate: new Date().toISOString().split('T')[0] // 오늘 날짜
-        }, ...prevList];
-      });
-    }
-  }, [location.state]);
-
-  // 3. 서버에서 관리 제외 상품 목록 가져오기
+  // 데이터 로딩 및 location state 합치기
   useEffect(() => {
     const fetchArchiveList = async () => {
       try {
         setLoading(true);
-        const res = await axios.get('http://localhost:3001/api/product/archive'); // 서버 API 호출
-        if (Array.isArray(res.data)) {
-          setArchiveList(prev => {
-            // 중복 제거 후 합치기
-            const combined = [...res.data];
-            prev.forEach(p => {
-              if (!combined.some(item => item.gds_cd === p.gds_cd)) {
-                combined.unshift(p); // 새로 넘어온 상품은 앞에
-              }
-            });
-            return combined;
-          });
+        const res = await axios.get(`${SERVER_URL}/ttik/product/productArchive`);
+        let combined = Array.isArray(res.data) ? res.data : [];
+
+        // 방금 삭제 처리되어 넘어온 데이터가 있다면 리스트 최상단에 추가
+        if (location.state && location.state.product) {
+          const newProduct = location.state.product;
+          if (!combined.some(item => item.gds_cd === newProduct.gds_cd)) {
+            combined = [{
+              ...newProduct,
+              archiveDate: new Date().toISOString().split('T')[0]
+            }, ...combined];
+          }
         }
+        setArchiveList(combined);
       } catch (error) {
-        console.error(error);
+        console.error("데이터 로드 실패:", error);
         setErrorMsg('보관 상품 목록을 불러오지 못했습니다.');
       } finally {
         setLoading(false);
@@ -54,31 +41,7 @@ const ProductArchive = () => {
     };
 
     fetchArchiveList();
-  }, []);
-
-  // 버튼 스타일 (UI 그대로)
-  const restoreBtnStyle = {
-    marginRight: '8px',
-    padding: '10px 20px',
-    background: '#2563eb', 
-    color: '#fff',
-    border: 'none',
-    borderRadius: '8px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    fontSize: '15px'
-  };
-
-  const deleteBtnStyle = {
-    padding: '10px 20px',
-    background: '#fff',
-    color: '#ef4444',
-    border: '1px solid #ef4444',
-    borderRadius: '8px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    fontSize: '15px'
-  };
+  }, [SERVER_URL, location.state]);
 
   // 수정 후 복구
   const handleEditAndRestore = (product) => {
@@ -87,74 +50,82 @@ const ProductArchive = () => {
     }
   };
 
-  // 영구 삭제 (UI 상에서만 제거, 서버 호출 X)
+  // 영구 삭제 (DB에서 진짜 지우기)
   const handlePermanentDelete = async (gds_cd) => {
-      if (!window.confirm("정말로 영구 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
-
-      try {
-        // 서버 API 호출 (DELETE 요청으로 실제 DB 데이터 삭제)
-        await axios.delete(`https://localhost:3001/api/product/archive/${gds_cd}`);
-        
-        // UI 갱신
-        setArchiveList(prev => prev.filter(item => item.gds_cd !== gds_cd));
-        alert('영구 삭제되었습니다.');
-
-        // 요구사항 반영: 삭제 후 목록 화면(/productList)
-        navigate('/productList');
-        
-      } catch (error) {
-        console.error(error);
-        alert('삭제 중 오류가 발생했습니다.');
-      }
-    };
+    if (!window.confirm("정말로 영구 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
+    
+    try {
+      // 엔드포인트 주의: 백엔드 매핑 주소 확인 필수
+      await axios.delete(`${SERVER_URL}/ttik/product/productArchive/${gds_cd}`);
+      
+      setArchiveList(prev => prev.filter(item => item.gds_cd !== gds_cd));
+      alert('영구 삭제되었습니다.');
+      
+      // 삭제 후 목록으로 튕겨나가게 하고 싶으면 아래 유지, 아니면 주석 처리
+      navigate('/productList'); 
+    } catch (error) {
+      console.error("삭제 실패:", error);
+      alert('삭제 중 오류가 발생했습니다. (백엔드 경로를 확인해보세요)');
+    }
+  };
 
   return (
-    <div style={{ padding: '30px' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: 'bold', borderBottom: '2px solid #333', paddingBottom: '10px' }}>
+    <div className={style['archive-wrapper']}>
+      <h2 className={style['archive-title']}>
         📦 관리 제외 품목 (Archive)
       </h2>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-        <thead>
-          <tr style={{ background: '#f4f4f4', borderBottom: '2px solid #ddd' }}>
-            <th style={{ padding: '12px' }}>상품코드</th>
-            <th>제품명</th>
-            <th>보관 처리일</th>
-            <th>상태</th>
-            <th>관리</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr><td colSpan="5" style={{ padding: '50px', textAlign: 'center' }}>데이터 불러오는 중...</td></tr>
-          ) : errorMsg ? (
-            <tr><td colSpan="5" style={{ padding: '50px', textAlign: 'center', color: 'red' }}>{errorMsg}</td></tr>
-          ) : archiveList.length === 0 ? (
-            <tr><td colSpan="5" style={{ padding: '50px', color: '#94a3b8', textAlign: 'center' }}>보관된 품목이 없습니다.</td></tr>
-          ) : (
-            archiveList.map((product, index) => (
-              <tr key={product.gds_cd || index} style={{ borderBottom: '1px solid #eee', textAlign: 'center' }}>
-                <td style={{ padding: '15px' }}>{product.gds_cd}</td>
-                <td style={{ fontWeight: '600' }}>{product.gds_nm}</td>
-                <td style={{ color: '#888' }}>{product.archiveDate || product.frst_reg_dt}</td>
-                <td>
-                  <span style={{ color: '#d32f2f', fontWeight: 'bold', background: '#fee2e2', padding: '4px 8px', borderRadius: '4px' }}>
-                    비활성
-                  </span>
-                </td>
-                <td>
-                  <button onClick={() => handleEditAndRestore(product)} style={restoreBtnStyle}>
-                    수정 후 복구
-                  </button>
-                  <button onClick={() => handlePermanentDelete(product.gds_cd)} style={deleteBtnStyle}>
-                    영구 삭제
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+      <div className={style['table-container']}>
+        <table className={style['archive-table']}>
+          <thead>
+            <tr>
+              <th className={style['col-cd']}>상품코드</th>
+              <th className={style['col-nm']}>제품명</th>
+              <th className={style['col-date']}>보관 처리일</th>
+              <th className={style['col-status']}>상태</th>
+              <th className={style['col-ctrl']}>관리</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr><td colSpan="5" className={style['status-msg']}>데이터 불러오는 중...</td></tr>
+            ) : errorMsg ? (
+              <tr><td colSpan="5" className={style['status-msg']} style={{ color: 'red' }}>{errorMsg}</td></tr>
+            ) : archiveList.length === 0 ? (
+              <tr><td colSpan="5" className={style['status-msg']}>보관된 품목이 없습니다.</td></tr>
+            ) : (
+              archiveList.map((product, index) => (
+                <tr key={product.gds_cd || index}>
+                  <td className={style['col-cd']}>{product.gds_cd}</td>
+                  <td className={style['col-nm']}>{product.gds_nm}</td>
+                  <td className={style['col-date']}>
+                    {product.archiveDate || (product.frst_reg_dt ? product.frst_reg_dt.split(' ')[0] : '-')}
+                  </td>
+                  <td className={style['col-status']}>
+                    <span className={style['status-badge']}>비활성</span>
+                  </td>
+                  <td className={style['col-ctrl']}>
+                    <div className={style['btn-group']}>
+                      <button 
+                        onClick={() => handleEditAndRestore(product)} 
+                        className={style['restore-btn']}
+                      >
+                        수정 후 복구
+                      </button>
+                      <button 
+                        onClick={() => handlePermanentDelete(product.gds_cd)} 
+                        className={style['delete-btn']}
+                      >
+                        영구 삭제
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
