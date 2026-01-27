@@ -194,6 +194,21 @@
     font-size: 1.2rem;
     color: #718096;
 }
+/* 창고 셀렉트 */
+.selectContainer{
+    text-align: center;
+}
+
+.selectBox {
+    display: flex;
+    width: 30rem;
+}
+
+.selectBox select{
+    margin: 0rem 0.5rem;
+}
+
+/* --- 진행률 바 스타일 추가 --- */
 .progressBarWrapper {
     width: 100%;
     height: 14px;            
@@ -315,3 +330,4 @@
     color: #718096;
     text-align: center;
 }
+

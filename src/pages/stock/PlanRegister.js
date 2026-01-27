@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import stylePlans from "../../css/plarns.module.css";
-import serverUrl from "../../db/server.json";
-
+import serverUrlData from "../../db/server.json";
 
 const initialFormState = {
     date: '',
@@ -11,8 +10,10 @@ const initialFormState = {
     itemName: '',
     untprc: 0,
     quantity: 0,
-    boxQuantity: 0,
-    eaQuantity: 0,
+    boxQuantity: 0, // 입고 시 사용
+    eaQuantity: 0,  // 입고 시: 입수량, 출고 시: 출고수량
+    boxCode: '',    // 출고 시: 선택된 박스 코드
+    currentStock: 0 // 출고 시: 선택된 박스의 실제 재고
 };
 
 function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
@@ -20,15 +21,19 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
     const [selectOptions, setSelectOptions] = useState({
         partners: [], brands: [], categories: [], Product: [] 
     });
-    const SERVER_URL = serverUrl.SERVER_URL;
+    const [availableBoxes, setAvailableBoxes] = useState([]); // 출고 가능 박스 목록
+
+    const SERVER_URL = serverUrlData.SERVER_URL; 
+
+    // 기초 데이터 로드
     useEffect(() => {
         if (isOpen) {
             const fetchRegisterData = async () => {
                 try {
-                    const response = await fetch(`${SERVER_URL}/ttik/register-info`, {
+                    const response = await fetch(`${SERVER_URL}/ttik/plans/register-info`, {
                         method: 'GET',
                         credentials: 'include'
-                    }); 
+                    });
                     if (response.ok) {
                         const data = await response.json();
                         setSelectOptions(data);
@@ -38,121 +43,145 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
                 }
             };
             fetchRegisterData();
-            setFormData(initialFormState); 
+            setFormData(initialFormState);
+            setAvailableBoxes([]);
         }
-    }, [isOpen]);
+    }, [isOpen, SERVER_URL]);
+
+    // [출고 전용] 상품 선택 시 해당 상품이 들어있는 박스 리스트 가져오기
+    useEffect(() => {
+        if (currentType === "OutBound" && formData.itemName) {
+            const fetchBoxes = async () => {
+                try {
+                    const response = await fetch(`${SERVER_URL}/ttik/plans/available-boxes?gdsCd=${formData.itemName}`, {
+                        credentials: 'include'
+                    });
+                    if (response.ok) {
+                        const data = await response.json(); // [{boxCd: '...', stock: 10}, ...]
+                        setAvailableBoxes(data);
+                    }
+                } catch (e) { console.error("박스 로드 실패", e); }
+            };
+            fetchBoxes();
+        }
+    }, [formData.itemName, currentType, SERVER_URL]);
 
     if (!isOpen) return null;
 
+    const isBrandSelected = currentType === "InBound" ? !!formData.targetName : !!formData.brand;
+
     const handleChange = (e) => {
         const { name, value } = e.target;
+        
         setFormData(prev => {
-            const nextData = { ...prev, [name]: value };
+            let nextData = { ...prev, [name]: value };
 
+            // 브랜드 변경 시 하위 항목 초기화
+            if (name === 'targetName' || name === 'brand') {
+                nextData.category = ''; nextData.itemName = ''; nextData.untprc = 0;
+                nextData.boxCode = ''; nextData.currentStock = 0;
+            }
+
+            // 상품 선택 시 단가 매칭 및 박스 정보 초기화
             if (name === 'itemName') {
                 const selectedProduct = selectOptions.Product?.find(p => String(p.GDS_CD) === String(value));
-                
-                // 💡 브라우저 콘솔(F12)에서 실제 어떤 데이터가 들어오는지 확인하는 용도
-                console.log("선택된 상품 데이터 전체:", selectedProduct);
-
-                if (selectedProduct) {
-                    // 만약 실제 필드명이 UNTPRC가 아니라 PRICE라면 아래를 수정해야 함
-                    nextData.untprc = selectedProduct.UNTPRC || selectedProduct.PRICE || 0; 
-                } else {
-                    nextData.untprc = 0;
-                }
-            }
-                        
-            // ✅ [추가] 상품 선택 시 단가(UNTPRC)를 자동으로 찾아 formData에 할당
-            if (name === 'itemName') {
-                const selectedProduct = selectOptions.Product?.find(p => String(p.GDS_CD) === String(value));
-                if (selectedProduct) {
-                    nextData.untprc = selectedProduct.UNTPRC || 0; // DB 컬럼명에 맞춰 확인 필요
-                } else {
-                    nextData.untprc = 0;
-                }
+                nextData.untprc = selectedProduct ? (selectedProduct.UNTPRC || 0) : 0;
+                nextData.boxCode = ''; nextData.currentStock = 0;
             }
 
-            // 필터링 조건 변경 시 상품명 및 단가 초기화
-            if (['targetName', 'brand', 'category'].includes(name)) {
-                nextData.itemName = '';
-                nextData.untprc = 0; // ✅ 단가도 함께 초기화
+            // [출고] 박스 선택 시 해당 박스 재고 업데이트
+            if (name === 'boxCode') {
+                const selectedBox = availableBoxes.find(b => b.boxCd === value);
+                nextData.currentStock = selectedBox ? selectedBox.stock : 0;
+                nextData.eaQuantity = 0; // 박스 변경 시 입력 수량 초기화
             }
 
-            if (name === 'boxQuantity' || name === 'eaQuantity') {
-                nextData.quantity = Number(nextData.boxQuantity || 0) * Number(nextData.eaQuantity || 0);
+            // 총 수량 자동 계산
+            if (currentType === "InBound") {
+                const bQty = name === 'boxQuantity' ? Number(value) : Number(prev.boxQuantity);
+                const eQty = name === 'eaQuantity' ? Number(value) : Number(prev.eaQuantity);
+                nextData.quantity = bQty * eQty;
+            } else {
+                nextData.quantity = name === 'eaQuantity' ? Number(value) : Number(prev.eaQuantity);
             }
+
             return nextData;
         });
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
         
-        console.log("제출 데이터:", formData);
-
-        const { itemName, eaQuantity, boxQuantity, targetName, date, untprc } = formData;
-
-        // 필수값 검증 (untprc가 NOT NULL이므로 검증에 추가 권장)
-        if (!targetName || !itemName || !date || boxQuantity <= 0 || eaQuantity <= 0) {
-            alert("모든 필수 항목을 입력해주세요.");
-            return;
+        // 1. 출고 시 수량 유효성 검사
+        if (currentType === "OutBound") {
+            if (!formData.boxCode) { alert("출고할 박스를 선택해주세요."); return; }
+            if (formData.eaQuantity > formData.currentStock) {
+                alert(`선택한 박스의 재고(${formData.currentStock}EA)를 초과할 수 없습니다.`);
+                return;
+            }
         }
 
         try {
-            const lastNoRes = await fetch(
-                `${SERVER_URL}/ttik/last-box-no?itemName=${itemName}&eaQuantity=${eaQuantity}`, {
-                method: 'GET',
-                credentials: 'include'
-            }); 
+            let boxesData = [];
             
-            if (!lastNoRes.ok) throw new Error("서버로부터 박스 번호를 가져오지 못했습니다.");
-            
-            const { lastBoxNo } = await lastNoRes.json();
+            if (currentType === "InBound") {
+                // 2. [입고] 마지막 박스 번호 조회
+                const lastNoRes = await fetch(
+                    `${SERVER_URL}/ttik/plans/last-box-no?itemName=${formData.itemName}&eaQuantity=${formData.eaQuantity}`,
+                    { credentials: 'include' }
+                );
+                
+                if (!lastNoRes.ok) throw new Error("박스 번호 조회 실패");
+                const { lastBoxNo } = await lastNoRes.json();
+                let startNo = Number(lastBoxNo || 0);
 
-            const boxesData = [];
-            let startNo = Number(lastBoxNo || 0);
-
-            for (let i = 1; i <= Number(boxQuantity); i++) {
-                const currentBoxNo = startNo + i;
-                const boxCode = `${itemName}-b${eaQuantity}-${currentBoxNo}`;
-                const itemCodes = [];
-                for (let j = 1; j <= Number(eaQuantity); j++) {
-                    itemCodes.push(`${boxCode}-${j}`);
+                // 3. [입고] 박스 및 아이템 코드 생성 규칙 적용
+                for (let i = 1; i <= Number(formData.boxQuantity); i++) {
+                    const currentBoxNo = startNo + i;
+                    // 규칙: [상품코드]-b[입수량]-[박스번호]
+                    const boxCode = `${formData.itemName}-b${formData.eaQuantity}-${currentBoxNo}`;
+                    
+                    const itemCodes = [];
+                    // 규칙: 입수량만큼 아이템 코드 반복 생성
+                    for (let j = 1; j <= Number(formData.eaQuantity); j++) {
+                        itemCodes.push(`${boxCode}-${j}`);
+                    }
+                    boxesData.push({ boxCode, itemCodes });
                 }
-                boxesData.push({
-                    boxCode: boxCode,
-                    boxNo: currentBoxNo,
-                    itemCodes: itemCodes
-                });
+            } else {
+                // 4. [출고] 선택된 박스 정보 담기
+                boxesData = [{ boxCode: formData.boxCode, eaQuantity: formData.eaQuantity }];
             }
 
+            // 5. 서버 전송용 데이터 구성
+            const payload = { 
+                ...formData, 
+                type: currentType === "InBound" ? 0 : 1,
+                date: formData.date.substring(0, 10),
+                targetName: Number(formData.targetName),
+                generatedBoxes: boxesData // 생성된 바코드 리스트 포함
+            };
+
             const endpoint = currentType === "InBound" ? "inbound" : "outbound";
-            const response = await fetch(`${SERVER_URL}/ttik/${endpoint}/register`, {
+
+            const response = await fetch(`${SERVER_URL}/ttik/plans/${endpoint}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    ...formData, 
-                    date: formData.date.substring(0, 10),
-                    targetName: Number(targetName),
-                    type: currentType === "InBound" ? 0 : 1,
-                    generatedBoxes: boxesData,
-                    untprc: Number(untprc) // ✅ 명시적으로 숫자형으로 전송
-                }),
+                body: JSON.stringify(payload),
+                credentials: 'include'
             });
 
             if (response.ok) {
                 alert(`${currentType === "InBound" ? "입고" : "출고"} 등록이 완료되었습니다.`);
                 onRegisterSuccess(); 
-                setFormData(initialFormState); 
-                onClose(); 
+                onClose();
             } else {
                 const errorData = await response.text();
                 alert(`등록 실패: ${errorData}`);
             }
-        } catch (error) {
-            console.error("등록 에러 상세:", error);
-            alert('서버와 통신 중 오류가 발생했습니다.');
+        } catch (error) { 
+            console.error("등록 중 에러:", error);
+            alert('서버와 통신 중 오류가 발생했습니다.'); 
         }
     };
 
@@ -160,7 +189,7 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
         <div className={stylePlans.modalOverlay}>
             <div className={stylePlans.modalContent} onClick={(e) => e.stopPropagation()}>
                 <button className={stylePlans.closeBtn} onClick={onClose}>&times;</button>
-                <h2>{currentType === "InBound" ? "입고 일정 등록" : "출고 일정 등록"}</h2>
+                <h2>{currentType === "InBound" ? "📦 입고 일정 등록" : "🚚 출고 일정 등록"}</h2>
                 
                 <form onSubmit={handleSubmit}>
                     <div className={stylePlans.modalItem}>
@@ -179,96 +208,90 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
                                 }
                             </select>
                         </div>
-                        
                         {currentType !== "InBound" && (
                             <div className={stylePlans.inputBoxL}>
                                 <label>브랜드</label>
-                                <select name="brand" value={formData.brand} onChange={handleChange}>
+                                <select name="brand" value={formData.brand} onChange={handleChange} required disabled={!formData.targetName}>
                                     <option value="">브랜드 선택</option>
-                                    {selectOptions.brands?.map(b => (
-                                        <option key={b.PARTNER_SN} value={b.PARTNER_SN}>{b.PARTNER_NM}</option>
-                                    ))}
+                                    {selectOptions.brands?.map(b => <option key={b.PARTNER_SN} value={b.PARTNER_SN}>{b.PARTNER_NM}</option>)}
                                 </select>
                             </div>
                         )}
                     </div>
 
                     <div className={stylePlans.doubleBox}>
-                        <div className={stylePlans.inputBox}>
-                            <label>카테고리</label>
-                            <select name="category" value={formData.category} onChange={handleChange}>
+                        <div className={stylePlans.inputBox}><label>카테고리</label>
+                            <select name="category" value={formData.category} onChange={handleChange} disabled={!isBrandSelected}>
                                 <option value="">전체</option>
-                                {selectOptions.categories?.map(c => (
-                                    <option key={c.CATE_CD} value={c.CATE_CD}>{c.CATE_NM}</option>
-                                ))}
+                                {selectOptions.categories?.map(c => <option key={c.CATE_CD} value={c.CATE_CD}>{c.CATE_NM}</option>)}
                             </select>
                         </div>
-                        <div className={stylePlans.inputBoxL}>
-                            <label>상품명</label>
-                            <select name="itemName" value={formData.itemName} onChange={handleChange} required>
+                        <div className={stylePlans.inputBoxL}><label>상품명</label>
+                            <select name="itemName" value={formData.itemName} onChange={handleChange} required disabled={!isBrandSelected}>
                                 <option value="">상품 선택</option>
-                                {selectOptions.Product
-                                    ?.filter(item => {
-                                        const filterBrandSN = currentType === "InBound" ? formData.targetName : formData.brand;
-                                        const matchBrand = !filterBrandSN || String(item.BRAND_SN) === String(filterBrandSN);
-                                        const matchCategory = !formData.category || String(item.GDS_CAT_CD) === String(formData.category);
-                                        return matchBrand && matchCategory;
-                                    })
-                                    .map((i, index) => (
-                                        <option key={i.GDS_CD || index} value={i.GDS_CD}>{i.GDS_NM}</option>
-                                    ))
-                                }
+                                {selectOptions.Product?.filter(item => {
+                                    const filterSN = currentType === "InBound" ? formData.targetName : formData.brand;
+                                    return (!filterSN || String(item.BRAND_SN) === String(filterSN)) && (!formData.category || String(item.GDS_CAT_CD) === String(formData.category));
+                                }).map(i => <option key={i.GDS_CD} value={i.GDS_CD}>{i.GDS_NM}</option>)}
                             </select>
                         </div>
                     </div>
 
                     <div className={stylePlans.modalItem}>
                         <label>단가(자동입력)</label>
-                        <input 
-                            name="untprc" 
-                            type="text" 
-                            value={Number(formData.untprc).toLocaleString() + " 원"} 
-                            readOnly 
-                            style={{textAlign: 'right'}}
-                        />
+                        <input name="untprc" type="text" value={Number(formData.untprc).toLocaleString() + " 원"} readOnly style={{textAlign: 'right', backgroundColor: '#f5f5f5'}} />
                     </div>
 
-                    <div className={stylePlans.doubleBox}>
-                        <div className={stylePlans.inputBox}>
-                            <label>상자수량(Box)</label>
-                            <input name="boxQuantity" type="number" value={formData.boxQuantity} onChange={handleChange} required />
+                    {/* --- 입고/출고 분기점 --- */}
+                    {currentType === "InBound" ? (
+                        <div className={stylePlans.doubleBox}>
+                            <div className={stylePlans.inputBox}>
+                                <label>상자수량(Box)</label>
+                                <input name="boxQuantity" type="number" value={formData.boxQuantity} onChange={handleChange} required min="1" />
+                            </div>
+                            <div className={stylePlans.inputBoxL}>
+                                <label>입수량(EA)</label>
+                                <input name="eaQuantity" type="number" value={formData.eaQuantity} onChange={handleChange} required min="1" />
+                            </div>
                         </div>
-                        <div className={stylePlans.inputBoxL}>
-                            <label>입수량(EA)</label>
-                            <input name="eaQuantity" type="number" value={formData.eaQuantity} onChange={handleChange} required />
-                        </div>
+                    ) : (
+                        <>
+                            <div className={stylePlans.modalItem}>
+                                <label>출고 박스 선택</label>
+                                <select name="boxCode" value={formData.boxCode} onChange={handleChange} required disabled={!formData.itemName}>
+                                    <option value="">박스 코드를 선택하세요</option>
+                                    {availableBoxes.map(box => (
+                                        <option key={box.boxCd} value={box.boxCd}>{box.boxCd}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className={stylePlans.modalItem}>
+                                <label>출고량(EA)</label>
+                                <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                                    <input 
+                                        name="eaQuantity" 
+                                        type="number" 
+                                        value={formData.eaQuantity} 
+                                        onChange={handleChange} 
+                                        required 
+                                        min="1" 
+                                        max={formData.currentStock} 
+                                        style={{flex: 1}}
+                                        placeholder="수량 입력"
+                                    />
+                                    <span style={{color: '#007bff', fontWeight: 'bold', fontSize: '0.9em', whiteSpace: 'nowrap'}}>
+                                        재고: {formData.currentStock} EA
+                                    </span>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    <div className={stylePlans.modalItem} style={{marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '10px'}}>
+                        <label>총 예정 수량: <strong style={{color: '#e74c3c'}}>{formData.quantity.toLocaleString()} EA</strong></label>
                     </div>
 
-                    {/* <div className={stylePlans.doubleBox}>
-                        <div className={stylePlans.inputBox}>
-                            <label>창고</label>
-                            <select name="storage" value={formData.storage} onChange={handleChange}>
-                                <option value="">선택</option>
-                                {selectOptions.storages?.map(s => <option key={s.STR_CD} value={s.STR_CD}>{s.STR_NM}</option>)}
-                            </select>
-                        </div>
-                        <div className={stylePlans.inputBoxL}>
-                            <label>구역</label>
-                            <select name="zone" value={formData.zone} onChange={handleChange}>
-                                <option value="">선택</option>
-                                {selectOptions.zones?.map(z => <option key={z.ZONE_CD} value={z.ZONE_CD}>{z.ZONE_NM}</option>)}
-                            </select>
-                        </div>
-                        <div className={stylePlans.inputBoxL}>
-                            <label>선반</label>
-                            <select name="rack" value={formData.rack} onChange={handleChange}>
-                                <option value="">선택</option>
-                                {selectOptions.racks?.map(r => <option key={r.RACK_CD} value={r.RACK_CD}>{r.RACK_NM}</option>)}
-                            </select>
-                        </div>
-                    </div> */}
-
-                    <button type='submit' className={stylePlans.submitBtn}>등록</button>
+                    <button type='submit' className={stylePlans.submitBtn}>등록하기</button>
                 </form>
             </div>
         </div>

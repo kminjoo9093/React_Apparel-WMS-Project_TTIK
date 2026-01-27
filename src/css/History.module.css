@@ -126,7 +126,7 @@
     align-items: center;
     gap: 10px;
     width: 40%;   /* 검색창 전체 너비 */
-    justify-content: flex-end; /* 검색 라벨과 창을 오른쪽으로 밀착 */
+    justify-content: center;
 }
 
 .searchInput input {
@@ -135,4 +135,66 @@
     padding: 8px 15px;
     border: 1px solid #ddd;
     border-radius: 20px; /* 이미지 스타일 적용 */
+}
+
+/* 상품명 텍스트 */
+.selectedProductName {
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 2rem 0 3rem 0;
+    color: #334155;
+}
+
+/* 타임라인 컨테이너 (세로줄) */
+.timelineContainer {
+    position: relative;
+    padding-left: 40px;
+    margin-left: 20px;
+    border-left: 2px solid #cbd5e1; /* 정의서의 수직선 */
+}
+
+/* 각 타임라인 항목 */
+.timelineItem {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+/* 수직선 위의 점 */
+.timelineDot {
+    position: absolute;
+    left: -47px; /* 선 위치에 맞게 조절 */
+    top: 10px;
+    width: 12px;
+    height: 12px;
+    background-color: #1e293b; /* 정의서의 검은 점 */
+    border-radius: 50%;
+    z-index: 1;
+}
+
+/* 내용 박스 스타일 */
+.timelineContent {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+/* 텍스트 색상 구분 */
+.inText { color: #2563eb; font-weight: bold; }
+.outText { color: #dc2626; font-weight: bold; }
+.timeText { color: #64748b; }
+.remarkText { color: #334155; }
+
+/* 검색창 둥글게 조절 */
+.searchInput input {
+    border-radius: 30px;
+    padding: 10px 20px;
+    border: 2px solid #e2e8f0;
+    width: 400px;
 }

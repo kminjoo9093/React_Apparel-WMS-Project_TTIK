@@ -3,120 +3,109 @@ import styleHistory from "../../css/History.module.css";
 import serverUrl from "../../db/server.json";
 
 function StockHistory() {
-    // 1. 상태 선언 (반드시 컴포넌트 내부)
-    const [startDate, setStartDate] = useState(''); 
-    const [endDate, setEndDate] = useState('');
+    // 날짜 상태는 유지하되, 이번 요구사항에 따라 검색 시에는 필수로 쓰지 않도록 처리
     const [searchTerm, setSearchTerm] = useState('');
     const [historyList, setHistoryList] = useState([]);
     const [loading, setLoading] = useState(false);
     const SERVER_URL = serverUrl.SERVER_URL;
 
-    // 2. 검색 핸들러
+    // 검색 핸들러
     const handleSearch = async () => {
+        // 개별 아이템 코드로만 검색하기로 했으므로 검색어 체크
+        if (!searchTerm.trim()) {
+            // 초기 로딩 시(useEffect)에는 경고창을 띄우지 않기 위해 조건부 처리
+            return;
+        }
+
         setLoading(true);
         try {
-            // 서버에 날짜와 검색어를 포함하여 요청
-            const response = await fetch(`${SERVER_URL}/ttik/history/list?startDate=${startDate}&endDate=${endDate}&search=${searchTerm}`, {
-                method: 'GET',
-                credentials: 'include'
-            }); 
+            // 날짜 파라미터는 보내되, 빈 값으로 보내서 백엔드 XML의 <if>문에서 걸러지게 함
+            const response = await fetch(
+                `${SERVER_URL}/ttik/history/list?search=${searchTerm}`,
+                { method: 'GET', credentials: 'include' }
+            );
+
+            if (!response.ok) {
+                throw new Error(`서버 에러: ${response.status}`);
+            }
+
             const data = await response.json();
             setHistoryList(data);
         } catch (error) {
             console.error("이력 로드 실패:", error);
+            alert("이력을 불러오는 중 오류가 발생했습니다. (백엔드 로그 확인 필요)");
         } finally {
             setLoading(false);
         }
     };
 
-    // 3. 페이지 로드 시 초기 데이터 가져오기
+    // 컴포넌트 마운트 시 실행 (초기값이 없을 때는 실행하지 않거나 기본값 설정 가능)
     useEffect(() => {
-        handleSearch();
+        if(searchTerm) handleSearch();
     }, []);
 
     return (
-        <div>
+        <div className={styleHistory.HistoryContainer}>
             <h1 className={styleHistory.HistoryTitle}>Stock History</h1>
-            <p className={styleHistory.HistorySubTitle}>입·출고 이력을 확인하세요.</p>
+            <p className={styleHistory.HistorySubTitle}>상품 이력을 확인하세요.</p>
             
             <div className={styleHistory.HistoryListbox}>
+                {/* 검색 영역 */}
                 <div className={styleHistory.searchBox}>
-                    {/* 왼쪽: 날짜 영역 */}
-                    <div className={styleHistory.dateGroup}>
-                        <label>날짜</label>
-                        <input
-                            className={styleHistory.dateInput}
-                            type='date'
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                        />
-                        <span className={styleHistory.dash}>~</span>
-                        <input
-                            className={styleHistory.dateInput}
-                            type='date'
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                        />
-                    </div>
-
-                    {/* 오른쪽: 상품 검색 영역 */}
                     <div className={styleHistory.searchInput}>
-                        <label>상품 검색</label>
                         <input 
                             type="text"
-                            placeholder="상품명 또는 코드를 입력하세요."
+                            placeholder="상품 및 박스 코드를 입력하세요"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()} // 엔터키 검색
+                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                         />
-                        <button className={styleHistory.HistoryBtn} onClick={handleSearch}>검색</button>
+                        <button className={styleHistory.HistoryBtn} onClick={handleSearch}>조회</button>
                     </div>   
                 </div>
 
-                <table className={styleHistory.HistoryTable}>
-                    <thead>
-                        <tr>
-                            <th>구분</th>
-                            <th>날짜</th>
-                            <th>시간</th>
-                            <th>거래처</th>
-                            <th>상품명</th>
-                            <th>수량</th>
-                            <th>단가</th>
-                            <th>총액</th>
-                            <th>재고</th>
-                            <th>상태</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr><td colSpan="10">데이터를 불러오는 중입니다...</td></tr>
-                        ) : historyList.length > 0 ? (
-                            historyList.map((item) => (
-                                <tr key={item.id} className={styleHistory.tableRow}>
-                                    <td className={item.type === 0 ? styleHistory.in : styleHistory.out}>
-                                        {item.type === 0 ? "입고" : "출고"}
-                                    </td>
-                                    <td>{item.date}</td>
-                                    <td>{item.time}</td>
-                                    <td>{item.target_name}</td>
-                                    <td>{item.item_name}</td>
-                                    <td className={styleHistory.num}>{item.quantity?.toLocaleString()}</td>
-                                    <td className={styleHistory.num}>{item.unit_price?.toLocaleString()}</td>
-                                    <td className={styleHistory.num}>{item.total_price?.toLocaleString()}</td>
-                                    <td className={styleHistory.num}>{item.current_stock?.toLocaleString()}</td>
-                                    <td>
-                                        <span className={`${styleHistory.statusBadge} ${styleHistory[`status${item.status}`]}`}>
-                                            {item.status === 0 ? "완료" : item.status === 1 ? "반품" : "취소"}
+                {/* 타임라인 영역 (정의서 3번 영역) */}
+                <div className={styleHistory.timelineContainer}>
+                    {loading ? (
+                        <div className={styleHistory.loadingText}>데이터를 불러오는 중입니다...</div>
+                    ) : historyList.length > 0 ? (
+                        historyList.map((item) => (
+                            <div key={item.id} className={styleHistory.timelineItem}>
+                                <div className={`${styleHistory.timelineDot} ${item.type === 0 ? styleHistory.inDot : styleHistory.outDot}`}></div>
+                                
+                                {/* 오른쪽 내용 박스 */}
+                                <div className={styleHistory.timelineContent}>
+                                    <div className={styleHistory.contentTop}>
+                                        <span className={item.type === 0 ? styleHistory.inBadge : styleHistory.outBadge}>
+                                            {item.type === 0 ? "입고" : "출고"}
+                                            {item.status === 0 ? "완료" : "예정"}
                                         </span>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr><td colSpan="10">데이터가 없습니다.</td></tr>
-                        )}
-                    </tbody>
-                </table>
+                                        <span className={styleHistory.timeText}>
+                                            {item.date} {item.time}
+                                        </span>
+                                    </div>
+
+                                    <div>
+                                        <span className={styleHistory.targetText}>
+                                            거래처 {item.target_name}
+                                        </span>
+                                    </div>
+
+                                    <div className={styleHistory.contentBottom}>
+                                        <span className={styleHistory.remarkText}>
+                                            {/* 비고(remark)에 저장된 창고 위치나 상세 상태 출력 */}
+                                            {item.remark || "상세 내역 없음"}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className={styleHistory.emptyText}>
+                            {searchTerm ? "조회된 이력이 없습니다." : "검색어를 입력 해주세요"}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
