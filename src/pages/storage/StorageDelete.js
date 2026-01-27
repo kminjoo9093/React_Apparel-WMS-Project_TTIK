@@ -50,9 +50,6 @@ function StorageDelete ({storageList, onUpdate}) {
         "storageSn" : selectedStorage,
         "zoneSn" : selectedZone,
         "rackSn" : selectedRack
-        // "deleteStorage" : isCheckedDelete.deleteStorage,
-        // "deleteZone": isCheckedDelete.deleteZone,
-        // "deleteRack": isCheckedDelete.deleteRack,
     }
 
     const resetForm = ()=>{
@@ -85,13 +82,14 @@ function StorageDelete ({storageList, onUpdate}) {
             });
             if(res.ok){
                 const data = await res.json();
-                console.log("수정 요청 응답-->", data);
+
+                //어떤 구역, 선반을 삭제했는지 안내
                 alert(data.message);
 
                 if(onUpdate) onUpdate();
                 resetForm();
+
             } else {
-                console.log("수정 요청 실패-->", res.status);
                 const errorData = await res.json();
                 alert(errorData.message);
             }
@@ -133,7 +131,6 @@ function StorageDelete ({storageList, onUpdate}) {
                     </label>
                 </div>
 
-                {/* { !isCheckedDelete.deleteStorage && ( */}
                     <div>
                         <div className={`${styleStorage.contentRow} ${styleStorage.row2}`}>
                             <h3 className={styleStorage.modifyHeading}>구역</h3>
@@ -157,38 +154,33 @@ function StorageDelete ({storageList, onUpdate}) {
                             </label>
                             
                         </div>
-                        {/* {
-                            !isCheckedDelete.deleteZone && */}
-                                <div className={`${styleStorage.contentRow} ${styleStorage.row3}`}>
-                                    <h3 className={styleStorage.modifyHeading}>선반</h3>
-                                    <div className={styleStorage.rackArea}>
-                                        <div className={styleStorage.rackSelectWrap}>
-                                            <select name="rack" 
-                                                    value={selectedRack} 
-                                                    disabled={isCheckedDelete.deleteStorage || isCheckedDelete.deleteZone}
-                                                    onChange={(e)=>setSelectedRack(Number(e.target.value))}>
-                                                <option value="">선반 선택</option>
-                                                {
-                                                    rackOptions.map((item) => (
-                                                        <option key={item.rackSn} value={item.rackSn}>{item.rackNm}</option>
-                                                    ))
-                                                }
-                                            </select>
-                                            <label className={styleStorage.checkDelete} htmlFor="deleteRack">
-                                                <input type="checkbox" 
-                                                        name="deleteRack" 
-                                                        checked={isCheckedDelete.deleteRack}
-                                                        onChange={handleCheckChange} 
-                                                        id="deleteRack"/>삭제
-                                            </label>
-                                        </div>
-                                    </div>
+                        <div className={`${styleStorage.contentRow} ${styleStorage.row3}`}>
+                            <h3 className={styleStorage.modifyHeading}>선반</h3>
+                            <div className={styleStorage.rackArea}>
+                                <div className={styleStorage.rackSelectWrap}>
+                                    <select name="rack" 
+                                            value={selectedRack} 
+                                            disabled={isCheckedDelete.deleteStorage || isCheckedDelete.deleteZone}
+                                            onChange={(e)=>setSelectedRack(Number(e.target.value))}>
+                                        <option value="">선반 선택</option>
+                                        {
+                                            rackOptions.map((item) => (
+                                                <option key={item.rackSn} value={item.rackSn}>{item.rackNm}</option>
+                                            ))
+                                        }
+                                    </select>
+                                    <label className={styleStorage.checkDelete} htmlFor="deleteRack">
+                                        <input type="checkbox" 
+                                                name="deleteRack" 
+                                                checked={isCheckedDelete.deleteRack}
+                                                onChange={handleCheckChange} 
+                                                id="deleteRack"/>삭제
+                                    </label>
                                 </div>
-                        {/* } */}
-                        
+                            </div>
+                        </div>
                     </div>
                     
-                {/* )} */}
                 <div className={styleStorage.btnSubmitWrap}>
                     <button type="submit" className={`${styleStorage.btnModify} btnSubmit`}>수정</button>
                 </div>

@@ -14,7 +14,6 @@ function Storage(){
     const [storageList, setStorageList] = useState([]);
 
     //현재 존재하는 창고 리스트
-
     const getStorageData = async () => {
         try{
             const res = await fetch(`${SERVER_URL}/ttik/storage/allStorages`, {

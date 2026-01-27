@@ -124,7 +124,6 @@ function StorageUpdate ({storageList, onUpdate}) {
             });
             if(res.ok){
                 const data = await res.json();
-                // console.log("수정 요청 응답-->", data);
                 alert(data.message);
 
                 resetForm();

@@ -262,48 +262,42 @@ function StorageAdd ({storageList, onUpdate}) {
                                 checked={isCheckedAdd.addZone} 
                                 onChange={handleCheckChange}/>구역 추가
                     </label>
-                    {/* {
-                        isCheckedAdd.addZone && ( */}
-                            <div className={styleStorage.addContents}>
-                                <div className={`${styleStorage.addItem} ${styleStorage.addZoneArea}`}>
-                                    <h3 className={styleStorage.modifyHeading}>구역</h3>
-                                    <input type="number" 
-                                        name="newZone"
-                                        value={newZone} 
+                        <div className={styleStorage.addContents}>
+                            <div className={`${styleStorage.addItem} ${styleStorage.addZoneArea}`}>
+                                <h3 className={styleStorage.modifyHeading}>구역</h3>
+                                <input type="number" 
+                                    name="newZone"
+                                    value={newZone} 
+                                    required
+                                    min="0"
+                                    disabled={!isCheckedAdd.addZone} 
+                                    placeholder="구역 번호 입력"
+                                    onChange={validateNumber}
+                                ></input>
+                                <p className={styleStorage.errorMsg} 
+                                    style={{ visibility: errors.newZone ? "visible" : "hidden" }}
+                                >{errorMsg.newZone}</p>
+                                {
+                                    (isCheckedAdd.addZone && selectedStorage) &&
+                                    <span className={styleStorage.informZoneCount}>현재 해당 창고의 마지막 구역은 {currentZoneCount} 입니다.</span>
+                                }
+                            </div>
+                            <div className={styleStorage.addItem}>
+                                <h3 className={styleStorage.modifyHeading}>선반</h3>
+                                <input type="number" 
+                                        name="rackCountForNewZone"
+                                        value={rackCountForNewZone}
                                         required
                                         min="0"
                                         disabled={!isCheckedAdd.addZone} 
-                                        placeholder="구역 번호 입력"
+                                        placeholder="선반 별 층수 입력"
                                         onChange={validateNumber}
-                                    ></input>
-                                    <p className={styleStorage.errorMsg} 
-                                        style={{ visibility: errors.newZone ? "visible" : "hidden" }}
-                                    >{errorMsg.newZone}</p>
-                                    {
-                                        (isCheckedAdd.addZone && selectedStorage) &&
-                                        <span className={styleStorage.informZoneCount}>현재 해당 창고의 마지막 구역은 {currentZoneCount} 입니다.</span>
-                                    }
-                                </div>
-                                <div className={styleStorage.addItem}>
-                                    <h3 className={styleStorage.modifyHeading}>선반</h3>
-                                    <input type="number" 
-                                            name="rackCountForNewZone"
-                                            value={rackCountForNewZone}
-                                            required
-                                            min="0"
-                                            disabled={!isCheckedAdd.addZone} 
-                                            placeholder="선반 별 층수 입력"
-                                            onChange={validateNumber}
-                                    ></input>
-                                    <p className={styleStorage.errorMsg} 
-                                        style={{ visibility: errors.rackCountForNewZone ? "visible" : "hidden" }}
-                                    >{errorMsg.rackCountForNewZone}</p>
-                                </div>
+                                ></input>
+                                <p className={styleStorage.errorMsg} 
+                                    style={{ visibility: errors.rackCountForNewZone ? "visible" : "hidden" }}
+                                >{errorMsg.rackCountForNewZone}</p>
                             </div>
-                        {/* )
-
-                    } */}
-                    
+                        </div>
                 </div>
                     
                 <div className={styleStorage.btnSubmitWrap}>
