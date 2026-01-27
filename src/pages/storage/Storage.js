@@ -13,28 +13,29 @@ function Storage(){
     const [view, setView] = useState("list");
     const [storageList, setStorageList] = useState([]);
 
-
     //현재 존재하는 창고 리스트
-    useEffect(()=>{
-        const getStorageData = async () => {
-            try{
-                const res = await fetch(`${SERVER_URL}/ttik/storage/allStorages`, {
-                    method: 'GET',
-                    credentials: 'include', 
-                })
 
-                if(res.ok){
-                    const storageData = await res.json();
-                    console.log(storageData);
+    const getStorageData = async () => {
+        try{
+            const res = await fetch(`${SERVER_URL}/ttik/storage/allStorages`, {
+                method: 'GET',
+                credentials: 'include', 
+            })
 
-                    setStorageList(storageData);
-                }
-            } catch(error){
-                console.log(error);
-                return [];
+            if(res.ok){
+                const storageData = await res.json();
+                console.log(storageData);
+
+                setStorageList(storageData);
             }
-            
+        } catch(error){
+            console.log(error);
+            return [];
         }
+        
+    }
+
+    useEffect(()=>{
         getStorageData();
     }, [])
 
@@ -62,9 +63,9 @@ function Storage(){
                 </div>
 
                 <div className={styleStorage.mainContentWrap}>
-                    {view === "register" && <StorageRegister storageList={storageList} />}
-                    {view === "modify" && <StorageModify storageList={storageList} />}
-                    {view === "list" && <StorageList storageList={storageList} />}
+                    {view === "register" && <StorageRegister storageList={storageList} onUpdate={getStorageData}/>}
+                    {view === "modify" && <StorageModify storageList={storageList} onUpdate={getStorageData}/>}
+                    {view === "list" && <StorageList storageList={storageList} onUpdate={getStorageData}/>}
                 </div>
             </div>
         </div>

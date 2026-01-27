@@ -4,7 +4,7 @@ import styleStorage from "../../css/Storage.module.css";
 import styleRegister from "../../css/ProductRegister.module.css";
 import serverUrl from "../../db/server.json";
 
-function StorageRegister({storageList}){
+function StorageRegister({storageList, onUpdate}){
 
     const SERVER_URL = serverUrl.SERVER_URL;
     const [storageNm, setStorageNm] = useState("");

@@ -282,38 +282,6 @@ function ProductList(){
         }
     }
 
-
-    //필터 & 검색
-    // useEffect(()=>{
-    //     // 모든 필터가 비어있으면 전체 리스트 표시
-    //     if(!searchFilters.brandCd && !searchFilters.categoryCd && !searchFilters.seasonCd && !searchFilters.stkStatus && !searchFilters.keyword){
-    //         setFilteredProductList(productList);
-    //         return;
-    //     }
-
-    //     const filteredList = productList.filter((product)=>{
-    //         // 브랜드/카테고리/시즌 필터
-    //         const isMatchBrand = String(product.brandSn) === searchFilters.brandCd || searchFilters.brandCd === "";
-    //         const isMatchCategory = product.catCd === searchFilters.categoryCd || searchFilters.categoryCd === "";
-    //         const isMatchSeason = product.seasonCd === searchFilters.seasonCd || searchFilters.seasonCd === "";
-
-    //         // 재고 상태 필터 (정상/부족)
-    //         const status = handleStkStatus(product.stkQty, product.threshold, product.gdsEnabled);
-    //         const isMatchStkStatus = status === searchFilters.stkStatus || searchFilters.stkStatus === "";
-
-    //         // 키워드 검색 (상품코드 또는 상품명)
-    //         const searchLower = searchFilters.keyword.toLowerCase();
-    //         const isMatchKeyword = searchFilters.keyword === ""
-    //                             || product.productCd.toLowerCase().includes(searchLower)
-    //                             || product.productNm.toLowerCase().includes(searchLower)
-    //                             || product.brandNm.toLowerCase().includes(searchLower);    // 추가 브랜드명 포함
-
-    //         return isMatchBrand && isMatchCategory && isMatchSeason && isMatchStkStatus && isMatchKeyword;
-    //     });
-
-    //     setFilteredProductList(filteredList);
-    // }, [searchFilters, productList]);
-
     // 인풋창 타이핑용 (서버 요청 안 보냄)
     const handleKeywordTyping = (e) => {
         setKeywordInput(e.target.value);
