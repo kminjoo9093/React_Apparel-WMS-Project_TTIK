@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import stylePlans from "../../css/plarns.module.css";
+import serverUrl from "../../db/server.json";
+
 
 const initialFormState = {
     date: '',
@@ -11,23 +13,22 @@ const initialFormState = {
     quantity: 0,
     boxQuantity: 0,
     eaQuantity: 0,
-    // storage: '',
-    // zone: '',
-    // rack: ''
 };
 
 function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
     const [formData, setFormData] = useState(initialFormState);
     const [selectOptions, setSelectOptions] = useState({
         partners: [], brands: [], categories: [], Product: [] 
-        // storages: [], zones: [], racks: []
     });
-
+    const SERVER_URL = serverUrl.SERVER_URL;
     useEffect(() => {
         if (isOpen) {
             const fetchRegisterData = async () => {
                 try {
-                    const response = await fetch('https://localhost:3001/ttik/register-info');
+                    const response = await fetch(`${SERVER_URL}/ttik/register-info`, {
+                        method: 'GET',
+                        credentials: 'include'
+                    }); 
                     if (response.ok) {
                         const data = await response.json();
                         setSelectOptions(data);
@@ -100,8 +101,10 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
 
         try {
             const lastNoRes = await fetch(
-                `https://localhost:3001/ttik/last-box-no?itemName=${itemName}&eaQuantity=${eaQuantity}`
-            );
+                `${SERVER_URL}/ttik/last-box-no?itemName=${itemName}&eaQuantity=${eaQuantity}`, {
+                method: 'GET',
+                credentials: 'include'
+            }); 
             
             if (!lastNoRes.ok) throw new Error("서버로부터 박스 번호를 가져오지 못했습니다.");
             
@@ -125,7 +128,7 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
             }
 
             const endpoint = currentType === "InBound" ? "inbound" : "outbound";
-            const response = await fetch(`https://localhost:3001/ttik/${endpoint}/register`, {
+            const response = await fetch(`${SERVER_URL}/ttik/${endpoint}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
