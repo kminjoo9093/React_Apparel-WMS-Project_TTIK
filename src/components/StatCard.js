@@ -17,7 +17,7 @@ const StatCard = ({ title, value, unit, isWarning, trend }) => {
   };
 
   // 재고 부족 품목 카드일 경우 필터 조건을 주소에 포함
-  const targetPath = isWarning ? "/productList?status=부족" : "/productList";
+  const targetPath = isWarning ? "/product/list?status=부족" : "/product/list";
 
   return (
     <div className={`${styleMainDashBoard.modernCard} ${isWarning ? styleMainDashBoard.warning : ''}`}>

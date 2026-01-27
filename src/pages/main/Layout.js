@@ -51,15 +51,13 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
           combinedNotis.push({
             id: item.productCd,
             type: 'warning',
-            msg: `[재고부족] ${item.productNm} (${item.stkQty}개)`,
-            time: '실시간'
+            msg: `[재고부족] ${item.productNm}(${item.stkQty}개)`,
           });
         } else if (isNewArrival) {
           combinedNotis.push({
             id: item.productCd,
             type: 'info',
             msg: `[신규등록] ${item.productNm} 상품 입고`,
-            time: 'NEW'
           });
         }
       });
@@ -85,15 +83,28 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleNotificationClick = (id, path) => {
+  const handleNotificationClick = (id) => {
     const readIds = JSON.parse(localStorage.getItem('readNotifications') || '[]');
-    if (!readIds.includes(id)) {
-      const newReadIds = [...readIds, id];
-      localStorage.setItem('readNotifications', JSON.stringify(newReadIds));
+      if (!readIds.includes(id)) {
+        const newReadIds = [...readIds, id];
+        localStorage.setItem('readNotifications', JSON.stringify(newReadIds));
+      }
+      setNotifications(prev => prev.filter(n => n.id !== id));
+
+      if (id) {
+      navigate(`/product/list?search=${encodeURIComponent(id)}`);
     }
-    setNotifications(prev => prev.filter(n => n.id !== id));
-    if (path) navigate(path);
   };
+  //알림 모두 읽음 --> 현재 테스트 초기화 부분을 추후 알림 모두 읽음으로 변경
+    const handleAllRead = () => {
+      if (notifications.length === 0) return;
+      const currentReadIds = JSON.parse(localStorage.getItem('readNotifications') || '[]');
+      const allIds = notifications.map(n => n.id);
+      const newReadIds = Array.from(new Set([...currentReadIds, ...allIds]));
+      localStorage.setItem('readNotifications', JSON.stringify(newReadIds));
+      setNotifications([]); 
+      
+    }
 
   const handleLogout = () => {
     setModal({
@@ -126,8 +137,9 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
     { path: '/stock/plans', name: '입출고 관리', icon: '🔄', roles: ['ALL', 'U'] },
     { path: '/stock/history', name: '이력 조회', icon: '📜', roles: ['ALL'] },
     { path: '/brand', name: '브랜드', icon: '🏷️', roles: ['ALL'] },
+    { path: '/partner', name: '거래처', icon: '💼', roles: ['ALL'] },
     { path: '/storage', name: '창고 관리', icon: '🕋', roles: ['ALL', 'U'] },
-    { path: '/register-admin', name: '관리자 등록', icon: '👤', roles: ['ALL'] }
+    { path: '/register/admin', name: '관리자 등록', icon: '👤', roles: ['ALL'] }
   ];
 
   const menus = allMenus.filter(m => m.roles.includes(user?.tkcgStorage));
@@ -143,6 +155,8 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
       setSearchKeyword("");
     }
   };
+
+  
 
   return (
     <div className={styleLayout.appContainer}>
@@ -228,13 +242,21 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
                   <div className={styleLayout.notiDropdown}>
                     <div className={styleLayout.notiHeader}>
                       <span>최근 알림</span>
-                      {/* 누락되었던 테스트용 초기화 버튼 복구 */}
                       <button 
                         onClick={() => {
                           localStorage.removeItem('readNotifications');
                           window.location.reload();
                         }}
                         style={{ fontSize: '10px', color: '#ef4444', cursor: 'pointer', border: 'none', background: 'none' }}
+                          // onClick={handleAllRead} // 분리한 함수 연결
+                          // style={{ 
+                          //   fontSize: '12px', 
+                          //   color: '#64748b', 
+                          //   cursor: 'pointer', 
+                          //   border: 'none', 
+                          //   background: 'none', 
+                          //   fontWeight: '500' 
+                          // }}
                       >
                         [테스트 초기화]
                       </button>
@@ -244,14 +266,44 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
                         notifications.map((n) => (
                           <li 
                             key={n.id} 
-                            className={styleLayout.notiItem} 
+                            className={`${styleLayout.notiItem} ${n.type === 'info' ? styleLayout.typeInfo : styleLayout.typeWarn}`} 
                             onClick={() => handleNotificationClick(n.id, '/product/list')}
                           >
                             <div className={styleLayout.notiContent}>
                               <p className={n.type === 'warning' ? styleLayout.textWarn : ''}>
-                                {n.msg}
+                                {n.msg.includes(']') ? (
+                                  <>
+                                    <span style={{ 
+                                      display: 'block', 
+                                      color: n.type === 'warning' ? '#e11d48' : '#2563eb' // 경고면 빨강, 정보면 파랑
+                                    }}>
+                                      {`${n.msg.split(']')[0]}]`}
+                                    </span>
+                                    
+                                    {/* 2. 상품명 - 진한 회색/검정색 */}
+                                    <span style={{ 
+                                      color: '#334155', 
+                                      fontSize: '13px',
+                                    }}>
+                                      {n.msg.split(']')[1]?.split('(')[0]?.trim()}
+                                    </span>
+
+                                    {/* 3. (수량) - 상품명 뒤에 붙는 강조색 */}
+                                    {n.msg.includes('(') && (
+                                      <span style={{ 
+                                        color: n.type === 'warning' ? '#e11d48' : '#64748b',
+                                        fontSize: '12px',
+                                        marginLeft: '4px',
+                                        whiteSpace: 'nowrap'
+                                      }}>
+                                        {`(${n.msg.split('(')[1]}`}
+                                      </span>
+                                    )}
+                                  </>
+                                ) : (
+                                  <span style={{ color: '#334155' }}>{n.msg}</span>
+                                )}
                               </p>
-                              <span>{n.time}</span>
                             </div>
                           </li>
                         ))

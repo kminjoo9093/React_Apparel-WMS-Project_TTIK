@@ -198,27 +198,52 @@
 }
 .itemInfo { 
   display: flex; 
-  -direction: column; 
-  gap: 0.6rem; 
+  flex-direction: column; 
+  gap: 6px; 
+  flex: 1;
+  overflow: hidden;
 }
 .itemName { 
+  display: flex;
+  align-items: center;
+  gap: 8px; 
   font-size: 15px; 
   font-weight: 600; 
-  color: #334155; 
+  color: #334155;
+  white-space: nowrap;
 }
 .itemDate { 
   font-size: 12px; 
-  color: #94a3b8; 
+  color: #94a3b8;
+  display: block; 
 }
 .itemQtyPlus  { 
   font-size: 16px; 
   font-weight: 700; 
   color: #2563eb; 
+  font-family: 'Inter', sans-serif;
 }
 .itemQtyMinus { 
   font-size: 16px; 
   font-weight: 700; 
   color: #ef4444; 
+  font-family: 'Inter', sans-serif;
+}
+
+.brandBadge {
+  background-color: #f1f5f9;
+  color: #475569;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid #e2e8f0;
+}
+
+.nameText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .welcomeFlex { 
@@ -410,6 +435,46 @@
     flex: 1; 
     padding: 1rem; 
   }
+  .listItem {
+    padding: 12px 8px; 
+    gap: 10px;
+  }
+
+  /* 상품명 컨테이너: 뱃지와 텍스트가 자연스럽게 배치되도록 설정 */
+  .itemName {
+    display: flex;
+    flex-direction: row; /* 한 줄 유지 */
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    min-width: 0; /* 자식 요소의 ellipsis 작동을 위해 필수 */
+  }
+
+  /* 상품명 텍스트: 남는 모든 공간을 차지하도록 flex: 1 부여 */
+  .nameText {
+    font-size: 14px;
+    letter-spacing: -0.4px;
+    flex: 1; 
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* 브랜드 뱃지: 텍스트에 밀려 찌그러지지 않게 고정 */
+  .brandBadge {
+    padding: 1px 5px;
+    font-size: 10px;
+    flex-shrink: 0; 
+  }
+
+  /* 수량 부분: 최소 너비만 차지하게 하여 왼쪽 상품명 공간 확보 */
+  .itemQtyPlus, .itemQtyMinus {
+    font-size: 15px;
+    min-width: fit-content;
+    margin-left: 8px;
+    flex-shrink: 0;
+  }
 }
 
 @media (max-width: 48rem) {
@@ -419,11 +484,7 @@
   .listItem { 
     padding: 1.6rem 0; 
   }
-  .itemName { 
-    font-size: 14px; 
-    max-width: 15rem; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    white-space: nowrap; 
+  .itemName {
+    max-width: none !important; 
   }
 }
