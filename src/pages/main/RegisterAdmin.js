@@ -82,7 +82,7 @@ const RegisterAdmin = () => {
           message: `${submitData.nickname} 등록이 완료되었습니다.`,
           onConfirm: () => {
             closeModal();
-            navigate('/ttik');
+            navigate('/storage');
           }
         });
       } else {
@@ -106,13 +106,13 @@ const RegisterAdmin = () => {
       <div className={style.card}>
         <div className={style.header}>
           <h2>신규 관리자 등록</h2>
-          <p>시스템에 접근할 새로운 관리자 계정을 생성합니다.</p>
+          <p>모니터 계정의 경우 동+모니터 로 생성 ex)B모니터</p>
         </div>
 
         <form onSubmit={handleRegister} className={style.form}>
           <div className={style.inputGroup}>
             <label>관리자 닉네임</label>
-            <input type="text" name="nickname" placeholder="ex) 사무실 관리자 / 창고 이용자" onChange={handleChange} required />
+            <input type="text" name="nickname" placeholder="ex) 사무실 관리자 / 창고 이용자 / A모니터" onChange={handleChange} required />
           </div>
 
           <div className={style.inputGroup}>

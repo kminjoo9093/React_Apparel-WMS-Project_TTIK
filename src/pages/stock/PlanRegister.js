@@ -123,7 +123,7 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
 
         try {
             let boxesData = [];
-
+            
             if (currentType === "InBound") {
                 // 2. [입고] 마지막 박스 번호 조회
                 const lastNoRes = await fetch(
@@ -163,6 +163,7 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
             };
 
             const endpoint = currentType === "InBound" ? "inbound" : "outbound";
+
             const response = await fetch(`${SERVER_URL}/ttik/plans/${endpoint}/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

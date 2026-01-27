@@ -2,6 +2,8 @@ import { style } from "framer-motion/client";
 import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import styleRegister from "../../css/ProductRegister.module.css";
+import { useNavigate } from "react-router-dom";
+import Modal from "../../components/Modal";
 import serverUrl from "../../db/server.json";
 
 function StorageRegister({storageList}){
@@ -9,6 +11,8 @@ function StorageRegister({storageList}){
     const SERVER_URL = serverUrl.SERVER_URL;
     const [storageNm, setStorageNm] = useState("");
     const [zoneList, setZoneList] = useState([{zone: 1, rack: ""}]);
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const navigate = useNavigate();
 
     const handleAddBtn = () => {
         setZoneList(prev => {
@@ -107,12 +111,26 @@ function StorageRegister({storageList}){
 
     }
 
-
-
-
+    const adminCreate = () => {
+        setModal({
+          isOpen: true,
+          title: '등록이 완료되었습니다',
+          message: '관리자/모니터 등록을 진행해 주세요',
+          onConfirm: () => {
+            navigate("/register/admin");
+          }
+        });
+        
+    };
 
     return (
         <>
+        <Modal 
+            isOpen={modal.isOpen} 
+            title={modal.title} 
+            message={modal.message} 
+            onConfirm={modal.onConfirm} 
+        />
             <h2 className={styleStorage.contentTitle}>창고 등록</h2>
             <form onSubmit={handleSubmit}>
                 <div className={`${styleStorage.contentRow}`} style={{gap:"2rem", alignItems:"flex-start"}}>
@@ -180,7 +198,7 @@ function StorageRegister({storageList}){
                     <button type="button" className={styleStorage.btnPlus} onClick={handleAddBtn}></button>
                 </div>
                 <div className={styleStorage.btnSubmitWrap}>
-                    <button type="submit" className={`${styleStorage.btnRegister} btnSubmit`}>등록</button>
+                    <button type="submit" className={`${styleStorage.btnRegister} btnSubmit`} onClick={adminCreate}>등록</button>
                 </div>
             </form>
         </>
