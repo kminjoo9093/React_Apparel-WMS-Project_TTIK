@@ -219,32 +219,48 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  word-break: keep-all;
 }
 
 .notiItem {
   padding: 12px 15px;
   border-bottom: 1px solid #f1f5f9;
   cursor: pointer; 
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-.notiItem:hover {
-  background-color: rgb(235, 57, 37,0.2);
+.typeInfo:hover {
+  background-color: rgba(37, 99, 235, 0.1); /* 투명도가 있는 파란색 */
+}
+
+/* 재고부족(warning) 마우스 오버 시 기존 빨간색 유지 */
+.typeWarn:hover {
+  background-color: rgba(235, 57, 37, 0.1);
 }
 
 .notiItem:last-child {
   border-bottom: none;
 }
 
+.notiItem:hover {
+  padding-left: 18px; 
+}
+
 .notiContent p {
   margin: 0;
   font-size: 13px;
   color: #334155;
+  line-height: 1.4;
+  /* 텍스트 밀림 방지 핵심 속성 */
+  word-break: keep-all;     /* 한글 단어 단위 줄바꿈 */
+  overflow-wrap: break-word; /* 필요한 경우에만 줄바꿈 */
 }
 
 .notiContent span {
-  font-size: 11px;
-  color: #94a3b8;
+  display: inline-block; /* 마진이나 패딩이 잘 먹도록 설정 */
+  word-break: keep-all;
+  font-size: 1.3rem;
+  /* color: #94a3b8; */
 }
 
 /* 로그아웃 버튼 */
@@ -318,6 +334,8 @@
   background: #e2e8f0;
   border-radius: 10px;
 }
+
+
 
 /* 모바일 반응형 UI */
 @media (max-width : 76.8rem){
