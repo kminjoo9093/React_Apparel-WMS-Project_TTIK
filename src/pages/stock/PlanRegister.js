@@ -139,7 +139,7 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
                 for (let i = 1; i <= Number(formData.boxQuantity); i++) {
                     const currentBoxNo = startNo + i;
                     // 규칙: [상품코드]-b[입수량]-[박스번호]
-                    const boxCode = `${formData.itemName}-b${formData.eaQuantity}-${currentBoxNo}`;
+                    const boxCode = `${formData.itemName}-B${formData.eaQuantity}-${currentBoxNo}`;
                     
                     const itemCodes = [];
                     // 규칙: 입수량만큼 아이템 코드 반복 생성

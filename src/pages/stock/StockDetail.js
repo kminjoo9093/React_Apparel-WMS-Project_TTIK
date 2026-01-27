@@ -68,6 +68,7 @@ function StockDetail() {
             };
             if(productCd) fetchDetail();
         }, [productCd, SERVER_URL, planType, planYmd]);
+
     const handleCheckItem = (barcode) => {
         setCheckedItems(prev => {
             const newSet = new Set(prev);
@@ -81,12 +82,10 @@ function StockDetail() {
     useEffect(() => {
         const fetchSelectData = async () => {
             try {
-                // PlanRegister에서 사용했던 기초정보 API와 동일한 엔드포인트
-                // const response = await fetch(`${SERVER_URL}/ttik/register-info`); - 수정
                 const response = await fetch(`${SERVER_URL}/ttik/plans/register-info`);
                 if (response.ok) {
                     const data = await response.json();
-                    setSelectOptions(data); // storages, zones, racks가 한꺼번에 저장됨
+                    setSelectOptions(data); 
                 }
             } catch (error) {
                 console.error("기초 데이터 로드 실패:", error);
@@ -104,18 +103,14 @@ function StockDetail() {
         }
     };
 
-    // 화면 표시용 
+    // 화면 표시용 수량 계산 (선택된 항목 기준)
     const selectedTotalQty = scanHistory
         .filter(h => checkedItems.has(h.barcode))
         .reduce((sum, h) => sum + h.increment, 0);
     
-    // 선택된 항목들 중 박스 스캔 횟수 계산
+    // 선택된 항목들 중 박스 스캔 횟수 계산 (h.isBox가 true인 것만 카운트)
     const selectedBoxCount = scanHistory
         .filter(h => checkedItems.has(h.barcode) && h.isBox).length;
-
-    // 선택된 항목들 중 낱개 스캔 횟수 계산 
-    // const selectedSingleCount = scanHistory
-    //     .filter(h => checkedItems.has(h.barcode) && !h.isBox).length;
 
     const playBeep = () => {
         if (!audioContextRef.current) audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
@@ -129,75 +124,139 @@ function StockDetail() {
         osc.start(); osc.stop(ctx.currentTime + 0.1);
     };
 
-    const handleBarcodeScanned = (fullBarcode) => {
-        // 중복 스캔 방지 
+    const handleBarcodeScanned = async (fullBarcode) => {
+        // 1. 중복 스캔 방지
         if (scanHistoryRef.current.some(h => h.barcode === fullBarcode)) {
             alert("이미 스캔된 고유 번호입니다: " + fullBarcode);
             return;
         }
 
-        // 바코드 파싱
-        const parts = fullBarcode.split('-');
-        let productId = "";
-        let incrementValue = 1;
-        let isBoxScan = false;
+        try {
+            // 2. DB에서 실제 박스/아이템 수량 조회
+            const res = await fetch(`${SERVER_URL}/ttik/productdetail/scan-check/${fullBarcode}`);
+            if (!res.ok) throw new Error("수량 조회 실패");
+            const actualQty = await res.json();
 
-        if (fullBarcode.includes('-B')) {
-            const bIndex = parts.findIndex(p => p.startsWith('B'));
-            if (bIndex !== -1) {
-                productId = parts.slice(0, bIndex).join('-');
-                if (parts.length === bIndex + 2) { 
-                    isBoxScan = true; 
-                    incrementValue = parseInt(parts[bIndex].substring(1), 10) || 1;
-                }
+            if (actualQty <= 0) {
+                alert("해당 박스에 입고 가능한 아이템이 없습니다.");
+                return;
             }
-        } else {
-            productId = parts.slice(0, 3).join('-');
+
+            // 3. 대소문자 구분 없이 박스 여부 및 상품코드 추출
+            const parts = fullBarcode.split('-');
+            const isBoxScan = fullBarcode.toUpperCase().includes('-B');
+            let productId = "";
+
+            if (isBoxScan) {
+                // 'B' 또는 'b'로 시작하는 파트 앞까지가 상품코드
+                const bIndex = parts.findIndex(p => p.toUpperCase().startsWith('B'));
+                productId = bIndex !== -1 ? parts.slice(0, bIndex).join('-') : parts.slice(0, 3).join('-');
+            } else {
+                productId = parts.slice(0, 3).join('-');
+            }
+
+            // 4. 상품코드 일치 여부 확인 (대소문자 무시 비교)
+            if (productId.toUpperCase() !== productCd.toUpperCase()) {
+                alert(`상품 불일치!\n현재 페이지: ${productCd}\n스캔 바코드: ${productId}`);
+                return;
+            }
+
+            // 5. 전체 예정 수량 초과 체크
+            const currentSum = scanHistoryRef.current.reduce((sum, item) => sum + item.increment, 0);
+            const limitQty = product?.stkQty || 0;
+
+            if (currentSum + actualQty > limitQty) {
+                alert(`❌ 초과 차단! (예정: ${limitQty} / 현재: ${currentSum} / 추가시도: ${actualQty})`);
+                return; 
+            }
+
+            // 6. 성공 시 알림음 및 데이터 반영
+            playBeep();
+            
+            const newLog = {
+                barcode: fullBarcode,
+                productId,
+                isBox: isBoxScan,
+                increment: actualQty,
+                time: new Date().toLocaleTimeString()
+            };
+
+            scanHistoryRef.current = [newLog, ...scanHistoryRef.current];
+            setScanHistory([...scanHistoryRef.current]);
+            
+            // 스캔 즉시 체크박스 선택 처리
+            setCheckedItems(prev => new Set(prev).add(fullBarcode));
+
+        } catch (error) {
+            console.error("스캔 처리 오류:", error);
+            alert("정보 조회 중 오류가 발생했습니다.");
         }
-
-        // 상품코드 불일치 차단
-        if (productId !== productCd) {
-            alert(`상품 불일치!\n현재 페이지: ${productCd}\n스캔 바코드: ${productId}`);
-            return;
-        }
-
-        // 실시간 수량 합산 및 초과 체크
-        const currentSum = scanHistoryRef.current.reduce((sum, item) => sum + item.increment, 0);
-        const limitQty = product?.stkQty || 0;
-
-        if (currentSum + incrementValue > limitQty) {
-            alert(`❌ 초과 차단! 더 이상 스캔할 수 없습니다.\n(예정: ${limitQty} / 현재: ${currentSum} / 추가시도: ${incrementValue})`);
-            return; 
-        }
-        playBeep();
-        
-        const newLog = {
-            barcode: fullBarcode,
-            productId,
-            isBox: isBoxScan,
-            increment: incrementValue,
-            time: new Date().toLocaleTimeString()
-        };
-
-        scanHistoryRef.current = [newLog, ...scanHistoryRef.current];
-        setScanHistory([...scanHistoryRef.current]);
-        setCheckedItems(prev => new Set(prev).add(fullBarcode));
     };
 
-    const handleRegister = () => {
-        if (checkedItems.size === 0) {
+    const handleRegister = async () => {
+        const itemsToProcess = scanHistory.filter(h => checkedItems.has(h.barcode));
+
+        if (itemsToProcess.length === 0) {
             alert("등록할 항목을 선택해주세요.");
             return;
         }
 
-        //창고 선택 확인
-        if (!selections.storage) {
-            alert("창고(Storage)를 선택해주세요.");
+        if (!selections.rack) {
+            alert("적재할 선반(Rack)을 선택해주세요.");
             return;
         }
 
-        if (window.confirm(`선택한 ${checkedItems.size}건(총 ${selectedTotalQty}개)을 등록하시겠습니까?`)) {
-            navigate('/stock/plans', { state: { activeTab: planType } });
+        if (window.confirm(`선택한 ${itemsToProcess.length}건을 [${selections.rack}] 위치에 등록하시겠습니까?`)) {
+            try {
+                let successCount = 0;
+
+                // ⚠️ 주의: for문 내부에서 중복 호출되지 않도록 구조 정돈
+                for (const item of itemsToProcess) {
+                    const payload = {
+                        boxCd: item.barcode,
+                        gdsCd: productCd,
+                        rackSn: Number(selections.rack), // 확실하게 숫자로 변환
+                        brandNm: product?.brandNm || '',
+                        qty: item.increment 
+                    };
+
+                    // 🔍 [디버깅 로그] 전송 직전 데이터 확인
+                    console.log(`🚀 [${item.barcode}] 전송 시도...`);
+                    console.log("📦 Payload:", payload);
+
+                    // URL 확인: /ttik/productdetail/inbound/process 가 맞는지 백엔드와 맞출 것
+                    const response = await fetch(`${SERVER_URL}/ttik/productdetail/inbound/process`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        console.log(`✅ [${item.barcode}] 전송 성공!`);
+                        successCount++;
+                    } else {
+                        const errorText = await response.text();
+                        console.error(`❌ [${item.barcode}] 전송 실패:`, response.status, errorText);
+                        throw new Error(`${item.barcode} 처리 중 서버 에러 발생`);
+                    }
+                }
+
+                alert(`${successCount}건의 입고 및 적재 처리가 완료되었습니다.`);
+
+                // 성공 후 상태 업데이트
+                const remainingHistory = scanHistory.filter(h => !checkedItems.has(h.barcode));
+                setScanHistory(remainingHistory);
+                scanHistoryRef.current = remainingHistory;
+                setCheckedItems(new Set());
+
+                if (remainingHistory.length === 0) {
+                    navigate('/stock/plans', { state: { activeTab: planType } });
+                }
+
+            } catch (error) {
+                console.error("🏁 최종 등록 실패:", error);
+                alert("처리 중 오류가 발생했습니다. 콘솔창(F12)의 에러 메시지를 확인해주세요.");
+            }
         }
     };
 
@@ -247,7 +306,6 @@ function StockDetail() {
                 <div className={styles.selectContainer}>
                     <h3 style={{marginBottom:'1rem'}}>🛅 창고 선택</h3>
                     <div className={styles.selectBox}>
-                        {/* 창고(Storage) */}
                         <select name="storage" value={selections.storage} onChange={handleSelectChange}>
                             <option value="">동</option>
                             {selectOptions.storages?.map(s => (
@@ -255,13 +313,12 @@ function StockDetail() {
                             ))}
                         </select>
 
-                        {/* 1. 구역(Zone) - '동'이 선택되지 않았을 때 비활성화 */}
                         <select 
                             name="zone" 
                             value={selections.zone} 
                             onChange={handleSelectChange}
-                            disabled={!selections.storage} // storage 값이 없으면 클릭 불가
-                            style={{ backgroundColor: !selections.storage ? '#f7fafc' : 'white' }} // 비활성화 시 색상 변경(선택)
+                            disabled={!selections.storage} 
+                            style={{ backgroundColor: !selections.storage ? '#f7fafc' : 'white' }} 
                         >
                             <option value="">구역</option>
                             {selectOptions.zones
@@ -277,12 +334,11 @@ function StockDetail() {
                             }
                         </select>
 
-                        {/* 2. 선반(Rack) - '구역'이 선택되지 않았을 때 비활성화 */}
                         <select 
                             name="rack" 
                             value={selections.rack} 
                             onChange={handleSelectChange}
-                            disabled={!selections.zone} // zone 값이 없으면 클릭 불가
+                            disabled={!selections.zone} 
                             style={{ backgroundColor: !selections.zone ? '#f7fafc' : 'white' }}
                         >
                             <option value="">선반</option>
@@ -367,35 +423,33 @@ function StockDetail() {
                             gridTemplateColumns: 'repeat(3, 1fr)', 
                             gap: '10px' 
                         }}>
-                            {/* 박스 수량 */}
-                            <div className={styles.statItem} style={{ background: '#fff5f5', border: '1px solid #feb2b2' }}>
-                                <span className={styles.statLabel}>박스 수</span>
-                                <span className={styles.statValue} style={{ color: '#e53e3e' }}>{selectedBoxCount}</span>
-                                <small>BOX</small>
+                            <div className={styles.statItem} style={{ background: '#fff5f5', border: '1px solid #feb2b2', padding: '10px', textAlign: 'center', borderRadius: '8px' }}>
+                                <span className={styles.statLabel} style={{display:'block', fontSize:'0.8rem', color:'#666'}}>박스 수</span>
+                                <span className={styles.statValue} style={{ color: '#e53e3e', fontSize: '1.5rem', fontWeight: 'bold' }}>{selectedBoxCount}</span>
+                                <small style={{display:'block'}}>BOX</small>
                             </div>
 
-                            {/* 선택 총 수량 (낱개 합산) */}
-                            <div className={styles.statItem} style={{ background: '#f0f7ff', border: '1px solid #bee3f8' }}>
-                                <span className={styles.statLabel}>선택 총량</span>
-                                <span className={styles.statValue} style={{ color: '#3182ce' }}>{selectedTotalQty}</span>
-                                <small>EA</small>
+                            <div className={styles.statItem} style={{ background: '#f0f7ff', border: '1px solid #bee3f8', padding: '10px', textAlign: 'center', borderRadius: '8px' }}>
+                                <span className={styles.statLabel} style={{display:'block', fontSize:'0.8rem', color:'#666'}}>선택 총량</span>
+                                <span className={styles.statValue} style={{ color: '#3182ce', fontSize: '1.5rem', fontWeight: 'bold' }}>{selectedTotalQty}</span>
+                                <small style={{display:'block'}}>EA</small>
                             </div>
 
-                            {/* 지시 예정량 (총 수량) */}
-                            <div className={styles.statItem} style={{ background: '#f0fff4', border: '1px solid #c6f6d5' }}>
-                                <span className={styles.statLabel}>지시 예정</span>
-                                <span className={styles.statValue} style={{ color: '#38a169' }}>{product.stkQty}</span>
-                                <small>EA</small>
+                            <div className={styles.statItem} style={{ background: '#f0fff4', border: '1px solid #c6f6d5', padding: '10px', textAlign: 'center', borderRadius: '8px' }}>
+                                <span className={styles.statLabel} style={{display:'block', fontSize:'0.8rem', color:'#666'}}>지시 예정</span>
+                                <span className={styles.statValue} style={{ color: '#38a169', fontSize: '1.5rem', fontWeight: 'bold' }}>{product.stkQty}</span>
+                                <small style={{display:'block'}}>EA</small>
                             </div>
                         </div>
 
-                        {/* 진행률 바 */}
-                        <div className={styles.progressBarWrapper} style={{ marginTop: '20px' }}>
+                        <div className={styles.progressBarWrapper} style={{ marginTop: '20px', height: '10px', backgroundColor: '#edf2f7', borderRadius: '5px', overflow: 'hidden' }}>
                             <div 
                                 className={styles.progressBar} 
                                 style={{ 
+                                    height: '100%',
                                     width: `${Math.min((selectedTotalQty / (product.stkQty || 1)) * 100, 100)}%`,
-                                    backgroundColor: selectedTotalQty === product.stkQty ? '#38a169' : '#3182ce'
+                                    backgroundColor: selectedTotalQty === product.stkQty ? '#38a169' : '#3182ce',
+                                    transition: 'width 0.3s ease'
                                 }}
                             ></div>
                         </div>
@@ -406,9 +460,9 @@ function StockDetail() {
                     
                     <button onClick={handleRegister} style={{
                         width: '100%', padding: '15px', marginTop: '20px', 
-                        backgroundColor: checkedItems.size > 0 ? '#3182ce' : '#a0aec0', 
+                        backgroundColor: (checkedItems.size > 0 && selections.rack) ? '#3182ce' : '#a0aec0', 
                         color: 'white', border: 'none', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 'bold', 
-                        cursor: checkedItems.size > 0 ? 'pointer' : 'not-allowed'
+                        cursor: (checkedItems.size > 0 && selections.rack) ? 'pointer' : 'not-allowed'
                     }}>
                         📥 선택 항목({checkedItems.size}건) 등록하기
                     </button>
