@@ -15,11 +15,11 @@ function StorageAdd ({storageList, onUpdate}) {
         addRack: false
     });
     const [newZone, setNewZone] = useState(""); // 추가 구역
-    const [rackCountByNewZone, setRackCountByNewZone] = useState("") //추가 구역의 선반 층수
+    const [rackCountForNewZone, setRackCountForNewZone] = useState("") //추가 구역의 선반 층수
 
     const [addRackCount, setAddRackCount] = useState("") //추가 선반 층수 숫자 input은 null보다 ""가 더 안전
 
-    const [currentRackCountByZone, setCurrentRackCountByZone] = useState(null);
+    const [currentRackCountForZone, setCurrentRackCountForZone] = useState(null);
     const [currentZoneCount, setCurrentZoneCount] = useState(null);
     const [currentZoneNm, setCurrentZoneNm] = useState(null);
 
@@ -34,7 +34,7 @@ function StorageAdd ({storageList, onUpdate}) {
     // 구역에 해당하는 선반 층 수 
     useEffect(()=>{
         const rackCount = rackOptions.length;
-        setCurrentRackCountByZone(rackCount);
+        setCurrentRackCountForZone(rackCount);
     }, [rackOptions, selectedZone])
 
     //창고에 해당하는 구역 수
@@ -44,7 +44,7 @@ function StorageAdd ({storageList, onUpdate}) {
         const zoneCount = zoneOptions.length;
         setCurrentZoneCount(zoneCount);
         setCurrentZoneNm(zoneOptions[zoneOptions.length - 1].zoneNm);
-    }, [zoneOptions, selectedStorage])
+    }, [zoneOptions, selectedStorage, isCheckedAdd.addZone])
 
     // 창고 변경 시 상태값 초기화
     useEffect(()=>{
@@ -64,24 +64,56 @@ function StorageAdd ({storageList, onUpdate}) {
          if (name === "addRack" && !checked) {
             setAddRackCount("");
             setSelectedZone("");
-            setCurrentRackCountByZone(null);
+            setCurrentRackCountForZone(null);
         }
 
         if (name === "addZone" && !checked) {
             setNewZone("");
-            setRackCountByNewZone("");
+            setRackCountForNewZone("");
             setCurrentZoneCount(null);
         }
     }
 
-    //창고 정보 수정 파라미터
-    const storageModifyReq = {
-        "storageSn" : selectedStorage,
-        "zoneSn" : selectedZone, //선반 추가할 구역
-        "addRackCount" : addRackCount, //추가 선반 수
-        "newZone": newZone, //추가할 구역
-        "rackCountByNewZone": rackCountByNewZone //추가할 구역의 선반수
+    // 숫자 입력 유효성 검사 
+    const [errors, setErrors] = useState({
+        addRack: false,    // 기존 구역에 추가하는 선반
+        newZone: false,    // 추가 구역
+        rackCountForNewZone: false, // 추가 구역의 선반 수
+    })
+    const [errorMsg, setErrorMsg] = useState({
+        addRack: "",
+        newZone: "",
+        rackCountForNewZone: "",
+    });
+
+    const validateNumber = (e) => {        
+        const { value, name } = e.target; //객체 구조분해
+        // const isInvalid = Number(value) <= 0; //음수면 true
+
+         switch (name){
+            case "addRack" : setAddRackCount(value);
+                break;
+            case "newZone" : setNewZone(value);
+                break;
+            case "rackCountForNewZone" : setRackCountForNewZone(value);
+                break;
+        }
+
+        const num = Number(value);
+        const isInvalid = value !== "" && (isNaN(num) || num <= 0);
+
+        setErrors((prev) => ({
+            ...prev
+            , [name] : isInvalid
+        }))
+
+        setErrorMsg(prev => ({
+            ...prev
+            , [name] : isInvalid ? "0 이상의 숫자를 입력하세요." : ""
+        }))
     }
+
+
 
     const resetForm = ()=>{
         // 1. 선택 데이터 초기화
@@ -90,27 +122,39 @@ function StorageAdd ({storageList, onUpdate}) {
         setSelectedRack(null);
         
         // 2. 체크박스 및 입력 필드 초기화
-        setIsCheckedAdd(false);
+        setIsCheckedAdd({
+            addZone: false,
+            addRack: false
+        });
         setNewZone(null);
-        setRackCountByNewZone(""); 
+        setRackCountForNewZone(""); 
         setAddRackCount(""); 
-        setCurrentRackCountByZone(null); 
+        setCurrentRackCountForZone(null); 
         setCurrentZoneCount(null);
     }
 
-    // 창고 정보 수정(추가) 서버 요청
+    //창고 정보 수정 파라미터
+    const storageModifyReq = {
+        "storageSn" : selectedStorage,
+        "zoneSn" : selectedZone, //선반 추가할 구역
+        "addRackCount" : addRackCount, //추가 선반 수
+        "newZone": newZone, //추가할 구역
+        "rackCountForNewZone": rackCountForNewZone //추가할 구역의 선반수
+    }
+
+    // 창고 정보 수정(선반/구역 추가) 서버 요청
     const handelSubmit = async (e) => {
 
         e.preventDefault();
 
-        // if(rackCountByNewZone <= 0){
-        //     alert("0이상의 숫자를 입력하세요");
-        // }
+        // 구역추가, 선반 추가 동시에 할때 기존에 존재하는 구역을 입력할 경우 처리
+        // if(isCheckedAdd.addRack && isCheckedAdd.addZone)
 
         // 구역 추가 시 기존에 존재하는 구역인지 확인
         const hasZone = zoneOptions.some((zone)=>(
             zone.zoneNm.slice(1) === newZone
-        ))
+        ));
+
         if(hasZone){
             alert("이미 등록된 구역입니다.");
             return;
@@ -193,16 +237,20 @@ function StorageAdd ({storageList, onUpdate}) {
                         <div className={`${styleStorage.addItem} ${styleStorage.addRackArea}`}>
                             <h3 className={styleStorage.modifyHeading}>선반</h3>
                             <input type="number" 
-                                    name="addRackCount"
+                                    name="addRack"
                                     value={addRackCount}
                                     required
+                                    min="0"
                                     disabled={!isCheckedAdd.addRack} 
                                     placeholder="추가할 층수 입력"
-                                    onChange={(e)=>setAddRackCount(e.target.value === "" ? "" : Number(e.target.value))}
+                                    onChange={validateNumber}
                             ></input>
+                            <p className={styleStorage.errorMsg} 
+                                style={{ visibility: errors.addRack ? "visible" : "hidden" }}
+                            >{errorMsg.addRack}</p>
                             {
                                 Number(selectedZone) > 0 && 
-                                <span className={styleStorage.informRackCount}>현재 해당 구역 선반은 {currentRackCountByZone}층 입니다.</span>
+                                <span className={styleStorage.informRackCount}>현재 해당 구역 선반은 {currentRackCountForZone}층 입니다.</span>
                             }
                         </div>
                     </div>
@@ -214,8 +262,8 @@ function StorageAdd ({storageList, onUpdate}) {
                                 checked={isCheckedAdd.addZone} 
                                 onChange={handleCheckChange}/>구역 추가
                     </label>
-                    {
-                        isCheckedAdd && (
+                    {/* {
+                        isCheckedAdd.addZone && ( */}
                             <div className={styleStorage.addContents}>
                                 <div className={`${styleStorage.addItem} ${styleStorage.addZoneArea}`}>
                                     <h3 className={styleStorage.modifyHeading}>구역</h3>
@@ -223,30 +271,38 @@ function StorageAdd ({storageList, onUpdate}) {
                                         name="newZone"
                                         value={newZone} 
                                         required
+                                        min="0"
                                         disabled={!isCheckedAdd.addZone} 
                                         placeholder="구역 번호 입력"
-                                        onChange={(e)=>setNewZone(e.target.value)}
+                                        onChange={validateNumber}
                                     ></input>
+                                    <p className={styleStorage.errorMsg} 
+                                        style={{ visibility: errors.newZone ? "visible" : "hidden" }}
+                                    >{errorMsg.newZone}</p>
                                     {
-                                        isCheckedAdd.addZone && 
+                                        (isCheckedAdd.addZone && selectedStorage) &&
                                         <span className={styleStorage.informZoneCount}>현재 해당 창고의 마지막 구역은 {currentZoneCount} 입니다.</span>
                                     }
                                 </div>
                                 <div className={styleStorage.addItem}>
                                     <h3 className={styleStorage.modifyHeading}>선반</h3>
                                     <input type="number" 
-                                            name="rackCountByNewZone"
-                                            value={rackCountByNewZone}
+                                            name="rackCountForNewZone"
+                                            value={rackCountForNewZone}
                                             required
+                                            min="0"
                                             disabled={!isCheckedAdd.addZone} 
                                             placeholder="선반 별 층수 입력"
-                                            onChange={(e)=>setRackCountByNewZone(e.target.value)}
+                                            onChange={validateNumber}
                                     ></input>
+                                    <p className={styleStorage.errorMsg} 
+                                        style={{ visibility: errors.rackCountForNewZone ? "visible" : "hidden" }}
+                                    >{errorMsg.rackCountForNewZone}</p>
                                 </div>
                             </div>
-                        )
+                        {/* )
 
-                    }
+                    } */}
                     
                 </div>
                     

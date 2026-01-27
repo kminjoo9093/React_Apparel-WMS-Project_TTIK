@@ -10,14 +10,12 @@ function StorageUpdate ({storageList, onUpdate}) {
     const [selectedZone, setSelectedZone] = useState(""); //구역 일련번호
     const [selectedRack, setSelectedRack] = useState(""); //선반 일련번호
 
-    // const [rackEnabled, setRackEnabled] = useState(""); //선반 활성(Y)/비활성(N)
+    const [rackEnabled, setRackEnabled] = useState(""); //선반 활성(Y)/비활성(N)
     const [rackCapacity, setRackCapacity] = useState(""); //선반 여유(Y)/포화(N)
     const [disableValues, setDisableValues] = useState({
         disabledZone: false,
         disabledRack: false
     })
-    // const [isDisabledZone, setIsDisabledZone] = useState(false);
-    // const [isDisabledRack, setIsDisabledRack] = useState(false);
 
 
     const handleSelectStorage = (e) => {
@@ -25,19 +23,8 @@ function StorageUpdate ({storageList, onUpdate}) {
     }
 
 
-    // 선택한 창고 별 구역 옵션 리스트
-    // 선택한 구역 별 선반 옵션 리스트
+    // 선택한 창고, 구역별 구역, 선반 옵션 리스트
     const {zoneOptions, rackOptions} = useStorageData(SERVER_URL, selectedStorage, selectedZone);
-
-    //창고 정보 수정 파라미터
-    const storageModifyReq = {
-        "storageSn" : selectedStorage,
-        "zoneSn" : selectedZone,
-        "isDisabledZone" : disableValues.disabledZone, //boolean
-        "rackSn" : selectedRack,
-        "rackEnabled": disableValues.disabledRack, //boolean
-        "rackCapacity": rackCapacity
-    }
 
     const handleDisabledChange = (e) => {
 
@@ -62,11 +49,13 @@ function StorageUpdate ({storageList, onUpdate}) {
         if(name === "disabledZone" && checked){ 
             setSelectedRack("");
             setRackCapacity("");
+            setRackEnabled("");
         }
 
         //선반 비활성화 -> 선반 재고 상태 초기화
         if(name === "disabledRack" && checked){ 
             setRackCapacity("");
+            setRackEnabled("");
         }
     }
 
@@ -79,7 +68,13 @@ function StorageUpdate ({storageList, onUpdate}) {
         // 2. 입력 필드 초기화
         // isDisabledRack("");
         setRackCapacity("");
+        setRackEnabled("");
         // setIsDisabledZone(false);
+
+        setDisableValues({
+            disabledZone: false,
+            disabledRack: false
+        })
     }
 
     // 창고 정보 수정 서버 요청
@@ -87,37 +82,38 @@ function StorageUpdate ({storageList, onUpdate}) {
 
         e.preventDefault();
 
-        // 구역 추가 시 기존에 존재하는 구역인지 확인
-        // const hasZone = zoneOptions.some((zone)=>(
-        //     zone.zoneNm.slice(1) === newZone
-        // ))
-        // if(hasZone){
-        //     alert("이미 등록된 구역입니다.");
-        //     return;
-        // }
+        //창고 정보 수정 파라미터
+        const storageModifyReq = {
+            "storageSn" : selectedStorage,
+            "zoneSn" : selectedZone,
+            "isDisabledZone" : disableValues.disabledZone, //boolean
+            "rackSn" : selectedRack,
+            "isDisabledRack": disableValues.disabledRack, //boolean
+            "rackEnabled": disableValues.disabledRack ? "N" : "Y",
+            "rackStts": disableValues.disabledRack ? "Y": (rackCapacity || "N") // 선반 비활성화상태면 rackStts는 무조건 Y(사용중/비었음)로 설정
+        }
 
 
-        //구역 비활성화 선택한 경우 선반 정보 리셋
-        // if(disableValues.disabledZone){
-        //     setRackCapacity("");
-        //     isDisabledRack("");
-        //     setSelectedRack("");
-        // }
+        let confirmMsg = "수정을 진행하시겠습니까?";
 
-
-        // 구역은 선택했는데 '구역 비활성화','선반' 모두 선택 안 한 경우
+        // 구역만 활성화하는 경우
         if (selectedZone && !disableValues.disabledZone && !selectedRack) {
-            alert("수정할 선반을 선택하거나 구역 비활성화를 선택해주세요.");
-            return;
+            confirmMsg = "해당 구역을 활성화 상태로 수정하시겠습니까?";
+        } 
+        // 선반을 수정하는 경우
+        else if (selectedZone && selectedRack) {
+            if (disableValues.disabledRack) {
+                confirmMsg = "해당 선반을 비활성화 상태로 수정하시겠습니까?";
+            } else {
+                confirmMsg = "해당 선반을 활성화 상태로 수정하시겠습니까?";
+            }
+        }
+        // 구역 자체를 비활성화하는 경우 
+        else if (selectedZone && disableValues.disabledZone) {
+            confirmMsg = "해당 구역과 하위 모든 선반을 비활성화하시겠습니까?";
         }
 
-        // 선반은 선택했는데 '선반 비활성화', '적재 상태' 모두 선택 안 한 경우
-        if (selectedRack && !disableValues.disabledRack && !rackCapacity) {
-            alert("선반의 적재 상태를 선택하거나 선반 비활성화를 선택해주세요.");
-            return;
-        }
-
-        alert("수정을 진행하시겠습니까?");
+        if (!window.confirm(confirmMsg)) return;
 
         try{
             const res = await fetch(`${SERVER_URL}/ttik/storage/modify`, {
@@ -200,7 +196,7 @@ function StorageUpdate ({storageList, onUpdate}) {
                             <div className={styleStorage.rackSelectWrap}>
                                 <select name="rack" 
                                         value={selectedRack || ""} 
-                                        disabled={disableValues.disabledZone}
+                                        disabled={!selectedZone || disableValues.disabledZone}
                                         onChange={(e)=>setSelectedRack(Number(e.target.value))}>
                                     <option value="">선반 선택</option>
                                     {
@@ -226,7 +222,7 @@ function StorageUpdate ({storageList, onUpdate}) {
                             <div className={styleStorage.statusSelectWrap}>
                                 <select name="rackCapacity" 
                                         value={rackCapacity || ""} 
-                                        disabled={disableValues.disabledZone || disableValues.disabledRack}
+                                        disabled={!selectedZone || disableValues.disabledZone || disableValues.disabledRack}
                                         onChange={(e)=>setRackCapacity(e.target.value)}>
                                     <option value="">적재 상태</option>
                                     <option value="Y">여유</option>
