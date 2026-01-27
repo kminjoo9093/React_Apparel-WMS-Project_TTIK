@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styleHistory from "../../css/History.module.css";
+import serverUrl from "../../db/server.json";
 
 function StockHistory() {
     // 1. 상태 선언 (반드시 컴포넌트 내부)
@@ -8,13 +9,17 @@ function StockHistory() {
     const [searchTerm, setSearchTerm] = useState('');
     const [historyList, setHistoryList] = useState([]);
     const [loading, setLoading] = useState(false);
+    const SERVER_URL = serverUrl.SERVER_URL;
 
     // 2. 검색 핸들러
     const handleSearch = async () => {
         setLoading(true);
         try {
             // 서버에 날짜와 검색어를 포함하여 요청
-            const response = await fetch(`http://localhost:3001/ttik/history/list?startDate=${startDate}&endDate=${endDate}&search=${searchTerm}`);
+            const response = await fetch(`${SERVER_URL}/ttik/history/list?startDate=${startDate}&endDate=${endDate}&search=${searchTerm}`, {
+                method: 'GET',
+                credentials: 'include'
+            }); 
             const data = await response.json();
             setHistoryList(data);
         } catch (error) {

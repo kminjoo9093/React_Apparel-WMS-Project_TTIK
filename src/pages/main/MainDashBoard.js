@@ -17,6 +17,7 @@ const MainDashboard = ({ user }) => {
 
   const [storageList, setStorageList] = useState([]);
   const [rackData, setRackData] = useState([]);
+  const [historyList, setHistoryList] = useState([]); // 이력 데이터 상태 추가
   const [selectedStorage, setSelectedStorage] = useState(initialStorage);
   const [lastUpdated, setLastUpdated] = useState(new Date());
   
@@ -65,24 +66,62 @@ const MainDashboard = ({ user }) => {
     }
   }, [SERVER_URL, selectedStorage]);
 
+  // 입출고 이력 데이터 로드 함수 추가
+  const fetchHistory = useCallback(async () => {
+    try {
+      const response = await axios.get(`${SERVER_URL}/ttik/history/list`, {
+        params: { 
+          startDate: '', 
+          endDate: '', 
+          search: '' 
+        },
+        withCredentials: true
+      });
+      setHistoryList(response.data);
+    } catch (error) {
+      console.error("이력 데이터 로드 실패:", error);
+    }
+  }, [SERVER_URL]);
+
   useEffect(() => { fetchStorages(); }, [fetchStorages]);
   useEffect(() => {
     fetchStats();
+    fetchHistory(); 
     if (selectedStorage !== 'ALL') fetchRacks();
-    const intervalId = setInterval(fetchStats, 10000);
+    
+    const intervalId = setInterval(() => {
+        fetchStats();
+        fetchHistory(); 
+    }, 10000);
+    
     return () => clearInterval(intervalId); 
-  }, [fetchStats, fetchRacks, selectedStorage]);
+  }, [fetchStats, fetchRacks, fetchHistory, selectedStorage]);
 
-  const groupedRacks = useMemo(() => {
-    const groups = {};
-    rackData.forEach(rack => {
-      const parts = rack.rackNm.split('-'); // 1-A 형태
-      const level = parts[0]; // 첫 번째 요소가 층수
-      if (!groups[level]) groups[level] = [];
-      groups[level].push(rack);
-    });
-    return groups;
-  }, [rackData]);
+const groupedRacks = useMemo(() => {
+  const groups = {};
+  if (!Array.isArray(rackData) || rackData.length === 0) return groups;
+
+  rackData.forEach(rack => {
+    if (rack && typeof rack.rackNm === 'string' && rack.rackNm.includes('-')) {
+      const parts = rack.rackNm.split('-'); 
+      const area = parts[0]; 
+      const level = parts[1];
+      
+      if (!groups[area]) groups[area] = [];
+      groups[area].push({ ...rack, displayLevel: level });
+    }
+  });
+  return groups;
+}, [rackData]);
+
+  // 최근 입고/출고 데이터 필터링 (최근 5개씩)
+  const recentInbound = useMemo(() => 
+    historyList.filter(item => item.type === 0).slice(0, 5), 
+  [historyList]);
+
+  const recentOutbound = useMemo(() => 
+    historyList.filter(item => item.type === 1).slice(0, 5), 
+  [historyList]);
 
   const getRackClass = (rack) => {
     if (rack.rackEnabled === 'N') return styleMainDashBoard.enabledN;
@@ -134,15 +173,19 @@ const MainDashboard = ({ user }) => {
             <button className={styleMainDashBoard.viewAll} onClick={() => navigate("/stock/history")}>전체보기</button>
           </div>
           <div className={styleMainDashBoard.customList}>
-            {[1, 2, 3].map((i) => (
-              <div key={`in-${i}`} className={styleMainDashBoard.listItem}>
-                <div className={styleMainDashBoard.itemInfo}>
-                  <span className={styleMainDashBoard.itemName}>샘플 상품 {i}</span>
-                  <span className={styleMainDashBoard.itemDate}>2026.1.02 14:20</span>
+            {recentInbound.length > 0 ? (
+              recentInbound.map((item) => (
+                <div key={item.id} className={styleMainDashBoard.listItem}>
+                  <div className={styleMainDashBoard.itemInfo}>
+                    <span className={styleMainDashBoard.itemName}>{item.item_name}</span>
+                    <span className={styleMainDashBoard.itemDate}>{item.date} {item.time}</span>
+                  </div>
+                  <span className={styleMainDashBoard.itemQtyPlus}>+{item.quantity?.toLocaleString()}</span>
                 </div>
-                <span className={styleMainDashBoard.itemQtyPlus}>+15</span>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className={styleMainDashBoard.listItem}>데이터가 없습니다.</div>
+            )}
           </div>
         </div>
 
@@ -152,15 +195,19 @@ const MainDashboard = ({ user }) => {
             <button className={styleMainDashBoard.viewAll} onClick={() => navigate("/stock/history")}>전체보기</button>
           </div>
           <div className={styleMainDashBoard.customList}>
-            {[1, 2].map((i) => (
-              <div key={`out-${i}`} className={styleMainDashBoard.listItem}>
-                <div className={styleMainDashBoard.itemInfo}>
-                  <span className={styleMainDashBoard.itemName}>샘플 상품 {i}</span>
-                  <span className={styleMainDashBoard.itemDate}>2026.1.02 15:45</span>
+            {recentOutbound.length > 0 ? (
+              recentOutbound.map((item) => (
+                <div key={item.id} className={styleMainDashBoard.listItem}>
+                  <div className={styleMainDashBoard.itemInfo}>
+                    <span className={styleMainDashBoard.itemName}>{item.item_name}</span>
+                    <span className={styleMainDashBoard.itemDate}>{item.date} {item.time}</span>
+                  </div>
+                  <span className={styleMainDashBoard.itemQtyMinus}>-{item.quantity?.toLocaleString()}</span>
                 </div>
-                <span className={styleMainDashBoard.itemQtyMinus}>-2</span>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className={styleMainDashBoard.listItem}>데이터가 없습니다.</div>
+            )}
           </div>
         </div>
 
@@ -183,32 +230,39 @@ const MainDashboard = ({ user }) => {
               </div>
             </div>
             
-            
             <div className={styleMainDashBoard.rackGrid} style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '2rem', overflowX: 'auto', paddingBottom: '10px' }}>
-              {Object.keys(groupedRacks).length > 0 ? (
-                // 구역을 가로로 나열
-                Object.keys(groupedRacks).sort().map(area => (
-                  <div key={area} style={{ display: 'flex', flexDirection: 'column-reverse', alignItems: 'center', gap: '8px' }}>
-                    {/* 하단 구역 라벨 */}
-                    <span className={styleMainDashBoard.rowLabel} style={{ marginTop: '8px', border: 'none', width: 'auto' }}>{area}</span>
-                    {/* 층수를 아래에서 위로 */}
-                    <div style={{ display: 'flex', flexDirection: 'column-reverse', gap: '5px' }}>
-                      {groupedRacks[area].sort((a, b) => Number(a.rackNm.split('-')[0]) - Number(b.rackNm.split('-')[0])).map(rack => (
-                        <div 
-                          key={rack.rackSn} 
-                          className={`${styleMainDashBoard.rackBox} ${getRackClass(rack)}`} 
-                          title={rack.rackNm}
-                          onClick={() => navigate('/storage')}
-                          style={{ margin: 0 }} 
-                        >
-                          {rack.rackNm.split('-')[0]}F
-                        </div>
-                      ))}
+                {Object.keys(groupedRacks).length > 0 ? (
+                  Object.keys(groupedRacks).sort().map(area => (
+                    <div key={area} style={{ display: 'flex', flexDirection: 'column-reverse', alignItems: 'center', gap: '8px' }}>
+                      <span className={styleMainDashBoard.rowLabel} style={{ marginTop: '8px', border: 'none', width: 'auto', fontWeight: 'bold' }}>
+                        {area}
+                      </span>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column-reverse', gap: '5px' }}>
+                        {groupedRacks[area] && groupedRacks[area]
+                          .sort((a, b) => {
+                            const valA = parseInt(a.displayLevel) || 0;
+                            const valB = parseInt(b.displayLevel) || 0;
+                            return valA - valB;
+                          })
+                          .map(rack => (
+                            <div 
+                              key={rack.rackSn} 
+                              className={`${styleMainDashBoard.rackBox} ${getRackClass(rack)}`} 
+                              title={rack.rackNm}
+                              onClick={() => navigate('/storage')}
+                              style={{ margin: 0 }} 
+                            >
+                              {rack.displayLevel || '1'}F
+                            </div>
+                          ))}
+                      </div>
                     </div>
-                  </div>
-                ))
-              ) : <p>데이터가 없습니다.</p>}
-            </div>
+                  ))
+                ) : (
+                  <p style={{ color: '#94a3b8', padding: '20px' }}>표시할 랙 데이터가 없습니다.</p>
+                )}
+              </div>
           </div>
         )}
       </div>

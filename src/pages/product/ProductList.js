@@ -16,6 +16,7 @@ function ProductList(){
     const [brandList, setBrandList] = useState([]);
     const [categoryList, setCategoryList] = useState([]);
     const [seasonList, setSeasonList] = useState([]);
+    const [keywordInput, setKeywordInput] = useState("");
 
     // 필터 상태 (초기값에 URL 파라미터 로직 통합)
     const [searchFilters, setSearchFilters] = useState({
@@ -29,10 +30,11 @@ function ProductList(){
 
     // 페이지네이션 관련 로직
     const [currentPage, setCurrentPage] = useState(1);
-    const postsPerPage = 10; // 한페이지에 10개씩 (Pc)
-
-    const indexOfLast = currentPage * postsPerPage;
-    const indexOfFirst = indexOfLast - postsPerPage;
+    const postsPerPagePC = 10; // 한페이지에 10개씩 (Pc)
+    const [totalPages, setTotalPages] = useState(null);
+    const [totalElements, setTotalElements] = useState(null);
+    const indexOfLast = currentPage * postsPerPagePC;
+    const indexOfFirst = indexOfLast - postsPerPagePC;
 
     const scrollRef = useRef(null);
     // const [visibleCount, setVisibleCount] = useState(5); // 모바일에서 한번에 보여줄 개수
@@ -53,83 +55,11 @@ function ProductList(){
     }, []);
 
     //화면에 보여줄 리스트 개수
-    const currentProducts = isMobile 
-                            ? productList //Mobile
-                            : filteredProductList.slice(indexOfFirst, indexOfLast); //PC
+    // const currentProducts = isMobile 
+    //                         ? productList //Mobile
+    //                         : filteredProductList.slice(indexOfFirst, indexOfLast); //PC
 
-    useEffect(()=>{
-
-        if (!isMobile || !hasMore) return; // || isLoading
-
-        //모바일 일때 상품 리스트 초기화
-        // setProductList([]); 
-
-        const observer = new IntersectionObserver((entries) => {
-            if(entries[0].isIntersecting){
-                console.log("바닥 감지");
-
-                if(productList.length > 0){
-                    //모바일 리스트 fetch
-                    const currentLastItem = currentProducts[currentProducts.length - 1];
-                    const lastItemDate = currentLastItem?.frstRegDt;
-                    const lastItemProCd = currentLastItem?.productCd;
-                    console.log("마지막 날짜 확인 ==> ", lastItemDate);
-                    if(lastItemDate){
-                        getNextData(lastItemDate, lastItemProCd);
-                    }
-                }
-                
-
-            }
-        }, { threshold: 0.5 } // 대상이 100% 다 보였을 때 실행
-        );
-
-
-        // 4. 관찰 시작
-        if (observerTarget.current) {
-            observer.observe(observerTarget.current);
-        }
-
-        // 5. 언마운트 시 관찰 중단
-        return () => {
-            // if (observerTarget.current) observer.unobserve(observerTarget.current);
-            if (observerTarget.current) observer.disconnect();
-        };
-    }, [isMobile, hasMore, productList]) //isLoading
-
-    //모바일 두번째 이후 데이터 요청
-    const getNextData = async (lastItemDate, lastItemProCd) => {
-
-        if (isLoading || !hasMore) return;
-        setIsLoading(true);
-
-        const encodedDate = encodeURIComponent(lastItemDate);
-
-        const { brandCd, categoryCd, seasonCd, stkStatus, keyword } = searchFilters;
-        const filterQuery = `&lastDate=${encodedDate}&lastProCd=${lastItemProCd}&brandCd=${brandCd}&catCd=${categoryCd}&seasonCd=${seasonCd}&stkStatus=${stkStatus}&keyword=${encodeURIComponent(keyword)}`;
-        let fetchUrl = `${URL}/list/scroll?size=5${filterQuery}`;
-
-        try{
-            const response = await fetch(fetchUrl);
-            if(response.ok){
-                const nextDataList = await response.json();
-                console.log("다음 목록 리스트 --> ", nextDataList);
-                
-                
-                if(nextDataList.length === 0){
-                    setHasMore(false);
-                    return;
-                } 
-                // setVisibleCount((prev) => prev + nextDataList.length);
-                setProductList((prev) => [...prev, ...nextDataList]);
-            }
-        } catch(error){
-            console.log("데이터 요청 실패 : ", error);
-            return [];
-        } finally {
-            setIsLoading(false); // 로딩 종료를 반드시 해줘야 다시 Observer가 작동함
-        }
-    }
+    
 
     //추가 -- 레이아웃에서 상품명(코드) 검색시 이동할때 받는 함수 
     useEffect(() => {
@@ -145,10 +75,13 @@ function ProductList(){
         setCurrentPage(1); // 검색 시 1페이지로
     }, [location.search]);
 
-    // 공통 데이터 페치 함수
+    // 공통 데이터 요청 함수
     async function getData(url){
         try{
-            const res = await fetch(url); 
+            const res = await fetch(url, {
+                method: 'GET',
+                credentials: 'include'
+            }); 
             if(!res.ok) throw new Error(`Error : ${res.status}`);
             const data = await res.json();
             return data || [];
@@ -173,11 +106,26 @@ function ProductList(){
 
 
     //재고 상태 판단 - 없음 추가하기
-    function handleStkStatus(stkQty, threshold){
-        return stkQty > threshold; // true: 정상, false: 부족
+    function handleStkStatus(stkQty, threshold, enabled){
+
+        let stkStatus = "";
+
+        if(enabled === "W"){
+            if(stkQty === 0){
+                stkStatus = "입고 대기";
+            }
+        } else {
+            if(stkQty > threshold){  // true: 정상, false: 부족
+                stkStatus = "정상";
+            } else {
+                stkStatus = "부족";
+            }
+        }
+
+        return stkStatus;
     }
 
-    // 상품 전체 목록 불러오기 (1분마다 갱신 기능 포함)
+    // 상품 전체 목록 불러오기
     useEffect(()=>{
         const getProductList = async () => {    
 
@@ -185,18 +133,17 @@ function ProductList(){
 
             try{
                 let fetchUrl = "";
-
+                
+                // 모바일: 필터 조건을 쿼리 스트링으로 변환하여 5개만 요청
+                const { brandCd, categoryCd, seasonCd, stkStatus, keyword } = searchFilters;
+                const filterQuery = `&brandCd=${brandCd}&catCd=${categoryCd}&seasonCd=${seasonCd}&stkStatus=${stkStatus}&keyword=${encodeURIComponent(keyword)}`;
                 if(isMobile){
-                    // fetchUrl = `${URL}/list/scroll?size=5`;
-                    // 모바일: 필터 조건을 쿼리 스트링으로 변환하여 5개만 요청
-                    const { brandCd, categoryCd, seasonCd, stkStatus, keyword } = searchFilters;
-                    const filterQuery = `&brandCd=${brandCd}&catCd=${categoryCd}&seasonCd=${seasonCd}&stkStatus=${stkStatus}&keyword=${encodeURIComponent(keyword)}`;
-                    fetchUrl = `${URL}/list/scroll?size=5${filterQuery}`;
+                    fetchUrl = `${URL}/list/mobile?size=5${filterQuery}`;
                     
                     // 모바일에서 필터가 바뀌면 '더보기' 상태도 초기화해줘야 함
                     setHasMore(true);
                 } else {
-                    fetchUrl = `${URL}/list`; //PC
+                    fetchUrl = `${URL}/list/pc?page=${currentPage - 1}&size=${postsPerPagePC}${filterQuery}`; //PC
                 }
 
                 const res = await fetch(fetchUrl, {
@@ -210,12 +157,25 @@ function ProductList(){
                 console.log("응답 상태:", res.status);
                 if(res.ok){
                     const data = await res.json();
-                    // console.log(data);
-
-                    setProductList(data);
+                    
                     if(isMobile) {
-                        // setVisibleCount(prev => prev + data.length);
-                        if (data.length === 0) setHasMore(false); // 가져온 데이터가 요청한 size(5개)보다 적으면 더 가져올 게 없다고 판단
+                        // data가 배열인지, Page 객체의 content인지 확인 후 적용
+                        const newItems = data.content || data; 
+
+                        setProductList(newItems);
+
+                        if(data.length > 0){
+                            if (data.length < 5){
+                                setHasMore(false); // 가져온 데이터가 요청한 size(5개)보다 적으면 더 가져올 게 없다고 판단
+                                return;
+                            } 
+                        } else {
+                            setHasMore(false);
+                        }
+                    } else {
+                        setTotalElements(data.totalElements);
+                        setProductList(data.content);
+                        setTotalPages(data.totalPages);
                     }
                 }
             } catch (error){
@@ -236,39 +196,112 @@ function ProductList(){
         // 컴포넌트가 사라질 때 타이머 해제
         // return () => clearInterval(timer);
 
-    }, [isMobile, searchFilters])
+    }, [currentPage, isMobile, searchFilters])
 
-
-    //필터 & 검색
+    //상품 목록 - 모바일
     useEffect(()=>{
-        // 모든 필터가 비어있으면 전체 리스트 표시
-        if(!searchFilters.brandCd && !searchFilters.categoryCd && !searchFilters.seasonCd && !searchFilters.stkStatus && !searchFilters.keyword){
-            setFilteredProductList(productList);
-            return;
+
+        if (!isMobile || !hasMore) return; // || isLoading
+
+        //모바일 일때 상품 리스트 초기화
+        // setProductList([]); 
+
+        const observer = new IntersectionObserver((entries) => {
+            if(entries[0].isIntersecting){
+                console.log("바닥 감지");
+
+                if(productList.length > 0){
+                    //모바일 리스트 fetch
+                    const currentLastItem = productList[productList.length - 1];
+                    const lastItemDate = currentLastItem?.frstRegDt;
+                    const lastItemProCd = currentLastItem?.productCd;
+                    console.log("마지막 날짜 확인 ==> ", lastItemDate);
+                    if(lastItemDate){
+                        getNextData(lastItemDate, lastItemProCd);
+                    }
+                }
+            }
+        }, { threshold: 0.5 } // 대상이 100% 다 보였을 때 실행
+        );
+
+
+        // 4. 관찰 시작
+        if (observerTarget.current) {
+            observer.observe(observerTarget.current);
         }
 
-        const filteredList = productList.filter((product)=>{
-            // 브랜드/카테고리/시즌 필터
-            const isMatchBrand = String(product.brandSn) === searchFilters.brandCd || searchFilters.brandCd === "";
-            const isMatchCategory = product.catCd === searchFilters.categoryCd || searchFilters.categoryCd === "";
-            const isMatchSeason = product.seasonCd === searchFilters.seasonCd || searchFilters.seasonCd === "";
+        // 5. 언마운트 시 관찰 중단
+        return () => {
+            // if (observerTarget.current) observer.unobserve(observerTarget.current);
+            if (observerTarget.current) observer.disconnect();
+        };
+    }, [isMobile, hasMore, productList]) //isLoading productList
 
-            // 재고 상태 필터 (정상/부족)
-            const status = handleStkStatus(product.stkQty, product.threshold) ? "정상" : "부족";
-            const isMatchStkStatus = status === searchFilters.stkStatus || searchFilters.stkStatus === "";
+    //모바일 두번째 이후 데이터 요청
+    const getNextData = async (lastItemDate, lastItemProCd) => {
 
-            // 키워드 검색 (상품코드 또는 상품명)
-            const searchLower = searchFilters.keyword.toLowerCase();
-            const isMatchKeyword = searchFilters.keyword === ""
-                                || product.productCd.toLowerCase().includes(searchLower)
-                                || product.productNm.toLowerCase().includes(searchLower)
-                                || product.brandNm.toLowerCase().includes(searchLower);    // 추가 브랜드명 포함
+        if (isLoading || !hasMore) return;
+        setIsLoading(true);
 
-            return isMatchBrand && isMatchCategory && isMatchSeason && isMatchStkStatus && isMatchKeyword;
-        });
+        const encodedDate = encodeURIComponent(lastItemDate);
 
-        setFilteredProductList(filteredList);
-    }, [searchFilters, productList]);
+        const { brandCd, categoryCd, seasonCd, stkStatus, keyword } = searchFilters;
+        const filterQuery = `&lastDate=${encodedDate}&lastProCd=${lastItemProCd}&brandCd=${brandCd}&catCd=${categoryCd}&seasonCd=${seasonCd}&stkStatus=${stkStatus}&keyword=${encodeURIComponent(keyword)}`;
+        let fetchUrl = `${URL}/list/scroll?size=5${filterQuery}`;
+
+        try{
+            const response = await fetch(fetchUrl, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if(response.ok){
+                const nextDataList = await response.json();
+                console.log("다음 목록 리스트 --> ", nextDataList);
+                
+                if(nextDataList.length > 0){
+                    setProductList((prev) => [...prev, ...nextDataList]);
+                    // setProductList((prev) => {
+                    //     const existingCds = new Set(prev.map(item => item.productCd));
+                    //     const uniqueNewItems = nextDataList.filter(item => !existingCds.has(item.productCd));
+                    //     return [...prev, ...uniqueNewItems];
+                    // });
+
+                    if(nextDataList.length < 5){
+                        setHasMore(false);
+                        return;
+                    } 
+                } else {
+                    setHasMore(false);
+                }
+            }
+        } catch(error){
+            console.log("데이터 요청 실패 : ", error);
+            return [];
+        } finally {
+            setIsLoading(false); // 로딩 종료를 반드시 해줘야 다시 Observer가 작동함
+        }
+    }
+
+    // 인풋창 타이핑용 (서버 요청 안 보냄)
+    const handleKeywordTyping = (e) => {
+        setKeywordInput(e.target.value);
+    };
+
+    // 검색 버튼 클릭 시 (실제 필터 적용)
+    const handleSearchClick = () => {
+        setSearchFilters(prev => ({
+            ...prev,
+            keyword: keywordInput.trim() // 현재 입력된 값을 필터에 세팅
+        }));
+
+        setCurrentPage(1);
+
+        if(isMobile){
+            setProductList([]); 
+            setHasMore(true);
+        }
+        setCurrentPage(1);
+    };
 
     // 입력값 변경 핸들러
     const handleFilterChange = (e) => {
@@ -318,10 +351,12 @@ function ProductList(){
                         <input className={styleList.searchInput} 
                                 id='searchProduct'
                                 name='keyword'
-                                value={searchFilters.keyword} 
-                                onChange={handleFilterChange}
+                                value={keywordInput} 
+                                onChange={handleKeywordTyping}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSearchClick()} // 엔터키 지원
                                 type="text" placeholder="상품명 또는 코드 검색"
                         ></input>
+                        <button onClick={handleSearchClick}>검색</button>
                     </div>
                 </div>
                 <div className={styleList.contentWrap}>
@@ -352,6 +387,7 @@ function ProductList(){
                                 </select>
                                 <select name="stkStatus" value={searchFilters.stkStatus} onChange={handleFilterChange}>
                                     <option value="">재고상태</option>
+                                    <option value="대기">입고 대기</option>
                                     <option value="정상">정상</option>
                                     <option value="부족">부족</option>
                                 </select>
@@ -360,19 +396,24 @@ function ProductList(){
                     </div>
                     <div className={styleList.listArea}>
                         <div className={styleList.totalCount}>
-                            [ 총 {filteredProductList.length}개 상품 ]
+                            [ 총 {totalElements}개 상품 ]
                         </div>
                         <ul className={styleList.productList}>
                             {
-                                currentProducts?.map((product, index) => (
-                                    <li className={`${styleList.productItem} ${handleStkStatus(product.stkQty, product.threshold) ? "" : styleList.warning}`} key={product.productCd}>
+                                productList?.map((product, index) => (
+                                    <li key={product.productCd}
+                                        className={`${styleList.productItem} 
+                                        ${handleStkStatus(product.stkQty, product.threshold, product.gdsEnabled) === "부족" 
+                                            ? styleList.warning 
+                                            : ""}`} 
+                                    >
                                         <a href="#" 
                                         className={`${styleList.itemCard} `
                                         }>
                                             <div className={styleList.itemNo}>
                                                 {isMobile 
                                                     ? index + 1  // 모바일은 누적 리스트이므로 인덱스 그대로 사용
-                                                    : (currentPage - 1) * postsPerPage + index + 1 // PC는 페이지 번호 고려
+                                                    : (currentPage - 1) * postsPerPagePC + index + 1 // PC는 페이지 번호 고려
                                                 }
                                             </div>
                                             {/* <div className={styleList.itemAlignMo}> */}
@@ -390,10 +431,13 @@ function ProductList(){
                                                 </div>
                                                 <div className={styleList.itemInfoR}>
                                                     <div className={styleList.stkWrap}>
-                                                        <div className={styleList.stkQty}><span className={styleList.infoLabel}>현재 재고 수량</span>{product.stkQty}</div>
+                                                        <div className={styleList.stkQty}>
+                                                            <span className={styleList.infoLabel}>현재 재고 수량</span>
+                                                            {product.stkQty}
+                                                        </div>
                                                         <div className={`${styleList.stkStatus}`}>
                                                             <span className={styleList.infoLabel}>재고 상태</span>
-                                                            {handleStkStatus(product.stkQty, product.threshold) ? "정상" : "부족"}
+                                                            {handleStkStatus(product.stkQty, product.threshold, product.gdsEnabled)}
                                                         </div>
                                                     </div>
                                                     <div className={styleList.date}>
@@ -421,8 +465,9 @@ function ProductList(){
                                 </div>)
                             : (
                                 <Pagination 
-                                    targetList={filteredProductList} 
-                                    postsPerPage={postsPerPage}
+                                    // targetList={filteredProductList} 
+                                    totalPages={totalPages}
+                                    // postsPerPage={postsPerPage}
                                     currentPage={currentPage}
                                     setCurrentPage={setCurrentPage}
                                     blockSize={5}

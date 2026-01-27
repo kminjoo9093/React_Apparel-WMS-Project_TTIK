@@ -51,7 +51,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
           combinedNotis.push({
             id: item.productCd,
             type: 'warning',
-            msg: `[재고부족] ${item.productNm} (${item.stkQty}개)`,
+            msg: `[재고부족] ${item.productNm}(${item.stkQty}개)`,
           });
         } else if (isNewArrival) {
           combinedNotis.push({
@@ -92,7 +92,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
       setNotifications(prev => prev.filter(n => n.id !== id));
 
       if (id) {
-      navigate(`/productList?search=${encodeURIComponent(id)}`);
+      navigate(`/product/list?search=${encodeURIComponent(id)}`);
     }
   };
   //알림 모두 읽음 --> 현재 테스트 초기화 부분을 추후 알림 모두 읽음으로 변경
@@ -133,7 +133,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
 
   const allMenus = [
     { path: '/ttik', name: '대시보드', icon: '📊', roles: ['ALL', 'U'] },
-    { path: '/productList', name: '상품 관리', icon: '📦', roles: ['ALL'] },
+    { path: '/product/list', name: '상품 관리', icon: '📦', roles: ['ALL'] },
     { path: '/stock/plans', name: '입출고 관리', icon: '🔄', roles: ['ALL', 'U'] },
     { path: '/stock/history', name: '이력 조회', icon: '📜', roles: ['ALL'] },
     { path: '/brand', name: '브랜드', icon: '🏷️', roles: ['ALL'] },
@@ -147,9 +147,9 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
       if (searchKeyword.trim() === "") {
-        navigate('/productList');
+        navigate('/product/list');
       } else {
-        navigate(`/productList?search=${encodeURIComponent(searchKeyword)}`);
+        navigate(`/product/list?search=${encodeURIComponent(searchKeyword)}`);
       }
       setSearchKeyword("");
     }
@@ -266,11 +266,42 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
                           <li 
                             key={n.id} 
                             className={`${styleLayout.notiItem} ${n.type === 'info' ? styleLayout.typeInfo : styleLayout.typeWarn}`} 
-                            onClick={() => handleNotificationClick(n.id)}
+                            onClick={() => handleNotificationClick(n.id, '/product/list')}
                           >
                             <div className={styleLayout.notiContent}>
                               <p className={n.type === 'warning' ? styleLayout.textWarn : ''}>
-                                {n.msg}
+                                {n.msg.includes(']') ? (
+                                  <>
+                                    <span style={{ 
+                                      display: 'block', 
+                                      color: n.type === 'warning' ? '#e11d48' : '#2563eb' // 경고면 빨강, 정보면 파랑
+                                    }}>
+                                      {`${n.msg.split(']')[0]}]`}
+                                    </span>
+                                    
+                                    {/* 2. 상품명 - 진한 회색/검정색 */}
+                                    <span style={{ 
+                                      color: '#334155', 
+                                      fontSize: '13px',
+                                    }}>
+                                      {n.msg.split(']')[1]?.split('(')[0]?.trim()}
+                                    </span>
+
+                                    {/* 3. (수량) - 상품명 뒤에 붙는 강조색 */}
+                                    {n.msg.includes('(') && (
+                                      <span style={{ 
+                                        color: n.type === 'warning' ? '#e11d48' : '#64748b',
+                                        fontSize: '12px',
+                                        marginLeft: '4px',
+                                        whiteSpace: 'nowrap'
+                                      }}>
+                                        {`(${n.msg.split('(')[1]}`}
+                                      </span>
+                                    )}
+                                  </>
+                                ) : (
+                                  <span style={{ color: '#334155' }}>{n.msg}</span>
+                                )}
                               </p>
                             </div>
                           </li>
