@@ -97,7 +97,7 @@ function StorageRegister({storageList}){
                 body: JSON.stringify(submitData)
             })
             if(res.ok){
-                alert("등록이 완료되었습니다.");
+                //alert("등록이 완료되었습니다.");
                 setStorageNm("");
                 setZoneList([{zone: 1, rack: ""}]);
 

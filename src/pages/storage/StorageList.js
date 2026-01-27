@@ -4,9 +4,11 @@ import styleProdModal from "../../css/ProductModal.module.css";
 import styleModal from "../../css/Modal.module.css";
 import serverUrl from "../../db/server.json";
 import Pagination from '../Pagination';
+import { useLocation } from "react-router-dom";
 
 function StorageList({storageList:storageOptions=[]}){
 
+    const location = useLocation();
     const SERVER_URL = serverUrl.SERVER_URL;
     const [isOpen, setIsOpen] = useState(false);
     const [storageList, setStorageList] = useState([]);
@@ -26,6 +28,17 @@ function StorageList({storageList:storageOptions=[]}){
 
     const indexOfLast = currentPage * postsPerPage;
     const indexOfFirst = indexOfLast - postsPerPage;
+
+    //메인 대시보드에서 창고 적재현황 클릭시 넘어오는 페이지
+    useEffect(() => {
+        if (location.state?.autoOpenRackSn) {
+            setSelectedRack(location.state.autoOpenRackSn);
+            setIsOpen(true);
+            
+            // 처리가 끝난 후 state를 비워주어 새로고침 시 계속 뜨는 것을 방지 (선택 사항)
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
 
     const handleRackClick = (rackSn)=>{
         setSelectedRack(rackSn);
