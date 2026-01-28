@@ -30,7 +30,7 @@
     display: grid;
     grid-template-columns: 1fr 2fr;
     column-gap: 4rem;
-    margin-block: 5rem;
+    margin-top: 5rem;
 }
 
 
@@ -238,6 +238,9 @@
 }
 .warning .stkStatus{
     color: var(--red-cf);
+}
+.waiting .stkStatus{
+    color: var(--secondary-color);
 }
 .date{
     color: var(--gray-64);

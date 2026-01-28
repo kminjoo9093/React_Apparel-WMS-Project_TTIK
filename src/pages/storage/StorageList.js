@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import styleProdModal from "../../css/ProductModal.module.css";
 import styleModal from "../../css/Modal.module.css";
@@ -15,11 +15,18 @@ function StorageList({storageList:storageOptions=[]}){
     const [isLoading, setIsLoading] = useState(true);
     const [storageFilter, setStorageFilter] = useState("");
     const [filteredList, setFilteredList] = useState([]);
+
+    //조회리스트에서 선택한 선반 정보
     const [selectedRack, setSelectedRack] = useState("");
     const [rackDetailList, setRackDetailList] = useState([]);
-
     const [detailRackNm, setDetailRackNm] = useState("");
     const [boxCount, setBoxCount] = useState(null);
+
+    //선반 이동 관련 상태값
+    const [boxQr, setBoxQr] = useState("");
+    const [oldRackSn, setOldRackSn] = useState("");
+    const [newRackSn, setNewRackSn] = useState("");
+    const [newRackNm, setNewRackNm] = useState("");
 
     // 페이지네이션
     const [currentPage, setCurrentPage] = useState(1);
@@ -33,70 +40,89 @@ function StorageList({storageList:storageOptions=[]}){
     useEffect(() => {
         if (location.state?.autoOpenRackSn) {
             setSelectedRack(location.state.autoOpenRackSn);
+            openDetailModal(location.state.autoOpenRackSn);
             setIsOpen(true);
             
+            // 2. 창고 필터 자동 선택 로직  -- 추가(김윤중)
+             if (location.state.autoOpenStorageNm && storageOptions.length > 0) {
+                const targetStorage = storageOptions.find(
+                    (s) => s.storageNm === location.state.autoOpenStorageNm
+                );
+                if (targetStorage) {
+                    setStorageFilter(targetStorage.storageSn.toString());
+                }
+            }
             // 처리가 끝난 후 state를 비워주어 새로고침 시 계속 뜨는 것을 방지 (선택 사항)
             window.history.replaceState({}, document.title);
         }
-    }, [location.state]);
+    }, [location.state, storageOptions]);
 
     const handleRackClick = (rackSn)=>{
         setSelectedRack(rackSn);
+        openDetailModal(rackSn);
         setIsOpen(true);
     }
 
-    useEffect(()=>{
-        const openDetailModal = async () => {
-            console.log("정보 확인");
-            // setIsOpen(true);
+    const openDetailModal = async (rackSn) => {
+        console.log("정보 확인");
+        // setIsOpen(true);
 
-            //rackSn으로 상세 정보 요청
-            try{
-                const res = await fetch(`${SERVER_URL}/ttik/storage/rack/detail?rackSn=${selectedRack}`, {
-                        method: 'GET',
-                        credentials: 'include',
-                    })
+        //rackSn으로 상세 정보 요청
+        try{
+            const res = await fetch(`${SERVER_URL}/ttik/storage/rack/detail?rackSn=${rackSn}`, {
+                method: 'GET',
+                credentials: 'include',
+            })
 
-                    if(res.ok){
-                        const data = await res.json();
-                        setRackDetailList(data);
-                        setDetailRackNm(data.rackNm);
-                        setBoxCount(data.boxQty);
-                        console.log("창고 랙 디테일 리스트-->", data);
-                    } 
-                } catch(error) {
-                    console.log("창고 랙 디테일 받아오기 실패 : ", error);
-                }
+            if(res.ok){
+                const data = await res.json();
+                setRackDetailList(data);
+                setDetailRackNm(data.rackNm);
+                setBoxCount(data.boxQty);
+                console.log("창고 랙 디테일 리스트-->", data);
+            } 
+        } catch(error) {
+            console.log("창고 랙 디테일 받아오기 실패 : ", error);
         }
-        openDetailModal();
-    }, [selectedRack])
+    }
+    // useEffect(()=>{
+        
+    //     }
+       
+    // }, [selectedRack])
     
 
     const onCloseModal = () => {
         setIsOpen(false);
+        //상태값 초기화
+        setSelectedRack("");
+        setRackDetailList([]);
+        setDetailRackNm("");
+        setBoxCount(null);
+    }
+
+    const getStorageListData = async () => {
+        setIsLoading(true);
+        try{
+            const res = await fetch(`${SERVER_URL}/ttik/storage/listByRack?page=${currentPage-1}&size=${postsPerPage}&filter=${storageFilter}`, {
+                method: 'GET',
+                credentials: 'include',
+            })
+
+            if(res.ok){
+                const data = await res.json();
+                setStorageList(data.content);
+                setTotalPages(data.totalPages);
+                console.log("창고 조회 리스트-->", data);
+            } 
+        } catch(error) {
+            console.log("창고 리스트 받아오기 실패 : ", error);
+        } finally {
+            setIsLoading(false); // 성공/실패 상관없이 종료 시 false
+        }
     }
 
     useEffect(()=>{
-        const getStorageListData = async () => {
-            setIsLoading(true);
-            try{
-                const res = await fetch(`${SERVER_URL}/ttik/storage/listByRack?page=${currentPage-1}&size=${postsPerPage}&filter=${storageFilter}`, {
-                    method: 'GET',
-                    credentials: 'include',
-                })
-
-                if(res.ok){
-                    const data = await res.json();
-                    setStorageList(data.content);
-                    setTotalPages(data.totalPages);
-                    console.log("창고 조회 리스트-->", data);
-                } 
-            } catch(error) {
-                console.log("창고 리스트 받아오기 실패 : ", error);
-            } finally {
-                setIsLoading(false); // 성공/실패 상관없이 종료 시 false
-            }
-        }
         getStorageListData();
     }, [currentPage, storageFilter])
 
@@ -111,6 +137,75 @@ function StorageList({storageList:storageOptions=[]}){
         }
 
         // return hasBox ? "포화" : "사용대기";
+    }
+
+
+    //위치 변경할 선반 선택
+    const handleChangeRackInfo = (e, boxQr, oldRackSn)=>{
+        // setBoxQr(boxQr);
+        // setOldRackSn(oldRackSn);
+        // setNewRackSn(e.target.value);
+        // setNewRackNm(e.target.options[e.target.selectedIndex].text);
+
+        const selectedValue = e.target.value;
+        const selectedName = e.target.options[e.target.selectedIndex].text;
+
+        setRackDetailList(prev => ({
+            ...prev,
+            boxes: prev?.boxes?.map(box => 
+                box.boxQr === boxQr 
+                ? {...box, nextRackSn : selectedValue, nextRackNm: selectedName}
+                : box
+            )
+        }));
+    }
+
+    //선반 위치 수정 서버 요청
+    const confirmModifyRack = async (e)=>{
+        e.preventDefault();
+
+        // 변경 위치가 선택된 박스들만 필터링
+        const modifiedBoxes = rackDetailList.boxes.filter(box => box.nextRackSn);
+
+        if (modifiedBoxes.length === 0) { //위치변경하는 박스가 없는 경우
+            onCloseModal();
+            return;
+        }
+
+        if (!window.confirm(`${modifiedBoxes.length}개의 박스를 이동시키겠습니까?`)) return;
+
+        // alert(`${boxQr}상자를 ${newRackNm}으로 옮기시겠습니까?`);
+
+        try{
+            const moveRequests = modifiedBoxes.map((box)=>
+                    fetch(`${SERVER_URL}/ttik/storage/rack/modify`, {
+                        method: 'PUT',
+                        credentials: 'include', 
+                        headers: {'Content-type': 'application/json'},
+                        body: JSON.stringify(
+                            {
+                                boxQr: box.boxQr,
+                                oldRack: selectedRack,
+                                newRack: box.nextRackSn
+                            }
+                        )
+                    })
+                );
+            
+            const response = await Promise.all(moveRequests);
+
+            if (response.every(res => res.ok)) {
+                alert("모든 박스의 위치 변경 및 이력 등록이 완료되었습니다.");
+                onCloseModal();
+
+                // 리스트 새로고침
+                getStorageListData();
+            } else {
+                alert("오류가 발생했습니다.");
+            }
+        } catch(error){
+            console.log(error);
+        }
     }
 
     // 창고 필터
@@ -142,7 +237,7 @@ function StorageList({storageList:storageOptions=[]}){
                     <option value="">창고 선택</option>
                     {
                         storageOptions.map((item)=>(
-                            <option value={item.storageSn}>{item.storageNm}</option>
+                            <option key={item.storageSn} value={item.storageSn}>{item.storageNm}</option>
                         ))
                     }
                 </select>
@@ -177,9 +272,7 @@ function StorageList({storageList:storageOptions=[]}){
             </table>
 
             <Pagination 
-                // targetList={filteredList} 
                 totalPages={totalPages}
-                // postsPerPage={postsPerPage}
                 currentPage={currentPage}
                 setCurrentPage={setCurrentPage}
                 blockSize={5}
@@ -202,14 +295,15 @@ function StorageList({storageList:storageOptions=[]}){
                                 </thead>
                                 <tbody>
                                      {
-                                        rackDetailList?.boxes?.map((box, index) => (
-                                             <tr key={index}>
+                                        rackDetailList?.boxes?.map((box, index) => {
+                                        return (
+                                             <tr key={box.boxQr}>
                                                 <td>{index + 1}</td>
                                                 <td>{box.boxQr}</td>
                                                 <td>{box.productNm}</td>
                                                 <td>{detailRackNm}</td>
                                                 <td>
-                                                    <select name="newLoc">
+                                                    <select name="newLoc" value={box.nextRackSn || ""} onChange={(e)=>handleChangeRackInfo(e, box.boxQr, box.rackSn)}>
                                                         <option value="">변경 안함</option>
                                                         {
                                                             rackDetailList.availableRacks?.map(rack=>(
@@ -219,11 +313,11 @@ function StorageList({storageList:storageOptions=[]}){
                                                     </select>
                                                 </td>
                                             </tr>
-                                        ))
+                                        )})
                                     }
                                 </tbody>
                             </table>
-                            <button type="submit" className="btnSubmit">확인</button>
+                            <button type="submit" className="btnSubmit" onClick={confirmModifyRack}>확인</button>
                         </div>
                         <button className={styleProdModal.closeBtn} onClick={onCloseModal}></button>
                     </div>
