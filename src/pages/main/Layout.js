@@ -219,7 +219,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
               <span className={styleLayout.searchIcon}>🔍</span>
               <input 
                 type="text" 
-                placeholder="상품명 또는 코드 검색" 
+                placeholder="상품명 / 상품코드 / 브랜드 검색" 
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 onKeyDown={handleSearch}
@@ -258,7 +258,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
                           //   fontWeight: '500' 
                           // }}
                       >
-                        [테스트 초기화]
+                        [모두 읽음]
                       </button>
                     </div>
                     <ul className={styleLayout.notiList}>

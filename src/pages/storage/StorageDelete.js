@@ -63,11 +63,15 @@ function StorageDelete ({storageList, onUpdate}) {
 
         e.preventDefault();
 
+        // 창고 삭제시 관련 관리자 삭제
+        const currentStorageNm = storageList.find(s => s.storageSn === selectedStorage)?.storageNm;
+
         //창고 정보 수정(삭제) 파라미터
         const storageDeleteReq = {
             "storageSn" : selectedStorage,
             "zoneSn" : selectedZone,
-            "rackSn" : selectedRack
+            "rackSn" : selectedRack,
+            "storageNm" : isCheckedDelete.deleteStorage ? currentStorageNm : null // 창고 삭제 시에만 창고명 전달
         }
 
         if(!window.confirm("삭제를 진행하시겠습니까?")) return;
