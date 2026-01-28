@@ -28,15 +28,19 @@
     color: #999;              /* 글자색 흐리게 */
     cursor: not-allowed;      /* 마우스 커서 금지 표시 */
 }
-
+.inputGroup{
+    position: relative;
+}
+.noticeArea{
+    position: absolute;
+    bottom: -3rem;
+    left: 8rem;
+}
 .notice{
     align-self: flex-start;
     margin-top: -1rem;
     display: inline-block;
     line-height: 1.4em;
-    position: absolute;
-    bottom: 1rem;
-    left: 7rem;
 }
 .notice:before{
     content: "";
@@ -88,7 +92,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     /* gap: 2rem; */
     position: relative;

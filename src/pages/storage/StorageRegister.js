@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Modal from "../../components/Modal";
 import serverUrl from "../../db/server.json";
 
-function StorageRegister({storageList}){
+function StorageRegister({storageList, onUpdate}){
 
     const SERVER_URL = serverUrl.SERVER_URL;
     const [storageNm, setStorageNm] = useState("");
@@ -97,7 +97,7 @@ function StorageRegister({storageList}){
                 body: JSON.stringify(submitData)
             })
             if(res.ok){
-                alert("등록이 완료되었습니다.");
+                //alert("등록이 완료되었습니다.");
                 setStorageNm("");
                 setZoneList([{zone: 1, rack: ""}]);
 

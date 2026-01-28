@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom'; // URL 파라미터 감지용
 import styleMainDashBoard from '../../css/MainDashboard.module.css';
@@ -260,11 +259,6 @@ function ProductList(){
                 
                 if(nextDataList.length > 0){
                     setProductList((prev) => [...prev, ...nextDataList]);
-                     setProductList((prev) => {
-                         const existingCds = new Set(prev.map(item => item.productCd));
-                         const uniqueNewItems = nextDataList.filter(item => !existingCds.has(item.productCd));
-                         return [...prev, ...uniqueNewItems];
-                    });
 
                     if(nextDataList.length < 5){
                         setHasMore(false);
@@ -314,9 +308,6 @@ function ProductList(){
         if(isMobile){
             setProductList([]); //초기화
             setHasMore(true); //초기화
-            // setVisibleCount(5); // 모바일 뷰 초기화 추가
-            // 이후 useEffect가 searchFilters 변경을 감지하여 
-            // 다시 처음 5개를 fetch하게 됩니다.
         }
         setCurrentPage(1);
     };
@@ -400,29 +391,26 @@ function ProductList(){
                         </div>
                         <ul className={styleList.productList}>
                             {
-                                // currentProducts.map((product, index) => (
-                                //     <li className={`${styleList.productItem} ${handleStkStatus(product.stkQty, product.threshold) ? "" : styleList.warning}`} key={product.productCd}>
-                                //         <Link to={`/product/productDetail/${product.productCd}`} 
-                                //             className={styleList.itemCard}
-                                //             >
-                                productList?.map((product, index) => (
-                                    <li key={product.productCd}
-                                        className={`${styleList.productItem} 
-                                        ${handleStkStatus(product.stkQty, product.threshold, product.gdsEnabled) === "부족" 
-                                            ? styleList.warning 
-                                            : ""}`} 
-                                    >
-                                        <Link 
-                                            to={`/product/productDetail/${product.productCd}`} // 📍 변수명 확인: productCd
-                                            className={styleList.itemCard}
-                                            >
-                                            <div className={styleList.itemNo}>
-                                                {isMobile 
-                                                    ? index + 1  // 모바일은 누적 리스트이므로 인덱스 그대로 사용
-                                                    : (currentPage - 1) * postsPerPagePC + index + 1 // PC는 페이지 번호 고려
-                                                }
-                                            </div>
-                                            {/* <div className={styleList.itemAlignMo}> */}
+                                productList?.map((product, index) => {
+
+                                    const status = handleStkStatus(product.stkQty, product.threshold, product.gdsEnabled);
+                                    const statusClass = 
+                                            status === "부족" ? styleList.warning :
+                                            status === "입고 대기" ? styleList.waiting : "";
+
+                                    return (
+                                        <li key={product.productCd}
+                                            className={`${styleList.productItem} ${statusClass}`} 
+                                        >
+                                            <a href="#" 
+                                            className={`${styleList.itemCard} `
+                                            }>
+                                                <div className={styleList.itemNo}>
+                                                    {isMobile 
+                                                        ? index + 1  // 모바일은 누적 리스트이므로 인덱스 그대로 사용
+                                                        : (currentPage - 1) * postsPerPagePC + index + 1 // PC는 페이지 번호 고려
+                                                    }
+                                                </div>
                                                 <div className={styleList.itemInfoL}>
                                                     <div className={styleList.brand}>{product.brandNm}</div>
                                                     <div className={styleList.proCdNmWrap}>
@@ -451,13 +439,11 @@ function ProductList(){
                                                         {product.frstRegDt.split('T')[0]}
                                                     </div>
                                                 </div>
-                                            {/* </div> */}
-
-                                            
-                                        </Link>
-                                        
-                                    </li>
-                                ))
+                                            </a>
+                                        </li>
+                                    )
+                                    
+                                })
                             }
                         </ul>
                     </div>
@@ -472,9 +458,7 @@ function ProductList(){
                                 </div>)
                             : (
                                 <Pagination 
-                                    // targetList={filteredProductList} 
                                     totalPages={totalPages}
-                                    // postsPerPage={postsPerPage}
                                     currentPage={currentPage}
                                     setCurrentPage={setCurrentPage}
                                     blockSize={5}

@@ -73,7 +73,8 @@ const MainDashboard = ({ user }) => {
         params: { 
           startDate: '', 
           endDate: '', 
-          search: '' 
+          search: '',
+          storageName: selectedStorage // 선택된 'A', 'B', 'C' 또는 'ALL' 전달
         },
         withCredentials: true
       });
@@ -81,7 +82,7 @@ const MainDashboard = ({ user }) => {
     } catch (error) {
       console.error("이력 데이터 로드 실패:", error);
     }
-  }, [SERVER_URL]);
+  }, [SERVER_URL, selectedStorage]); 
 
   useEffect(() => { fetchStorages(); }, [fetchStorages]);
   useEffect(() => {
@@ -115,13 +116,41 @@ const groupedRacks = useMemo(() => {
 }, [rackData]);
 
   // 최근 입고/출고 데이터 필터링 (최근 5개씩)
-  const recentInbound = useMemo(() => 
-    historyList.filter(item => item.type === 0).slice(0, 5), 
-  [historyList]);
+  const getGroupedHistory = (type) => {
+    if (!Array.isArray(historyList)) return [];
 
-  const recentOutbound = useMemo(() => 
-    historyList.filter(item => item.type === 1).slice(0, 5), 
-  [historyList]);
+    const grouped = historyList
+      .filter(item => Number(item.type) === type)
+      .reduce((acc, current) => {
+        // 그룹화 기준: 날짜 + 거래처 + 브랜드 + 상품명 (데이터의 정밀도 유지)
+        const brand = current.brand_name || '';
+        const key = `${current.date}-${current.target_name}-${brand}-${current.item_name}`;
+        
+        if (!acc[key]) {
+          acc[key] = { 
+            ...current, 
+            quantity: 0,
+            display_brand: brand
+          };
+        }
+        acc[key].quantity += (current.quantity || 1); 
+        return acc;
+      }, {});
+
+    // 객체를 배열로 변환 후, 날짜와 시간순으로 정렬하여 최근 5건만 추출
+    return Object.values(grouped)
+      .sort((a, b) => {
+        const dateTimeA = new Date(`${a.date.replace(/\./g, '-')} ${a.time}`);
+        const dateTimeB = new Date(`${b.date.replace(/\./g, '-')} ${b.time}`);
+        return dateTimeB - dateTimeA;
+      })
+      .slice(0, 5);
+  };
+
+  // 최근 입고/출고 데이터 (그룹화 적용)
+  const recentInbound = useMemo(() => getGroupedHistory(0), [historyList]);
+  const recentOutbound = useMemo(() => getGroupedHistory(1), [historyList]);
+  
 
   const getRackClass = (rack) => {
     if (rack.rackEnabled === 'N') return styleMainDashBoard.enabledN;
@@ -174,18 +203,33 @@ const groupedRacks = useMemo(() => {
           </div>
           <div className={styleMainDashBoard.customList}>
             {recentInbound.length > 0 ? (
-              recentInbound.map((item) => (
-                <div key={item.id} className={styleMainDashBoard.listItem}>
-                  <div className={styleMainDashBoard.itemInfo}>
-                    <span className={styleMainDashBoard.itemName}>{item.item_name}</span>
-                    <span className={styleMainDashBoard.itemDate}>{item.date} {item.time}</span>
+                recentInbound.map((item, index) => (
+                  <div key={`inbound-${index}`} className={styleMainDashBoard.listItem}>
+                    <div className={styleMainDashBoard.itemInfo}>
+                      <div className={styleMainDashBoard.itemName}>
+                        {/* 브랜드명 뱃지화 */}
+                        {item.brand_name && (
+                          <span className={styleMainDashBoard.brandBadge}>
+                            {item.brand_name}
+                          </span>
+                        )}
+                        {/* 상품명 텍스트 분리 */}
+                        <span className={styleMainDashBoard.nameText}>
+                          {item.item_name}
+                        </span>
+                      </div>
+                      <span className={styleMainDashBoard.itemDate}>
+                        {item.date} <span style={{ opacity: 0.7, marginLeft: '4px' }}>{item.time}</span>
+                      </span>
+                    </div>
+                    <span className={styleMainDashBoard.itemQtyPlus}>
+                      +{item.quantity?.toLocaleString()}
+                    </span>
                   </div>
-                  <span className={styleMainDashBoard.itemQtyPlus}>+{item.quantity?.toLocaleString()}</span>
-                </div>
-              ))
-            ) : (
-              <div className={styleMainDashBoard.listItem}>데이터가 없습니다.</div>
-            )}
+                ))
+              ) : (
+                <div className={styleMainDashBoard.listItem}>데이터가 없습니다.</div>
+              )}
           </div>
         </div>
 
@@ -199,8 +243,19 @@ const groupedRacks = useMemo(() => {
               recentOutbound.map((item) => (
                 <div key={item.id} className={styleMainDashBoard.listItem}>
                   <div className={styleMainDashBoard.itemInfo}>
-                    <span className={styleMainDashBoard.itemName}>{item.item_name}</span>
-                    <span className={styleMainDashBoard.itemDate}>{item.date} {item.time}</span>
+                    <span className={styleMainDashBoard.itemName}>
+                      {item.brand_name && (
+                          <span className={styleMainDashBoard.brandBadge}>
+                            {item.brand_name}
+                          </span>
+                        )}
+                        <span className={styleMainDashBoard.nameText}>
+                          {item.item_name}
+                        </span>
+                    </span>
+                    <span className={styleMainDashBoard.itemDate}>
+                        {item.date} <span style={{ opacity: 0.7, marginLeft: '4px' }}>{item.time}</span>
+                    </span>
                   </div>
                   <span className={styleMainDashBoard.itemQtyMinus}>-{item.quantity?.toLocaleString()}</span>
                 </div>
@@ -250,7 +305,7 @@ const groupedRacks = useMemo(() => {
                               key={rack.rackSn} 
                               className={`${styleMainDashBoard.rackBox} ${getRackClass(rack)}`} 
                               title={rack.rackNm}
-                              onClick={() => navigate('/storage')}
+                              onClick={() => navigate('/storage', { state: { autoOpenRackSn: rack.rackSn, autoOpenStorageNm: selectedStorage } })} 
                               style={{ margin: 0 }} 
                             >
                               {rack.displayLevel || '1'}F

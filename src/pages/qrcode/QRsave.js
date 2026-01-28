@@ -2,8 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import style from '../../css/QRsave.module.css';
 import serverUrl from "../../db/server.json";
+import Modal from '../../components/Modal';
 
 const QRsave = () => {
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const closeModal = () => setModal({ ...modal, isOpen: false });
     const [products, setProducts] = useState([]);
     const [generatedQrs, setGeneratedQrs] = useState([]);
     const [isDownloading, setIsDownloading] = useState(false);
@@ -31,7 +34,6 @@ const QRsave = () => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    // DTO 필드명에 맞춰 매핑 (productCd -> id, productNm -> name)
                     const mappedData = data.map(p => ({
                         id: p.productCd,
                         name: p.productNm
@@ -89,22 +91,22 @@ const QRsave = () => {
     setIsDownloading(true);
     setProgress(0);
     const userId = `user_${Date.now()}`;
-    // 전달해주신 API_BASE 주소 유지
-    // const API_BASE = "https://192.168.0.11:3001";
-
     const progressTimer = setInterval(async () => {
         try {
-            const res = await fetch(`${SERVER_URL}/test/labels/status/${userId}`);
+            const res = await fetch(`${SERVER_URL}/test/labels/status/${userId}`, {
+                method: 'GET',
+                credentials: 'include'
+            }); 
             if (res.ok) {
-                const currentProgress = await res.json();
-                // 원본 로직: 서버 진행률을 그대로 setProgress에 반영
-                setProgress(currentProgress);
-                if (currentProgress >= 100) clearInterval(progressTimer);
+                const serverProgress = await res.json();
+                setProgress(prev => {
+                    const nextValue = Math.floor(serverProgress);
+                    if (nextValue >= 100) clearInterval(progressTimer);
+                    return Math.max(prev, nextValue);
+                });
             }
-        } catch (err) {
-            console.error("상태 조회 실패:", err);
-        }
-    }, 500);
+        } catch (err) { console.error(err); }
+    }, 200);
 
     try {
         const selectedProduct = products.find(p => p.id === printConfig.productId);
@@ -127,30 +129,53 @@ const QRsave = () => {
         if (!response.ok) throw new Error(`서버 응답 에러 (${response.status})`);
         const blob = await response.blob();
         
-        // 원본 로직: 다운로드 완료 시 인터벌 클리어 및 100 설정
         clearInterval(progressTimer);
         setProgress(100);
 
-        const safeProductName = productNameRaw.replace(/[\\/:*?"<>|]/g, "");
-        const fileName = `${safeProductName}_${generatedQrs.length}개_${new Date().toISOString().split('T')[0]}.pdf`;
+        setTimeout(() => {
+            const safeProductName = productNameRaw.replace(/[\\/:*?"<>|]/g, "");
+            const fileName = `${safeProductName}_${generatedQrs.length}개_${new Date().toISOString().split('T')[0]}.pdf`;
 
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = fileName; 
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(downloadUrl);
-        alert(`${fileName} 파일 생성이 완료되었습니다!`);
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = fileName; 
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(downloadUrl);
+            
+            setModal({
+                    isOpen: true,
+                    title: 'PDF 파일 생성 완료',
+                    message: (
+                        <>
+                            {fileName}
+                            <br />
+                            파일 생성이 완료되었습니다!
+                        </>
+                    ),
+                    onConfirm: closeModal
+                });
+            
+            setIsDownloading(false); 
+            setProgress(0); 
+        }, 700);
     } catch (error) {
         clearInterval(progressTimer);
         alert('다운로드 중 오류가 발생했습니다: ' + error.message);
-    } finally {
         setIsDownloading(false);
-    }
+    } 
   };
     return (
+        <>
+        <Modal 
+            isOpen={modal.isOpen} 
+            title={modal.title} 
+            message={modal.message} 
+            onConfirm={modal.onConfirm} 
+        />
+        
         <div className={style.container}>
             {/* 좌측: 설정창 */}
             <aside className={style.leftSection}>
@@ -211,7 +236,6 @@ const QRsave = () => {
             <main className={style.rightSection} ref={printAreaRef}>
                 {generatedQrs.length > 0 ? (
                     <>
-                        {/* 인쇄 대기 알림창 (제시하신 노란 박스 스타일) */}
                         <div className={style.printNoticeBox}>
                             <h3 style={{ color: '#d48806', marginTop: 0, fontSize: '1.6rem', fontWeight: 800 }}>
                                 🖨️ 인쇄 대기 중: {generatedQrs.length}개
@@ -231,7 +255,6 @@ const QRsave = () => {
                             {isDownloading && (
                                 <div className={style.progressWrapper}>
                                     <div className={style.progressBarBg}>
-                                        {/* progress 상태값을 그대로 width에 대입 */}
                                         <div 
                                             className={style.progressBarFill} 
                                             style={{ width: `${progress}%` }} 
@@ -256,13 +279,13 @@ const QRsave = () => {
                     </>
                 ) : (
                     <div className={style.emptyState}>
-                        {/* 데이터 없을 때 화면 */}
                         <div style={{fontSize: '5rem', marginBottom: '1.5rem'}}>📄</div>
                         <h2 style={{color: '#64748b'}}>미리보기 데이터가 없습니다.</h2>
                     </div>
                 )}
             </main>
         </div>
+        </>
     );
 };
 
