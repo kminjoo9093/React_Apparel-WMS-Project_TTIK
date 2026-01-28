@@ -133,19 +133,19 @@ function StorageAdd ({storageList, onUpdate}) {
         setCurrentZoneCount(null);
     }
 
-    //창고 정보 수정 파라미터
-    const storageModifyReq = {
-        "storageSn" : selectedStorage,
-        "zoneSn" : selectedZone, //선반 추가할 구역
-        "addRackCount" : addRackCount, //추가 선반 수
-        "newZone": newZone, //추가할 구역
-        "rackCountForNewZone": rackCountForNewZone //추가할 구역의 선반수
-    }
-
     // 창고 정보 수정(선반/구역 추가) 서버 요청
     const handelSubmit = async (e) => {
 
         e.preventDefault();
+
+        //창고 정보 수정 파라미터
+        const storageAddReq = {
+            "storageSn" : selectedStorage,
+            "zoneSn" : selectedZone, //선반 추가할 구역
+            "addRackCount" : addRackCount, //추가 선반 수
+            "newZone": newZone, //추가할 구역
+            "rackCountForNewZone": rackCountForNewZone //추가할 구역의 선반수
+        }
 
         // 구역추가, 선반 추가 동시에 할때 기존에 존재하는 구역을 입력할 경우 처리
         // if(isCheckedAdd.addRack && isCheckedAdd.addZone)
@@ -167,7 +167,7 @@ function StorageAdd ({storageList, onUpdate}) {
                 method: 'POST',
                 credentials: 'include', 
                 headers: {'Content-type': 'application/json'},
-                body: JSON.stringify(storageModifyReq)
+                body: JSON.stringify(storageAddReq)
             });
             if(res.ok){
                 const data = await res.json();
