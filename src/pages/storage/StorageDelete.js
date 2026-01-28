@@ -44,14 +44,6 @@ function StorageDelete ({storageList, onUpdate}) {
         }
     }
 
-    
-    //창고 정보 수정(삭제) 파라미터
-    const storageDeleteReq = {
-        "storageSn" : selectedStorage,
-        "zoneSn" : selectedZone,
-        "rackSn" : selectedRack
-    }
-
     const resetForm = ()=>{
         // 1. 선택 데이터 초기화
         setSelectedStorage(1);
@@ -70,6 +62,13 @@ function StorageDelete ({storageList, onUpdate}) {
     const handelSubmit = async (e) => {
 
         e.preventDefault();
+
+        //창고 정보 수정(삭제) 파라미터
+        const storageDeleteReq = {
+            "storageSn" : selectedStorage,
+            "zoneSn" : selectedZone,
+            "rackSn" : selectedRack
+        }
 
         if(!window.confirm("삭제를 진행하시겠습니까?")) return;
 
