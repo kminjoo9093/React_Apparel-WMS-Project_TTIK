@@ -147,7 +147,7 @@ function StorageRegister({storageList, onUpdate}){
                                 }}
                                 /> 동
                         <span className={styleStorage.storageGuide}>
-                            * 창고 이름은 A부터 Z까지의 알파벳으로 입력하세요.<br/>
+                            * 창고 이름은 A부터 Z까지의 <br className={styleStorage.brMo}></br>알파벳으로 입력하세요.<br/>
                             예시 ) A
                         </span>
                     </div>

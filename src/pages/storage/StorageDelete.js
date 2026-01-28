@@ -133,30 +133,33 @@ function StorageDelete ({storageList, onUpdate}) {
                     <div>
                         <div className={`${styleStorage.contentRow} ${styleStorage.row2}`}>
                             <h3 className={styleStorage.modifyHeading}>구역</h3>
-                            <select name="zone" value={selectedZone} 
-                                    className={styleStorage.modifyZoneSelect} 
-                                    disabled={isCheckedDelete.deleteStorage}
-                                    onChange={(e)=>setSelectedZone(Number(e.target.value))}>
-                                <option value="">구역 선택</option>
-                                {
-                                    zoneOptions.map((item) => (
-                                        <option key={item.zoneSn} value={item.zoneSn}>{item.zoneNm.slice(1)}({item.zoneNm})</option>
-                                    ))
-                                }
-                            </select>
-                            <label className={styleStorage.checkDelete} htmlFor="deleteZone">
-                                <input type="checkbox" 
-                                        name="deleteZone" 
-                                        checked={isCheckedDelete.deleteZone}
-                                        onChange={handleCheckChange} 
-                                        id="deleteZone"/>삭제
-                            </label>
+                            <div className={styleStorage.selectWrap}>
+                                <select name="zone" value={selectedZone} 
+                                        className={styleStorage.modifyZoneSelect} 
+                                        disabled={isCheckedDelete.deleteStorage}
+                                        onChange={(e)=>setSelectedZone(Number(e.target.value))}>
+                                    <option value="">구역 선택</option>
+                                    {
+                                        zoneOptions.map((item) => (
+                                            <option key={item.zoneSn} value={item.zoneSn}>{item.zoneNm.slice(1)}({item.zoneNm})</option>
+                                        ))
+                                    }
+                                </select>
+                                <label className={styleStorage.checkDelete} htmlFor="deleteZone">
+                                    <input type="checkbox" 
+                                            name="deleteZone" 
+                                            checked={isCheckedDelete.deleteZone}
+                                            onChange={handleCheckChange} 
+                                            id="deleteZone"/>삭제
+                                </label>
+                            </div>
+                            
                             
                         </div>
                         <div className={`${styleStorage.contentRow} ${styleStorage.row3}`}>
                             <h3 className={styleStorage.modifyHeading}>선반</h3>
                             <div className={styleStorage.rackArea}>
-                                <div className={styleStorage.rackSelectWrap}>
+                                <div className={styleStorage.selectWrap}>
                                     <select name="rack" 
                                             value={selectedRack} 
                                             disabled={isCheckedDelete.deleteStorage || isCheckedDelete.deleteZone}

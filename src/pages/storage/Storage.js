@@ -45,27 +45,30 @@ function Storage(){
                 <p>창고 정보를 조회하고 관리하세요.</p>
             </div>
             <div className={styleStorage.contentArea}>
-                <div className={styleStorage.menuArea}>
-                    <div className={`${styleStorage.menuBox} ${styleList.filterCard}`}>
-                        <ul className={styleStorage.menuList}>
-                            <li onClick={()=>setView("list")} 
-                                className={`${view === "list" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuList}`}
-                            >창고 조회</li>
-                            <li onClick={()=>setView("register")} 
-                                className={`${view === "register" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuRegister}`}
-                            >창고 등록</li>
-                            <li onClick={()=>setView("modify")} 
-                                className={`${view === "modify" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuModify}`}
-                            >창고 정보 수정</li>
-                        </ul>
+                <div className={styleStorage.contentWidth}>
+                    <div className={styleStorage.menuArea}>
+                        <div className={`${styleStorage.menuBox} ${styleList.filterCard}`}>
+                            <ul className={styleStorage.menuList}>
+                                <li onClick={()=>setView("list")} 
+                                    className={`${view === "list" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuViewList}`}
+                                >창고 조회</li>
+                                <li onClick={()=>setView("register")} 
+                                    className={`${view === "register" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuRegister}`}
+                                >창고 등록</li>
+                                <li onClick={()=>setView("modify")} 
+                                    className={`${view === "modify" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuModify}`}
+                                >창고 정보 수정</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className={styleStorage.mainContentWrap}>
+                        {view === "register" && <StorageRegister storageList={storageList} onUpdate={getStorageData}/>}
+                        {view === "modify" && <StorageModify storageList={storageList} onUpdate={getStorageData}/>}
+                        {view === "list" && <StorageList storageList={storageList} onUpdate={getStorageData}/>}
                     </div>
                 </div>
-
-                <div className={styleStorage.mainContentWrap}>
-                    {view === "register" && <StorageRegister storageList={storageList} onUpdate={getStorageData}/>}
-                    {view === "modify" && <StorageModify storageList={storageList} onUpdate={getStorageData}/>}
-                    {view === "list" && <StorageList storageList={storageList} onUpdate={getStorageData}/>}
-                </div>
+                
             </div>
         </div>
     )
