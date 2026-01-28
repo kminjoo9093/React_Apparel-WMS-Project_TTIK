@@ -305,7 +305,7 @@ const groupedRacks = useMemo(() => {
                               key={rack.rackSn} 
                               className={`${styleMainDashBoard.rackBox} ${getRackClass(rack)}`} 
                               title={rack.rackNm}
-                              onClick={() => navigate('/storage', { state: { autoOpenRackSn: rack.rackSn } })} // state 추가
+                              onClick={() => navigate('/storage', { state: { autoOpenRackSn: rack.rackSn, autoOpenStorageNm: selectedStorage } })} 
                               style={{ margin: 0 }} 
                             >
                               {rack.displayLevel || '1'}F

@@ -40,12 +40,22 @@ function StorageList({storageList:storageOptions=[]}){
     useEffect(() => {
         if (location.state?.autoOpenRackSn) {
             setSelectedRack(location.state.autoOpenRackSn);
+            openDetailModal(location.state.autoOpenRackSn);
             setIsOpen(true);
             
+            // 2. 창고 필터 자동 선택 로직  -- 추가(김윤중)
+             if (location.state.autoOpenStorageNm && storageOptions.length > 0) {
+                const targetStorage = storageOptions.find(
+                    (s) => s.storageNm === location.state.autoOpenStorageNm
+                );
+                if (targetStorage) {
+                    setStorageFilter(targetStorage.storageSn.toString());
+                }
+            }
             // 처리가 끝난 후 state를 비워주어 새로고침 시 계속 뜨는 것을 방지 (선택 사항)
             window.history.replaceState({}, document.title);
         }
-    }, [location.state]);
+    }, [location.state, storageOptions]);
 
     const handleRackClick = (rackSn)=>{
         setSelectedRack(rackSn);
