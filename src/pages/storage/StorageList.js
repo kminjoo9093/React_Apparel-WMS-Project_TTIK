@@ -85,11 +85,6 @@ function StorageList({storageList:storageOptions=[]}){
             console.log("창고 랙 디테일 받아오기 실패 : ", error);
         }
     }
-    // useEffect(()=>{
-        
-    //     }
-       
-    // }, [selectedRack])
     
 
     const onCloseModal = () => {

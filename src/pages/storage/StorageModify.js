@@ -5,7 +5,7 @@ import StorageUpdate from "./StorageUpdate";
 import StorageAdd from "./StorageAdd";
 import StorageDelete from "./StorageDelete";
 
-function StorageModify({storageList, onUpdate}){
+function StorageModify({storageList, onUpdate, setView}){
 
     const SERVER_URL = serverUrl.SERVER_URL;
 
@@ -28,9 +28,9 @@ function StorageModify({storageList, onUpdate}){
                         }
                     </div>
 
-                    {modifyType === "update" && <StorageUpdate storageList={storageList} onUpdate={onUpdate}/>}
-                    {modifyType === "add" && <StorageAdd storageList={storageList} onUpdate={onUpdate}/>}
-                    {modifyType === "delete" && <StorageDelete storageList={storageList} onUpdate={onUpdate}/>}
+                    {modifyType === "update" && <StorageUpdate storageList={storageList} onUpdate={onUpdate} setView={setView}/>}
+                    {modifyType === "add" && <StorageAdd storageList={storageList} onUpdate={onUpdate} setView={setView}/>}
+                    {modifyType === "delete" && <StorageDelete storageList={storageList} onUpdate={onUpdate} setView={setView}/>}
 
                 </div>
             </div>

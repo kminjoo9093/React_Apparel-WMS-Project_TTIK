@@ -3,7 +3,7 @@ import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
 
-function StorageDelete ({storageList, onUpdate}) {
+function StorageDelete ({storageList, onUpdate, setView}) {
 
     const SERVER_URL = serverUrl.SERVER_URL;
     const [selectedStorage, setSelectedStorage] = useState(1); //창고 일련번호
@@ -91,6 +91,8 @@ function StorageDelete ({storageList, onUpdate}) {
 
                 if(onUpdate) onUpdate();
                 resetForm();
+
+                setView("list"); //수정 후 창고 조회 리스트가 보이도록
 
             } else {
                 const errorData = await res.json();

@@ -65,8 +65,9 @@ function StorageRegister({storageList, onUpdate}){
         //알파벳이 맞는지 확인, 자릿수 확인
         const isAlphabet = (value) => value >= "A" && value <= "Z";
 
-        if(value.length > 1 || !isAlphabet){
+        if(value.length > 1 || !isAlphabet(value)){
             alert("창고명을 다시 입력하세요.");
+            return;
         } 
 
         //창고명 존재 여부 검사
@@ -98,11 +99,12 @@ function StorageRegister({storageList, onUpdate}){
             })
             if(res.ok){
                 //alert("등록이 완료되었습니다.");
+
+                const data = await res.json();
+
                 setStorageNm("");
                 setZoneList([{zone: 1, rack: ""}]);
 
-                const data = await res.json();
-                console.log(data);
             }
             
         } catch(error){
@@ -198,7 +200,7 @@ function StorageRegister({storageList, onUpdate}){
                     <button type="button" className={styleStorage.btnPlus} onClick={handleAddBtn}></button>
                 </div>
                 <div className={styleStorage.btnSubmitWrap}>
-                    <button type="submit" className={`${styleStorage.btnRegister} btnSubmit`} onClick={adminCreate}>등록</button>
+                    <button type="submit" className={`${styleStorage.btnRegister} btnSubmit`} onClick={adminCreate}>등록</button> 
                 </div>
             </form>
         </>

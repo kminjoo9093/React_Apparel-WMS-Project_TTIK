@@ -63,9 +63,9 @@ function Storage(){
                     </div>
 
                     <div className={styleStorage.mainContentWrap}>
-                        {view === "register" && <StorageRegister storageList={storageList} onUpdate={getStorageData}/>}
-                        {view === "modify" && <StorageModify storageList={storageList} onUpdate={getStorageData}/>}
-                        {view === "list" && <StorageList storageList={storageList} onUpdate={getStorageData}/>}
+                        {view === "register" && <StorageRegister storageList={storageList} onUpdate={getStorageData} setView={setView}/>}
+                        {view === "modify" && <StorageModify storageList={storageList} onUpdate={getStorageData} setView={setView}/>}
+                        {view === "list" && <StorageList storageList={storageList} onUpdate={getStorageData} setView={setView}/>}
                     </div>
                 </div>
                 
