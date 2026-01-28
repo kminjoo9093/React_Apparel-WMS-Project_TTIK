@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom'; // URL 파라미터 감지용
 import styleMainDashBoard from '../../css/MainDashboard.module.css';
