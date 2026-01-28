@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom'; // URL 파라미터 감지용
 import styleMainDashBoard from '../../css/MainDashboard.module.css';
@@ -260,11 +259,6 @@ function ProductList(){
                 
                 if(nextDataList.length > 0){
                     setProductList((prev) => [...prev, ...nextDataList]);
-                    // setProductList((prev) => {
-                    //     const existingCds = new Set(prev.map(item => item.productCd));
-                    //     const uniqueNewItems = nextDataList.filter(item => !existingCds.has(item.productCd));
-                    //     return [...prev, ...uniqueNewItems];
-                    // });
 
                     if(nextDataList.length < 5){
                         setHasMore(false);
@@ -314,9 +308,6 @@ function ProductList(){
         if(isMobile){
             setProductList([]); //초기화
             setHasMore(true); //초기화
-            // setVisibleCount(5); // 모바일 뷰 초기화 추가
-            // 이후 useEffect가 searchFilters 변경을 감지하여 
-            // 다시 처음 5개를 fetch하게 됩니다.
         }
         setCurrentPage(1);
     };
@@ -420,38 +411,34 @@ function ProductList(){
                                                         : (currentPage - 1) * postsPerPagePC + index + 1 // PC는 페이지 번호 고려
                                                     }
                                                 </div>
-                                                {/* <div className={styleList.itemAlignMo}> */}
-                                                    <div className={styleList.itemInfoL}>
-                                                        <div className={styleList.brand}>{product.brandNm}</div>
-                                                        <div className={styleList.proCdNmWrap}>
-                                                            <div className={styleList.proCd}>
-                                                                <span className={styleList.infoLabel} style={{marginBottom: "0.5rem"}}>상품코드</span>
-                                                                {product.productCd}
-                                                            </div>
-                                                            <div className={styleList.proNm}>
-                                                                <span className={styleList.infoLabel}>상품명</span>{product.productNm}
-                                                            </div>
+                                                <div className={styleList.itemInfoL}>
+                                                    <div className={styleList.brand}>{product.brandNm}</div>
+                                                    <div className={styleList.proCdNmWrap}>
+                                                        <div className={styleList.proCd}>
+                                                            <span className={styleList.infoLabel} style={{marginBottom: "0.5rem"}}>상품코드</span>
+                                                            {product.productCd}
+                                                        </div>
+                                                        <div className={styleList.proNm}>
+                                                            <span className={styleList.infoLabel}>상품명</span>{product.productNm}
                                                         </div>
                                                     </div>
-                                                    <div className={styleList.itemInfoR}>
-                                                        <div className={styleList.stkWrap}>
-                                                            <div className={styleList.stkQty}>
-                                                                <span className={styleList.infoLabel}>현재 재고 수량</span>
-                                                                {product.stkQty}
-                                                            </div>
-                                                            <div className={`${styleList.stkStatus}`}>
-                                                                <span className={styleList.infoLabel}>재고 상태</span>
-                                                                {handleStkStatus(product.stkQty, product.threshold, product.gdsEnabled)}
-                                                            </div>
+                                                </div>
+                                                <div className={styleList.itemInfoR}>
+                                                    <div className={styleList.stkWrap}>
+                                                        <div className={styleList.stkQty}>
+                                                            <span className={styleList.infoLabel}>현재 재고 수량</span>
+                                                            {product.stkQty}
                                                         </div>
-                                                        <div className={styleList.date}>
-                                                            <span className={styleList.infoLabel}>등록일</span>
-                                                            {product.frstRegDt.split('T')[0]}
+                                                        <div className={`${styleList.stkStatus}`}>
+                                                            <span className={styleList.infoLabel}>재고 상태</span>
+                                                            {handleStkStatus(product.stkQty, product.threshold, product.gdsEnabled)}
                                                         </div>
                                                     </div>
-                                                {/* </div> */}
-
-                                                
+                                                    <div className={styleList.date}>
+                                                        <span className={styleList.infoLabel}>등록일</span>
+                                                        {product.frstRegDt.split('T')[0]}
+                                                    </div>
+                                                </div>
                                             </a>
                                         </li>
                                     )
@@ -471,9 +458,7 @@ function ProductList(){
                                 </div>)
                             : (
                                 <Pagination 
-                                    // targetList={filteredProductList} 
                                     totalPages={totalPages}
-                                    // postsPerPage={postsPerPage}
                                     currentPage={currentPage}
                                     setCurrentPage={setCurrentPage}
                                     blockSize={5}

@@ -1,102 +1,87 @@
-.card-stack-wrapper {
-    position: relative;
-    padding-top: 20px;
-    overflow-y: auto;
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    background-color: #f8f9fa;
+.archive-wrapper {
+    padding: 20px;
+    background: #fff;
 }
 
-.detail-card {
-    background: white;
-    border-radius: 30px;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
-    border: 1px solid #eee;
-    /* PC 카드 겹침 효과 유지 */
-    margin-top: -170px; 
-    transition: transform 0.3s ease;
-}
-
-/* 첫 번째 카드는 시인성을 위해 상단 여백 확보 */
-.detail-card:first-child {
-    margin-top: 50px;
-}
-
-/* PC 버전에서는 페이지 내부의 하단바를 숨김 (MainLayout 사이드바와 충돌 방지) */
-.sidebar {
-    display: none;
-}
-
-.info-header {
-    color: #1e293b;
+.archive-title {
     font-size: 22px;
-    border-bottom: 3px solid #1e293b;
-    padding-bottom: 10px;
-    width: fit-content; 
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
-.info-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #f0f0f0;
+.table-container {
+    width: 100%;
+    overflow: hidden; /* 가로 스크롤 방지 */
 }
 
-.info-label {
-    color: #777;
-    font-weight: 500;
+.archive-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.info-value {
-    color: #333;
+.archive-table th, .archive-table td {
+    padding: 12px 5px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+/* 📍 여기가 핵심: 제품명이 길면 자르지 말고 아래로 내리기 */
+.col-nm {
     font-weight: 600;
+    white-space: normal;   /* 📍 말줄임표 대신 다음 줄로 넘김 */
+    word-break: break-all; /* 📍 칸 안 모자라게 강제 줄바꿈 */
+    text-align: left;      /* 📍 왼쪽 정렬이 세로로 길어질 때 예쁨 */
 }
 
+.status-badge {
+    color: #ef4444;
+    background: #fee2e2;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+
+    /* 📍 핵심: 글자가 아래로 안 떨어지게 고정 */
+    white-space: nowrap; 
+    display: inline-block;
+}
+
+    /* 📍 만약 그래도 좁아 보이면 상태 칸(td) 너비를 아주 살짝만 넓혀줘 */
+.col-status {
+    width: 60px; /* '비활성' 세 글자가 충분히 들어갈 크기 */
+}
+    /* 📍 버튼 그룹: 네가 좋다고 한 세로 배치 */
+.btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+}
+
+.restore-btn {
+    width: 85px;
+    padding: 8px 0;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.delete-btn {
+    width: 85px;
+    padding: 8px 0;
+    background: #fff;
+    color: #ef4444;
+    border: 1px solid #ef4444;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+/* 📍 모바일 대응: 아까처럼 코드랑 날짜 숨기기 */
 @media (max-width: 768px) {
-    /* 1. 카드 위치 초기화 및 나열 */
-    .detail-card { 
-        width: 94% !important; 
-        left: 3% !important; 
-        margin-top: 20px !important; /* 중요: 마이너스 마진 제거 */
-        padding: 30px !important; 
-        top: 20px !important; 
-        position: relative !important; 
-    }
-
-    /* 2. 페이지 내부 하단 탭 바 활성화 (기존 유지하시는 코드) */
-    .sidebar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 65px;
-        background: #0d1b3e;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 1000;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .sidebar li span {
-        display: none;
-    }
-
-    /* 3. 보관함 테이블 최적화: 모바일에서 데이터 간소화 */
-    table th:nth-child(4), 
-    table td:nth-child(4) {
-        display: none;
-    }
-
-    /* 4. 전체 레이아웃 하단 여백 추가 (하단바 가림 방지) */
-    .card-stack-wrapper {
-        padding-bottom: 100px;
-        height: auto;
+    .col-cd, .col-date {
+        display: none !important;
     }
 }
