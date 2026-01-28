@@ -13,13 +13,26 @@ const ProductModify = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [tempCode, setTempCode] = useState("");
 
-  useEffect(() => {
-    if (location.state && location.state.product) {
-      const p = location.state.product;
-      setProduct(p); 
-      setTempCode(p.gds_cd || "");
-    }
-  }, [location.state]);
+useEffect(() => {
+  if (location.state && location.state.product) {
+    const p = location.state.product;
+    // 📍 백엔드에서 대문자로 줄 경우를 대비해 소문자로 표준화해서 state에 저장
+    const normalizedProduct = {
+      ...p,
+      gds_cd: p.GDS_CD || p.gds_cd || "",
+      gds_nm: p.GDS_NM || p.gds_nm || "",
+      untprc: p.UNTPRC || p.untprc || 0,
+      threshold: p.THRESHOLD || p.threshold || 0,
+      inbox_qty: p.INBOX_QTY || p.inbox_qty || 0,
+      season_cd: p.SEASON_CD || p.season_cd || "",
+      brand_sn: p.BRAND_SN || p.brand_sn || "",
+      gds_cat_cd: p.GDS_CAT_CD || p.gds_cat_cd || "",
+      size_cd: p.SIZE_CD || p.size_cd || ""
+    };
+    setProduct(normalizedProduct); 
+    setTempCode(normalizedProduct.gds_cd);
+  }
+}, [location.state]);
 
   const handleChange = (e, field) => {
     const value = (field === 'untprc' || field === 'threshold' || field === 'inbox_qty') 
@@ -47,10 +60,16 @@ const ProductModify = () => {
     };
 
     try {
-      const response = await axios.post(`${SERVER_URL}/ttik/product/update`, finalData);
+      const response = await axios.post(`${SERVER_URL}/ttik/product/update`,
+                                         finalData,
+                                        {
+                                          withCredentials: true 
+                                        });
       if (response.status === 200) {
         alert(fromArchive ? "복구 및 수정 완료!" : "수정 완료!");
-        navigate(`/product/productDetail/${finalData.gds_cd}`, { state: { product: finalData } });
+        
+        // 📍 state를 넘기지 말고 깔끔하게 경로만 이동!
+        navigate(`/product/productDetail/${finalData.gds_cd}`); 
       }
     } catch (error) {
       alert("서버 연동 실패!");
@@ -59,7 +78,7 @@ const ProductModify = () => {
 
   return (
     /* 📍 기존의 넓은 패딩과 중앙 정렬 디자인 그대로 유지 */
-    <div style={{ padding: '60px', width: '1100px', margin: '0 auto', background: '#fff', borderRadius: '30px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
+    <div style={{ padding: '5% 40px', width: '90%', maxWidth: '1100px', margin: '0 auto', background: '#fff', borderRadius: '30px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
       
       <div style={{ marginBottom: '50px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px' }}>

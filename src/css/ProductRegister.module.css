@@ -1,31 +1,3 @@
-
-/* 공통 form buttons */
-.registerBtn, .searchBtn{
-    display: inline-block;
-    padding-inline: 2rem;
-    height: 4.5rem;
-    line-height: 4.5rem;
-    border-radius: 1rem;
-    margin-inline: 1rem;
-    text-wrap: nowrap;
-    font-size: 1.8rem;
-    font-weight: 600;
-    /* color: var(--secondary-color); */
-    color: #fff;
-    background-color: var(--secondary-color);
-    transition: all 0.3s;
-}
-
-.registerBtn{
-    /* width: 8rem; 
-    height: 4.5rem; */
-}
-
-.registerBtn:hover, .searchBtn:hover{
-    background: #2563eb;
-    box-shadow: 0 2rem 4rem rgba(37, 99, 235, 0.3);
-}
-
 /* 등록 폼 */
 .registerForm{
     color: var(--secondary-color);

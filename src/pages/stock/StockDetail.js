@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Html5QrcodeScanner } from "html5-qrcode";
 import serverUrl from "../../db/server.json";
@@ -10,6 +10,15 @@ function StockDetail() {
     const location = useLocation();
     const SERVER_URL = serverUrl.SERVER_URL;
 
+    const [selectOptions, setSelectOptions] = useState({
+        storages: [], zones: [], racks: []
+    });
+    const [selections, setSelections] = useState({
+        storage: '',
+        zone: '',
+        rack: ''
+    });
+
     const planType = location.state?.type || "InBound"; 
     const planYmd = location.state?.planYmd;
 
@@ -20,21 +29,30 @@ function StockDetail() {
 
     const isProcessing = useRef(false);
     const scannerRef = useRef(null);
-    // 실시간 수량 체크를 위한 가장 정확한 참조 데이터
     const scanHistoryRef = useRef([]); 
     const audioContextRef = useRef(null);
+
+    // 창고 카테고리 상위 변경시 초기화
+    const handleSelectChange = (e) => {
+        const { name, value } = e.target;
+        setSelections(prev => {
+            const next = { ...prev, [name]: value };
+            if (name === 'storage') { next.zone = ''; next.rack = ''; }
+            if (name === 'zone') { next.rack = ''; }
+            return next;
+        });
+    };
 
     useEffect(() => {
         const fetchDetail = async () => {
         try {
             const url = `${SERVER_URL}/ttik/productdetail/product/${productCd}?type=${planType}${planYmd ? `&planYmd=${planYmd}` : ''}`;
             
-            // 수정 포인트: 두 번째 인자로 옵션 객체 추가
             const res = await fetch(url, {
                 method: 'GET',
-                credentials: 'include', // 세션 쿠키를 서버로 전송
+                credentials: 'include', 
                 headers: {
-                    'Accept': 'application/json' // JSON 데이터를 받겠다고 명시
+                    'Accept': 'application/json' 
                 }
             });
 
@@ -42,7 +60,6 @@ function StockDetail() {
                 const data = await res.json();
                 setProduct(data);
             } else {
-                    // 401이나 403 에러 발생 시 로그 확인용
                     console.error("서버 응답 상태 에러:", res.status);
                     }
                 } catch (error) { 
@@ -60,6 +77,24 @@ function StockDetail() {
         });
     };
 
+    //창고 리스트 불러오기
+    useEffect(() => {
+        const fetchSelectData = async () => {
+            try {
+                // PlanRegister에서 사용했던 기초정보 API와 동일한 엔드포인트
+                // const response = await fetch(`${SERVER_URL}/ttik/register-info`); - 수정
+                const response = await fetch(`${SERVER_URL}/ttik/plans/register-info`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setSelectOptions(data); // storages, zones, racks가 한꺼번에 저장됨
+                }
+            } catch (error) {
+                console.error("기초 데이터 로드 실패:", error);
+            }
+        };
+        fetchSelectData();
+    }, [SERVER_URL]);
+
     const handleAllCheck = (e) => {
         if (e.target.checked) {
             const allBarcodes = scanHistory.map(h => h.barcode);
@@ -69,18 +104,18 @@ function StockDetail() {
         }
     };
 
-    // 화면 표시용 (선택된 수량)
+    // 화면 표시용 
     const selectedTotalQty = scanHistory
         .filter(h => checkedItems.has(h.barcode))
         .reduce((sum, h) => sum + h.increment, 0);
     
-    // 1. 선택된 항목들 중 박스(Box) 스캔 횟수 계산
+    // 선택된 항목들 중 박스 스캔 횟수 계산
     const selectedBoxCount = scanHistory
         .filter(h => checkedItems.has(h.barcode) && h.isBox).length;
 
-    // 2. 선택된 항목들 중 낱개(Single) 스캔 횟수 계산 (참고용)
-    const selectedSingleCount = scanHistory
-        .filter(h => checkedItems.has(h.barcode) && !h.isBox).length;
+    // 선택된 항목들 중 낱개 스캔 횟수 계산 
+    // const selectedSingleCount = scanHistory
+    //     .filter(h => checkedItems.has(h.barcode) && !h.isBox).length;
 
     const playBeep = () => {
         if (!audioContextRef.current) audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
@@ -95,13 +130,13 @@ function StockDetail() {
     };
 
     const handleBarcodeScanned = (fullBarcode) => {
-        // 1. 중복 스캔 방지 (Ref 사용)
+        // 중복 스캔 방지 
         if (scanHistoryRef.current.some(h => h.barcode === fullBarcode)) {
             alert("이미 스캔된 고유 번호입니다: " + fullBarcode);
             return;
         }
 
-        // 2. 바코드 파싱
+        // 바코드 파싱
         const parts = fullBarcode.split('-');
         let productId = "";
         let incrementValue = 1;
@@ -126,16 +161,14 @@ function StockDetail() {
             return;
         }
 
-        // 3. 실시간 수량 합산 및 초과 체크 (Ref를 기준으로 직접 계산)
+        // 실시간 수량 합산 및 초과 체크
         const currentSum = scanHistoryRef.current.reduce((sum, item) => sum + item.increment, 0);
         const limitQty = product?.stkQty || 0;
 
         if (currentSum + incrementValue > limitQty) {
             alert(`❌ 초과 차단! 더 이상 스캔할 수 없습니다.\n(예정: ${limitQty} / 현재: ${currentSum} / 추가시도: ${incrementValue})`);
-            return; // 리스트에 추가하지 않고 종료
+            return; 
         }
-
-        // 4. 모든 조건 통과 시 데이터 반영
         playBeep();
         
         const newLog = {
@@ -146,7 +179,6 @@ function StockDetail() {
             time: new Date().toLocaleTimeString()
         };
 
-        // Ref와 State를 동시에 업데이트하여 정합성 유지
         scanHistoryRef.current = [newLog, ...scanHistoryRef.current];
         setScanHistory([...scanHistoryRef.current]);
         setCheckedItems(prev => new Set(prev).add(fullBarcode));
@@ -157,6 +189,13 @@ function StockDetail() {
             alert("등록할 항목을 선택해주세요.");
             return;
         }
+
+        //창고 선택 확인
+        if (!selections.storage) {
+            alert("창고(Storage)를 선택해주세요.");
+            return;
+        }
+
         if (window.confirm(`선택한 ${checkedItems.size}건(총 ${selectedTotalQty}개)을 등록하시겠습니까?`)) {
             navigate('/stock/plans', { state: { activeTab: planType } });
         }
@@ -204,6 +243,64 @@ function StockDetail() {
                         <p className={styles.productNameRow}>{product.productNm}</p>
                     </div>
                 </div>
+
+                <div className={styles.selectContainer}>
+                    <h3 style={{marginBottom:'1rem'}}>🛅 창고 선택</h3>
+                    <div className={styles.selectBox}>
+                        {/* 창고(Storage) */}
+                        <select name="storage" value={selections.storage} onChange={handleSelectChange}>
+                            <option value="">동</option>
+                            {selectOptions.storages?.map(s => (
+                                <option key={s.STR_CD} value={s.STR_CD}>{s.STR_NM}</option>
+                            ))}
+                        </select>
+
+                        {/* 1. 구역(Zone) - '동'이 선택되지 않았을 때 비활성화 */}
+                        <select 
+                            name="zone" 
+                            value={selections.zone} 
+                            onChange={handleSelectChange}
+                            disabled={!selections.storage} // storage 값이 없으면 클릭 불가
+                            style={{ backgroundColor: !selections.storage ? '#f7fafc' : 'white' }} // 비활성화 시 색상 변경(선택)
+                        >
+                            <option value="">구역</option>
+                            {selectOptions.zones
+                                ?.filter(z => {
+                                    const storageKey = z.STORAGE_SN || z.STR_CD; 
+                                    return !selections.storage || String(storageKey) === String(selections.storage);
+                                })
+                                .map(z => (
+                                    <option key={z.ZONE_SN || z.ZONE_CD} value={z.ZONE_SN || z.ZONE_CD}>
+                                        {z.ZONE_NM}
+                                    </option>
+                                ))
+                            }
+                        </select>
+
+                        {/* 2. 선반(Rack) - '구역'이 선택되지 않았을 때 비활성화 */}
+                        <select 
+                            name="rack" 
+                            value={selections.rack} 
+                            onChange={handleSelectChange}
+                            disabled={!selections.zone} // zone 값이 없으면 클릭 불가
+                            style={{ backgroundColor: !selections.zone ? '#f7fafc' : 'white' }}
+                        >
+                            <option value="">선반</option>
+                            {selectOptions.racks
+                                ?.filter(r => {
+                                    const zoneKey = r.ZONE_SN || r.ZONE_CD;
+                                    return !selections.zone || String(zoneKey) === String(selections.zone);
+                                })
+                                .map(r => (
+                                    <option key={r.RACK_SN || r.RACK_CD} value={r.RACK_SN || r.RACK_CD}>
+                                        {r.RACK_NM}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                    </div>
+                </div>
+
                 <div className={styles.btnGroup}>
                     <button className={`${styles.btn} ${styles.btnBack}`} onClick={() => navigate('/stock/plans', { state: { activeTab: planType } })}>← 뒤로</button>
                     <button 
@@ -267,7 +364,7 @@ function StockDetail() {
                         <div className={styles.cardTitle}>📊 검수 현황 (선택됨)</div>
                         <div className={styles.statGrid} style={{ 
                             display: 'grid', 
-                            gridTemplateColumns: 'repeat(3, 1fr)', // 3열로 변경
+                            gridTemplateColumns: 'repeat(3, 1fr)', 
                             gap: '10px' 
                         }}>
                             {/* 박스 수량 */}

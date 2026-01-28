@@ -76,7 +76,7 @@ function ModalBrandSearch({onClose, setBrandCd}){
                 }
             </ul>
             
-            <button type="submit" className={`${styleRegister.registerBtn}`}>확인</button>
+            <button type="submit" className="btnSubmit">확인</button>
         </form>
     </div>
     )

@@ -10,7 +10,8 @@ const RegisterAdmin = () => {
     password: '',
     confirmPassword: '',
     nickname: '',
-    storage: '' // 'ALL', 'A', 'B' 문자열 저장
+    storage: '', 
+    monitorStorage: '' 
   });
 
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
@@ -49,11 +50,21 @@ const RegisterAdmin = () => {
       return;
     }
 
+    if (formData.storage === 'MONITOR' && !formData.monitorStorage) {
+      setModal({
+        isOpen: true,
+        title: 'Input Error',
+        message: '모니터링할 창고 이름을 입력해주세요.',
+        onConfirm: closeModal
+      });
+      return;
+    }
+
     const submitData = {
       mngrId: formData.id,
       mngrPswd: formData.password,
       nickname: formData.nickname,
-      tkcgStorage: formData.storage
+      tkcgStorage: formData.storage === 'MONITOR' ? formData.monitorStorage : formData.storage
     };
 
     try {
@@ -71,7 +82,7 @@ const RegisterAdmin = () => {
           message: `${submitData.nickname} 등록이 완료되었습니다.`,
           onConfirm: () => {
             closeModal();
-            navigate('/ttik');
+            navigate('/storage');
           }
         });
       } else {
@@ -95,13 +106,13 @@ const RegisterAdmin = () => {
       <div className={style.card}>
         <div className={style.header}>
           <h2>신규 관리자 등록</h2>
-          <p>시스템에 접근할 새로운 관리자 계정을 생성합니다.</p>
+          <p>모니터 계정의 경우 동+모니터 로 생성 ex)B모니터</p>
         </div>
 
         <form onSubmit={handleRegister} className={style.form}>
           <div className={style.inputGroup}>
             <label>관리자 닉네임</label>
-            <input type="text" name="nickname" placeholder="ex) 사무실 관리자 / 창고 이용자" onChange={handleChange} required />
+            <input type="text" name="nickname" placeholder="ex) 사무실 관리자 / 창고 이용자 / A모니터" onChange={handleChange} required />
           </div>
 
           <div className={style.inputGroup}>
@@ -125,6 +136,7 @@ const RegisterAdmin = () => {
               {[
                 { id: 'ALL', label: '전체 관리자 (ALL)' },
                 { id: 'U', label: '이용자' },
+                { id: 'MONITOR', label: '모니터용' }, // 모니터용 추가
               ].map((opt) => (
                 <label key={opt.id} className={style.checkboxLabel}>
                   <input
@@ -141,6 +153,21 @@ const RegisterAdmin = () => {
               ))}
             </div>
           </div>
+
+          {/* 모니터용 선택 시 나타나는 추가 입력창 */}
+          {formData.storage === 'MONITOR' && (
+            <div className={style.inputGroup} style={{ marginTop: '1rem' }}>
+              <label>모니터링 대상 창고명</label>
+              <input 
+                type="text" 
+                name="monitorStorage" 
+                placeholder="ex) C" 
+                value={formData.monitorStorage}
+                onChange={handleChange} 
+                required 
+              />
+            </div>
+          )}
 
           <button type="submit" className={style.submitBtn}>계정 생성하기</button>
         </form>

@@ -15,60 +15,81 @@ const ProductDetail = () => {
 
   const fetchProductData = async () => {
     try {
-        setLoading(true);
-        const response = await axios.get(`${SERVER_URL}/ttik/product/productDetail/${gds_cd}`);
-        
-        // 📍 이 부분을 복사해서 콘솔에 찍힌 결과(객체 내부)를 알려줘!
-        console.log("🔥 서버에서 보낸 진짜 데이터:", response.data); 
-        
-        if (response.data) {
-          setCardList([response.data]); 
-        }
-      } catch (error) {
-        console.error("데이터 호출 에러:", error);
-      } finally {
-        setLoading(false);
+    setLoading(true);
+    const response = await axios.get(`${SERVER_URL}/ttik/product/productDetail/${gds_cd}`, {
+      withCredentials: true,
+      headers: {
+        'Cache-Control': 'no-cache', // 우리가 아까 넣은 거!
+        'Pragma': 'no-cache'
       }
-    };
+    });
 
+    if (response.data) {
+      console.log("서버에서 갓 구워낸 데이터:", response.data);
+      // 기존 배열 통째로 갈아치우기
+      setCardList([response.data]); 
+    }
+  } catch (error) {
+    console.error("데이터 호출 에러:", error);
+  } finally {
+    setLoading(false);
+  }
+};
   useEffect(() => { 
-    if(gds_cd) fetchProductData(); 
-  }, [gds_cd]);
+  // 페이지 들어오자마자 기존 데이터 싹 비우기 (초기화)
+  setCardList([]); 
+  if(gds_cd) fetchProductData(); 
+  }, [gds_cd]); // gds_cd가 바뀔 때마다 실행
 
   const handleCardClick = () => {
     if (cardList.length <= 1) return;
     setCardList((prev) => [...prev.slice(1), prev[0]]);
   };
 
-  const handleDelete = async (product) => {
-    if (!product) {
-      alert("상품 정보를 불러올 수 없습니다.");
-      return;
-    }
-    // 📍 대/소문자 백업 매칭
-    const currentStock = Number(product.STK_QTY || product.frst_stk_qty || 0);
-    const targetGdsCd = product.GDS_CD || product.gds_cd;
-    const targetGdsNm = product.GDS_NM || product.gds_nm;
+const handleDelete = async (product) => {
+  // 1. 데이터 누락 방어
+  if (!product) {
+    alert("상품 정보를 불러올 수 없습니다.");
+    return;
+  }
 
-    if (currentStock === 0) {
-      const confirmMessage = `[${targetGdsNm}] \n재고가 0입니다. 관리 제외 품목(Archive)으로 이동시킬까요?`;
-      if (window.confirm(confirmMessage)) {
-        try {
-          await axios.post(`${SERVER_URL}/ttik/product/disable`, { 
+  // 2. 대문자/소문자 혼용 및 데이터 추출
+  const targetGdsCd = product.GDS_CD || product.gds_cd;
+  const targetGdsNm = product.GDS_NM || product.gds_nm || "이 상품";
+  // 재고량: 현재고(STK_QTY)를 우선으로 보고 없으면 최초재고라도 확인
+  const currentStock = Number(product.STK_QTY ?? product.stk_qty ?? product.frst_stk_qty ?? 0);
+
+  // 3. 재고가 0일 때만 실행
+  if (currentStock === 0) {
+    const confirmMessage = `[${targetGdsNm}] \n재고가 0입니다. 관리 제외 품목(Archive)으로 이동시킬까요?`;
+    
+    if (window.confirm(confirmMessage)) {
+      try {
+        // 📍 axios 인자 구조: URL, 데이터, 설정 순서 엄수!
+        await axios.post(
+          `${SERVER_URL}/ttik/product/disable`, 
+          { 
             gds_cd: targetGdsCd,
             gds_enabled: 'N'
-          });
-          alert("관리 제외 품목으로 이동되었습니다.");
-          navigate('/product/productArchive');
-        } catch (error) {
-          console.error("비활성화 처리 에러:", error);
-          alert("처리 중 오류가 발생했습니다.");
-        }
+          }, 
+          { 
+            withCredentials: true // 🔐 아까 해결했던 보안 설정 추가
+          }
+        );
+
+        alert("관리 제외 품목으로 이동되었습니다.");
+        navigate('/product/productArchive');
+        
+      } catch (error) {
+        console.error("비활성화 처리 에러:", error);
+        alert("처리 중 오류가 발생했습니다. (서버 연결 확인 필요)");
       }
-    } else {
-      alert(`현재 재고가 ${currentStock}개 남아있어 삭제할 수 없습니다. \n재고를 먼저 소진해주세요.`);
     }
-  };
+  } else {
+    // 4. 재고가 남았을 때 차단
+    alert(`현재 재고가 ${currentStock}개 남아있어 삭제할 수 없습니다. \n재고를 먼저 소진해주세요.`);
+  }
+};
 
   const handleModifyClick = (product) => {
     navigate('/product/productModify', { state: { product } });

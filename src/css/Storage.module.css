@@ -1,0 +1,376 @@
+.contentArea{
+    display: grid;
+    grid-template-columns: 1fr 2.5fr;
+    column-gap: 4rem;
+}
+.mainContentWrap{
+    padding: 3rem;
+    border-radius: 1.5rem;
+    width: 100%; 
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+}
+
+.contentTitle{
+    font-size: 1.8rem;
+    color: var(--gray-64);
+    margin-bottom: 3rem;
+    /* padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--gray-e2); */
+}
+
+.storage input, .storage select{
+    height: 5rem;
+}
+
+/* 좌측 메뉴 선택 */
+.menuArea{
+    /* border: 1px solid #000; */
+    position: sticky;
+    top: 0;
+}
+.menuBox{
+    /* border: 1px solid red; */
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    border-radius: 1.5rem;
+    background-color: #fff;
+    padding: 3rem;
+}
+
+.menuList li{
+    border-radius: 10px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    line-height: 3em;
+    text-align: center;
+    color: var(--secondary-color);
+    background-color: var(--gray-f1);
+    margin-block: 2rem;
+    transition: 0.3s;
+    cursor: pointer;
+    border: 3px solid transparent;
+}
+
+.menuList li.selected{
+    background-color: #fff;
+    border: 3px solid var(--primary-color);
+}
+.menu{
+    position: relative;
+}
+.menu::before{
+    content: "";
+    display: inline-block;
+    width: 3rem;
+    aspect-ratio: 1;
+    position: absolute;
+    left: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 2rem auto;
+}
+.menuRegister::before{
+    background-image: url(/src/resources/images/storage/iconPlus.svg);
+    background-size: 2.5rem auto;
+}
+.menuModify::before{
+    background-image: url(/src/resources/images/storage/iconSetting.svg);
+}
+.menuList::before{
+    background-image: url(/src/resources/images/storage/iconSearch.svg);
+}
+.contentRow{
+    display: flex;
+    align-items: center;
+    /* justify-content: space-between; */
+    padding: 4rem;
+    gap: 3rem;
+    border-top: 1px solid var(--gray-e2);
+}
+
+/* 창고 조회 */
+.listTopWrap{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+}
+
+.notice{
+    color: var(--gray-64);
+}
+
+.listFilter{
+    width: 15rem;
+}
+
+.storageTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.storageTable tbody tr{
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.storageTable tbody tr:hover{
+    background-color: rgb(37, 99, 235, 0.2);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1);
+}
+
+.storageTable td, .storageTable th {
+    padding: 1.2rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.storageTable th{
+    border-width: 2px;
+}
+
+/* 창고 모달*/
+.rackHeading{
+    text-align: left;
+    margin-inline: 2rem;
+    padding: 1rem 3rem;
+    /* font-weight: 500; */
+    border-bottom: 1px solid var(--gray-cb);
+    background: url(/src/resources/images/storage/iconLoc.svg) no-repeat left center / 2rem auto;
+}
+.rackHeading span{
+    font-size: 1.5rem;
+}
+.storageModal select{
+    height: 4rem;
+    width: 90%;
+    cursor: pointer;
+}
+.storageModal tbody tr:hover{
+    box-shadow: none;
+    background-color: transparent;
+}
+
+
+/* 창고 등록 */
+.storageNameWrap{
+    width: 100%;
+    position: relative;
+    margin-bottom: 3rem;
+}
+.storageName{
+    width: 30%;
+}
+.storageGuide{
+    font-size: 1.4rem;
+    color: var(--gray-64);
+    position: absolute;
+    left: 0;
+    bottom: -5rem;
+}
+.registerRow{
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+.zoneRackBox{
+    width: 100%;
+    display: flex;
+    gap: 3rem;
+    margin-bottom: 3rem;
+    padding-right: 3rem;
+    position: relative;
+}
+.zoneRackBox > div{
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    position: relative;
+}
+.errorMsg{
+    bottom: -3rem;
+}
+.btnPlus, .btnRemove{
+    display: block;
+    width: 4rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+.btnPlus{
+    background: #fff url(/src/resources/images/storage/iconPlus.svg) no-repeat center / 70% auto;
+    margin-top: 3rem;
+    border: 3px solid var(--primary-color);
+}
+.btnPlus:hover{
+    box-shadow: 0 1rem 2rem rgba(37, 100, 235, 0.3);
+}
+.btnRemove{
+    position: absolute;
+    top: 50%;
+    right: -2rem;
+    transform: translateY(-50%) scale(0.8);
+    background: var(--gray-e2) url(/src/resources/images/storage/iconDash.svg) no-repeat center / 50% auto;
+}
+.btnRemove:hover{
+    background: var(--gray-cb) url(/src/resources/images/storage/iconDash.svg) no-repeat center / 50% auto;
+}
+
+/* 창고 수정 */
+.modifyHeading{
+    /* color: #fff; */
+    /* background-color: var(--primary-color); */
+    background-color: rgba(37, 100, 235, 0.2);
+    border-radius: 50px;
+    font-size: 1.8rem;
+    width: 10rem;
+    padding-block: 0.5em;
+    /* margin-right: 2rem; */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.storageBtnWrap{
+    flex: 1;
+    /* display: flex;
+    flex-wrap: wrap; */
+
+    /* gap: 2rem; */
+    /* justify-content: space-between; */
+    /* justify-content: center; */
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 2rem;
+}
+
+.storageBtnWrap > div{
+    width: 100%;
+}
+
+.btnStorage{
+    display: inline-block;
+    font-size: 2rem;
+    /* padding: 1em 3em; */
+    width: 100%;
+    padding-block: 1em;
+    background-color: var(--gray-e2);
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.btnStorage.selected{
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.modifyRadio{
+    display: none;
+}
+
+.contentRow:first-child{
+    border: none;
+}
+
+.contentRow.row3{
+    /* align-items: flex-end; */
+    border-top: none;
+    padding-top: 0;
+}
+
+.rackStatusWrap{
+    display: inline-flex;
+    align-items: center;
+    gap: 3rem;
+    flex: 1;
+}
+.rackStatusWrap > select{
+    flex-basis: 30%;
+}
+
+.statusSelectWrap{
+    text-align: center;
+}
+
+.statusSelectWrap label{
+    font-weight: 500;
+    line-height: 2em;
+    color: var(--gray-64);
+    display: inline-block;
+}
+
+.modifyZoneSelect{
+    width: 40%;
+    min-width: 15rem;
+}
+
+.btnSubmitWrap{
+    text-align: center;
+}
+.btnModify{
+    /* height: 5rem; */
+    display: block;
+    margin-block: 3rem 1.5rem;
+    margin-inline: auto;
+}
+
+.checkDelete, .addZone{
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    padding: 1rem 1.5rem;
+    border-radius: 100px;
+}
+.checkDelete{
+    /* color: var(--red-cf); */
+    /* border: 2px solid var(--red-ff); */
+    background-color: var(--red-ff);
+}
+.addZone{
+    /* color: var(--primary-color); */
+    /* border: 2px solid var(--primary-color); */
+    background-color: var(--primary-color);
+    position: absolute;
+    top: 3rem;
+    left: 4rem;
+}
+
+.checkDelete input[type="checkbox"], 
+.addZone input[type="checkbox"]{
+    width: 1.5rem;
+    height: auto;
+    aspect-ratio: 1;
+    margin-right: 1rem;
+    border-color: var(--red-cf);
+}
+
+.row4{
+    position: relative;
+    padding-top: 10rem;
+}
+
+.addContents{
+    display: flex;
+    gap: 3rem;
+    width: 100%;
+}
+
+.addItem{
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+}

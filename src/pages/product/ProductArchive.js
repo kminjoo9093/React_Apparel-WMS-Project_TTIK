@@ -18,7 +18,9 @@ const ProductArchive = () => {
     const fetchArchiveList = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${SERVER_URL}/ttik/product/productArchive`);
+        const res = await axios.get(`${SERVER_URL}/ttik/product/productArchive`, {
+            withCredentials: true
+        });
         let combined = Array.isArray(res.data) ? res.data : [];
 
         // 방금 삭제 처리되어 넘어온 데이터가 있다면 리스트 최상단에 추가
@@ -50,22 +52,20 @@ const ProductArchive = () => {
     }
   };
 
-  // 영구 삭제 (DB에서 진짜 지우기)
+  // 영구 삭제 (DB에서 진짜 지우기) ProductArchive.js 수정
   const handlePermanentDelete = async (gds_cd) => {
-    if (!window.confirm("정말로 영구 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
-    
+    if (!window.confirm("정말로 영구 삭제하시겠습니까?")) return;
+
     try {
-      // 엔드포인트 주의: 백엔드 매핑 주소 확인 필수
-      await axios.delete(`${SERVER_URL}/ttik/product/productArchive/${gds_cd}`);
+      await axios.delete(`${SERVER_URL}/ttik/product/productArchive/${gds_cd}`, {
+        withCredentials: true // 🔐 이 줄이 없어서 로그인 페이지로 튕기는 거야!
+      });
       
-      setArchiveList(prev => prev.filter(item => item.gds_cd !== gds_cd));
-      alert('영구 삭제되었습니다.');
-      
-      // 삭제 후 목록으로 튕겨나가게 하고 싶으면 아래 유지, 아니면 주석 처리
-      navigate('/productList'); 
+      // 성공 시 로직...
+      alert("영구 삭제되었습니다.");
+      navigate('/product/list');
     } catch (error) {
       console.error("삭제 실패:", error);
-      alert('삭제 중 오류가 발생했습니다. (백엔드 경로를 확인해보세요)');
     }
   };
 
