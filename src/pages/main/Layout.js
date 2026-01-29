@@ -161,12 +161,8 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
   return (
     <div className={styleLayout.appContainer}>
       <Modal 
-        isOpen={modal.isOpen} 
-        title={modal.title} 
-        message={modal.message} 
-        onConfirm={modal.onConfirm}
-        onCancel={modal.onCancel} 
-      />
+            {...modal} 
+        />
 
       {hasSidebarPermission && (
         <>
@@ -180,24 +176,33 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
             <div className={styleLayout.sidebarProfile}>
               <div className={styleLayout.profileInfo}>
                 <span style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>
-                  {user?.tkcgStorage === 'ALL' ? 'Main Admin' : 'Warehouse User'}
+                  {user?.tkcgStorage === 'ALL' ? 'Admin' : 'User'}
                 </span>
                 <span className={styleLayout.profileName}>{user?.nickname || '관리자'}</span> 
               </div>
             </div>
 
-            <nav className={styleLayout.sidebarNav}>
-              {menus.map((menu) => (
-                <Link 
-                  key={menu.path} 
-                  to={menu.path}
-                  className={`${styleLayout.navItem} ${location.pathname === menu.path ? styleLayout.active : ''}`}
-                  onClick={closeSidebar}
-                >
-                  <span className={styleLayout.navIcon}>{menu.icon}</span>
-                  <span className={styleLayout.navText}>{menu.name}</span>
-                </Link>
-              ))}
+           <nav className={styleLayout.sidebarNav}>
+              {menus.map((menu) => {
+                const isBasicActive = location.pathname === menu.path || 
+                                    (menu.path !== '/' && location.pathname.startsWith(menu.path));
+                const isProductDetailActive = location.pathname.includes('/product/productDetail/') && 
+                                            (menu.path.includes('/product/productDetail') || menu.name.includes('상품'));
+
+                const isActive = isBasicActive || isProductDetailActive;
+
+                return (
+                  <Link 
+                    key={menu.path} 
+                    to={menu.path}
+                    className={`${styleLayout.navItem} ${isActive ? styleLayout.active : ''}`}
+                    onClick={closeSidebar}
+                  >
+                    <span className={styleLayout.navIcon}>{menu.icon}</span>
+                    <span className={styleLayout.navText}>{menu.name}</span>
+                  </Link>
+                );
+              })}
             </nav>
           </aside>
         </>
@@ -210,7 +215,14 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
               <button className={styleLayout.menuToggle} onClick={() => setIsSidebarOpen(true)}>☰</button>
             )}
             <h2 className={styleLayout.sageTitle}>
-              {allMenus.find(m => m.path === location.pathname)?.name || (user?.tkcgStorage.toUpperCase() + " 모니터링") }
+              {
+                allMenus.find(m => m.path === location.pathname)?.name || 
+                (location.pathname === "/stock/plans/qr/print" 
+                  ? "QR코드 인쇄" 
+                  : (location.pathname.includes("/product/productDetail/") 
+                      ? "상품 상세" 
+                      : "입·출고 검수 시스템"))
+              }
             </h2>
           </div>
 
