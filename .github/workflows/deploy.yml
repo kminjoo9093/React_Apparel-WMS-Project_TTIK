@@ -41,11 +41,11 @@ jobs:
         run: |
           set CI=false
           npm run build
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          path: build/
+      #- name: Upload Artifact
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: frontend-build
+      #    path: build/
 
   release:
     name: Prepare Release
@@ -55,10 +55,10 @@ jobs:
       DEPLOY_ROOT: C:\deploy\frontend
       RELEASE_DIR: C:\deploy\frontend\releases\${{ needs.build.outputs.release_id }}
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: frontend-build
-          path: build/
+      #- uses: actions/download-artifact@v4
+      #  with:
+      #    name: frontend-build
+      #    path: build/
       - name: Create Release Directory
         shell: cmd
         run: if not exist "%RELEASE_DIR%" mkdir "%RELEASE_DIR%"
