@@ -17,7 +17,7 @@ function StockPlans() {
     
     // 페이지네이션 상태
     const [currentPage, setCurrentPage] = useState(1);
-    const postsPerPage = 5;
+    const postsPerPage = 10;
 
     // 데이터 호출 함수
     const fetchStockPlanList = async () => {
@@ -123,24 +123,24 @@ function StockPlans() {
                                     <tr><td colSpan="8" style={{textAlign:'center', padding:'2rem'}}>데이터를 불러오는 중입니다...</td></tr>
                                 ) : currentPosts.length > 0 ? (
                                     currentPosts.map((item, index) => {
-                                        const date = item.IN_PLAN_DATE || item.OUT_PLAN_DATE || item.PLAN_YMD;
-                                        const target = item.BRAND_NM || item.PARTNER_NM || item.PARTNER_SN;
-                                        const product = item.GDS_NM || item.GDS_CD;
+                                        const date = item.IN_PLAN_DATE || item.OUT_PLAN_DATE || item.PLAN_YMD || '-';
+                                        const product = item.GDS_NM || item.GDS_CD || '상품정보없음';
                                         const price = item.UNTPRC || 0;
-                                        
-                                        // 수량 로직 수정: 입고(InBound)일 때 COMPLETED / TOTAL 구조 적용
-                                        const totalQty = plansType === "InBound" 
-                                            ? (item.TOTAL_EA_QTY || 0) 
-                                            : (item.OUT_PLAN_QTY || item.GDS_QTY || 0);
-                                        const completedQty = item.COMPLETED_QTY || 0;
 
-                                        // 상태 텍스트 로직 수정
-                                        let statusText = "대기";
-                                        if (plansType === "InBound") {
-                                            if (completedQty > 0 && completedQty < totalQty) statusText = "진행중";
-                                            else if (completedQty > 0 && completedQty === totalQty) statusText = "완료";
-                                        } else {
-                                            statusText = totalQty === 0 ? "완료" : "대기";
+                                        const target = plansType === "OutBound" 
+                                            ? (item.PARTNER_NM || item.BRAND_NM || item.PARTNER_SN || "미지정")
+                                            : (item.BRAND_NM || item.PARTNER_NM || item.PARTNER_SN || "미지정");
+                                        
+                                        const doneQty = Number(item.COMPLETED_QTY || 0);
+                                        const totalQty = plansType === "InBound" 
+                                            ? Number(item.TOTAL_EA_QTY || 0) 
+                                            : Number(item.TOTAL_QTY || item.TOTAL_OUT_QTY || item.GDS_QTY || 0);
+
+                                        let statusText = item.STATUS || "대기";
+                                        if (totalQty > 0) {
+                                            if (doneQty >= totalQty) statusText = "완료";
+                                            else if (doneQty > 0) statusText = "진행중";
+                                            else statusText = "대기";
                                         }
 
                                         return (
@@ -162,12 +162,15 @@ function StockPlans() {
                                                         alert(`상품 코드를 인식할 수 없습니다.`);
                                                         return;
                                                     }
-                                                   navigate(`/stock/plans/${productCode}`, { 
-                                                                state: { 
-                                                                    type: plansType, 
-                                                                    planYmd: date    
-                                                                } 
-                                                            });
+                                                    if (plansType === "InBound") {
+                                                        navigate(`/stock/plans/inbound/${productCode}`, {
+                                                            state: { planYmd: date }
+                                                        });
+                                                    } else {
+                                                        navigate(`/stock/plans/outbound/${productCode}`, {
+                                                            state: { planYmd: date }
+                                                        });
+                                                    }
                                                 }}
                                                 className={stylePlans.tableRow}
                                             >
@@ -176,17 +179,14 @@ function StockPlans() {
                                                 <td>{target}</td>
                                                 <td>{product}</td> 
                                                 <td>
-                                                    {plansType === "InBound" ? (
-                                                        <>
-                                                            <span style={{ fontWeight: 'bold', color: completedQty === totalQty ? '#28a745' : '#007bff' }}>
-                                                                {completedQty.toLocaleString()}
-                                                            </span>
-                                                            <span style={{ color: '#999', margin: '0 2px' }}>/</span>
-                                                            {totalQty.toLocaleString()}
-                                                        </>
-                                                    ) : (
-                                                        totalQty.toLocaleString()
-                                                    )}
+                                                    <span style={{ 
+                                                        fontWeight: 'bold', 
+                                                        color: (doneQty === totalQty && totalQty !== 0) ? '#28a745' : '#007bff' 
+                                                    }}>
+                                                        {doneQty.toLocaleString()}
+                                                    </span>
+                                                    <span style={{ color: '#999', margin: '0 2px' }}>/</span>
+                                                    {totalQty.toLocaleString()}
                                                 </td> 
                                                 <td>{price.toLocaleString()}</td>
                                                 <td>{(totalQty * price).toLocaleString()}</td>

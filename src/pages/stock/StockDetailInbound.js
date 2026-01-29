@@ -19,7 +19,7 @@ function StockDetail() {
         rack: ''
     });
 
-    const planType = location.state?.type || "InBound"; 
+    const planType = "InBound"; 
     const planYmd = location.state?.planYmd;
 
     const [product, setProduct] = useState(null);
@@ -82,7 +82,13 @@ function StockDetail() {
     useEffect(() => {
         const fetchSelectData = async () => {
             try {
-                const response = await fetch(`${SERVER_URL}/ttik/plans/register-info`);
+                const response = await fetch(`${SERVER_URL}/ttik/plans/register-info`, {
+                method: 'GET',
+                credentials: 'include', 
+                headers: {
+                    'Accept': 'application/json' 
+                }
+            });
                 if (response.ok) {
                     const data = await response.json();
                     setSelectOptions(data); 
@@ -133,7 +139,13 @@ function StockDetail() {
 
         try {
             // 2. DB에서 실제 박스/아이템 수량 조회
-            const res = await fetch(`${SERVER_URL}/ttik/productdetail/scan-check/${fullBarcode}`);
+            const res = await fetch(`${SERVER_URL}/ttik/productdetail/scan-check/${fullBarcode}`, {
+                method: 'GET',
+                credentials: 'include', 
+                headers: {
+                    'Accept': 'application/json' 
+                }
+            });
             if (!res.ok) throw new Error("수량 조회 실패");
             const actualQty = await res.json();
 
@@ -227,6 +239,7 @@ function StockDetail() {
                     // URL 확인: /ttik/productdetail/inbound/process 가 맞는지 백엔드와 맞출 것
                     const response = await fetch(`${SERVER_URL}/ttik/productdetail/inbound/process`, {
                         method: 'POST',
+                        credentials: 'include',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
