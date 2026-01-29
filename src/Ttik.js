@@ -76,10 +76,9 @@ function Ttik() {
                 <Route path="/partner" element={<Partner />} />
                 <Route path="/stock/plans" element={<Plans />} />
                 <Route path="/stock/plans/:productCd" element={<StockDetail />} />
-                {/* <Route path="/register" element={<ProductRegister />} /> */}
                 <Route path="/product/register" element={<ProductRegister />} />
                 <Route path="/register/admin" element={<RegisterAdmin />} />
-                <Route path="/product/productDetail" element={<ProductDetail />} />
+                <Route path="/product/productDetail/:gds_cd" element={<ProductDetail />} />
                 <Route path="/product/productModify" element={<ProductModify />} />
                 <Route path="/product/productArchive" element={<ProductArchive />} />
                 <Route path="/stock/plans/qr/print" element={<QRsave />} />

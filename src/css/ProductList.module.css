@@ -283,22 +283,22 @@
         width: 100%;
     }
     .itemCard{
-        padding: 3rem 1.5rem;
+        padding: 3rem 5rem;
         display: grid;
-        grid-template-columns: 15% 85%;
-        grid-template-rows: 1fr 1fr;
-        align-items: center;
+        /* grid-template-columns: 15% 85%;
+        grid-template-rows: 1fr 1fr; */
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 3fr 2fr;
+        /* align-items: center; */
     }
     .itemNo{
-        grid-row: span 2;
+        /* grid-row: span 2; */
         font-size: 1.8rem;
-    }
-    .itemInfoR{
-        padding-left: 2rem;
     }
     .prodCd{
         font-size: 2rem;
         text-wrap: nowrap;
+        margin-bottom: 2rem;
     }
     .proNm{
         font-size: 1.8rem;
@@ -307,9 +307,13 @@
     .infoLabel{
         display: block;
         font-size: 1.6rem;
+        margin-bottom: 1rem;
     }
     .itemInfoL .infoLabel{
         display: inline-block;
+    }
+    .itemInfoR .infoLabel{
+        margin-right: 0;
     }
     .itemInfoL::after{
         width: 100%;
@@ -324,18 +328,25 @@
     .itemInfoL{
         gap: 3rem;
         padding-bottom: 2rem;
+        /* justify-content: space-around; */
         flex-direction: column;
     }
     .itemInfoR{
         padding-top: 2rem;
+        /* justify-content: space-around; */
+        /* padding-inline: 5rem; */
     }
     .proCdNmWrap{
-        flex: 1;
+        /* flex: 1; */
     }
     .stkWrap{
         display: flex;
         align-items: center;
         justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+    .stkQty, .stkStatus{
+        text-align: center;
     }
     .itemInfoR{
         /* display: flex;
@@ -347,7 +358,7 @@
 
 @media (max-width: 480px){
     .itemCard{
-        grid-template-columns: 10% 90%;
+        /* grid-template-columns: 10% 90%; */
     }
     .itemInfoL .infoLabel{
         display: block;

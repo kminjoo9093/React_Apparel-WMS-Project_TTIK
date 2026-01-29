@@ -1,22 +1,28 @@
+.paginationArea{
+    max-width: 30rem;
+}
 .paginationContainer {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 1rem;
     margin-Top: 4rem;
+    width: 100%;
 }
 
 .pageButton {
     cursor: pointer;
-    padding: 5px 10px;
     width: 3.2rem;
     height: 3.2rem;
+    font-size: 1.4rem;
     border: 1px solid #ddd;
     background-color: #fff;
     border-radius: 4px;
     color: #333;
     transition: all 0.2s ease;
 }
-
+.pageButton, .navButton {
+    padding: 0.5rem 1rem;
+}
 .pageButton:disabled {
     cursor: default;
     opacity: 0.5;
@@ -30,7 +36,6 @@
 }
 
 .navButton {
-    padding: 5px 10px;
     cursor: pointer;
     border: 1px solid #ddd;
     background-color: #f9f9f9;
@@ -40,4 +45,17 @@
 .navButton:disabled {
     cursor: not-allowed;
     opacity: 0.5;
+}
+
+@media (max-width: 480px){
+    .paginationContainer{
+        gap: 0.8rem;
+    }
+    .pageButton {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    .pageButton, .navButton {
+        padding: 0.3rem 0.6rem;
+    }
 }

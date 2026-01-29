@@ -130,10 +130,10 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
       onCancel: closeModal 
     });
   };
-
   const allMenus = [
     { path: '/ttik', name: '대시보드', icon: '📊', roles: ['ALL', 'U'] },
     { path: '/product/list', name: '상품 관리', icon: '📦', roles: ['ALL'] },
+    { path: '/product/productArchive', name: '관리 제외 품목 (Archive)', icon: '📦', roles: ['ALL'] },
     { path: '/stock/plans', name: '입출고 관리', icon: '🔄', roles: ['ALL', 'U'] },
     { path: '/stock/history', name: '이력 조회', icon: '📜', roles: ['ALL'] },
     { path: '/brand', name: '브랜드', icon: '🏷️', roles: ['ALL'] },
@@ -213,7 +213,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
             <h2 className={styleLayout.sageTitle}>
               {
                 allMenus.find(m => m.path === location.pathname)?.name || 
-                (location.pathname === "/stock/plans/qr/print" ? "QR코드 인쇄" : "입고 검수 시스템") 
+                (location.pathname === "/stock/plans/qr/print" ? "QR코드 인쇄" : "입·출고 검수 시스템") 
               }
             </h2>
           </div>

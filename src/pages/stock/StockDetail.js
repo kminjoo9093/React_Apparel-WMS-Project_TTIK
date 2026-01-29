@@ -3,8 +3,11 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Html5QrcodeScanner } from "html5-qrcode";
 import serverUrl from "../../db/server.json";
 import styles from "../../css/StockDetail.module.css"; 
+import Modal from '../../components/Modal';
 
 function StockDetail() {
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const closeModal = () => setModal({ ...modal, isOpen: false });
     const { productCd } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -19,7 +22,7 @@ function StockDetail() {
         rack: ''
     });
 
-    const planType = location.state?.type || "InBound"; 
+    const planType = (location.state?.type); 
     const planYmd = location.state?.planYmd;
 
     const [product, setProduct] = useState(null);
@@ -68,6 +71,7 @@ function StockDetail() {
             };
             if(productCd) fetchDetail();
         }, [productCd, SERVER_URL, planType, planYmd]);
+        console.log(location.state?.type);
     const handleCheckItem = (barcode) => {
         setCheckedItems(prev => {
             const newSet = new Set(prev);
@@ -130,43 +134,80 @@ function StockDetail() {
     };
 
     const handleBarcodeScanned = (fullBarcode) => {
-        // 중복 스캔 방지 
         if (scanHistoryRef.current.some(h => h.barcode === fullBarcode)) {
-            alert("이미 스캔된 고유 번호입니다: " + fullBarcode);
+            setModal({
+                isOpen: true,
+                title: '중복 스캔',
+                message: (
+                    <>
+                        이미 스캔된 고유 번호입니다:<br />
+                        {fullBarcode}
+                    </>
+                ),
+                onConfirm: closeModal
+            });
             return;
         }
 
-        // 바코드 파싱
-        const parts = fullBarcode.split('-');
+        const boxMatch = fullBarcode.match(/^(.*)-B(\d+)-(\d+)(?:-(\d+))?$/);
+        
         let productId = "";
         let incrementValue = 1;
         let isBoxScan = false;
 
-        if (fullBarcode.includes('-B')) {
-            const bIndex = parts.findIndex(p => p.startsWith('B'));
-            if (bIndex !== -1) {
-                productId = parts.slice(0, bIndex).join('-');
-                if (parts.length === bIndex + 2) { 
-                    isBoxScan = true; 
-                    incrementValue = parseInt(parts[bIndex].substring(1), 10) || 1;
-                }
+        if (boxMatch) {
+            productId = boxMatch[1];
+            const bQty = parseInt(boxMatch[2], 10);
+            const isSingleItem = !!boxMatch[4]; 
+
+            if (!isSingleItem) {
+                isBoxScan = true;
+                incrementValue = bQty;
+            } else {
+                isBoxScan = false;
+                incrementValue = 1;
             }
         } else {
-            productId = parts.slice(0, 3).join('-');
+            productId = fullBarcode.split('-').slice(0, 3).join('-');
         }
+
+
 
         // 상품코드 불일치 차단
         if (productId !== productCd) {
-            alert(`상품 불일치!\n현재 페이지: ${productCd}\n스캔 바코드: ${productId}`);
+            setModal({
+                isOpen: true,
+                title: '상품 불일치',
+                message: (
+                    <span>
+                        상품 불일치! 더 이상 스캔할 수 없습니다.<br />
+                        현재 페이지: {productCd} <br/>
+                        스캔 바코드: {productId}
+                    </span>
+                ),
+                onConfirm: closeModal
+            });
             return;
         }
 
         // 실시간 수량 합산 및 초과 체크
-        const currentSum = scanHistoryRef.current.reduce((sum, item) => sum + item.increment, 0);
+        const currentSum = scanHistoryRef.current.reduce(
+                (sum, item) => sum + item.increment, 0
+            );
         const limitQty = product?.stkQty || 0;
 
         if (currentSum + incrementValue > limitQty) {
-            alert(`❌ 초과 차단! 더 이상 스캔할 수 없습니다.\n(예정: ${limitQty} / 현재: ${currentSum} / 추가시도: ${incrementValue})`);
+            setModal({
+                isOpen: true,
+                title: '수량 초과',
+                message: (
+                    <span>
+                        ❌ 초과 차단! 더 이상 스캔할 수 없습니다.<br />
+                        (예정: {limitQty} / 현재: {currentSum} / 추가시도: {incrementValue})
+                    </span>
+                ),
+                onConfirm: closeModal
+            });
             return; 
         }
         playBeep();
@@ -184,15 +225,26 @@ function StockDetail() {
         setCheckedItems(prev => new Set(prev).add(fullBarcode));
     };
 
+
     const handleRegister = () => {
         if (checkedItems.size === 0) {
-            alert("등록할 항목을 선택해주세요.");
+            setModal({
+                isOpen: true,
+                title: '항목 선택',
+                message: '등록할 항목을 선택해주세요.',
+                onConfirm: closeModal
+            });
             return;
         }
 
         //창고 선택 확인
         if (!selections.storage) {
-            alert("창고(Storage)를 선택해주세요.");
+            setModal({
+                isOpen: true,
+                title: '창고 선택',
+                message: '창고(Storage)를 선택해주세요.',
+                onConfirm: closeModal
+            });
             return;
         }
 
@@ -231,6 +283,10 @@ function StockDetail() {
     if (!product) return <div className={styles.loading}>데이터를 불러오는 중입니다...</div>;
 
     return (
+        <>
+        <Modal
+            {...modal} 
+        />
         <div className={styles.container}>
             <div className={styles.headerSection}>
                 <div className={styles.headerInfo}>
@@ -415,6 +471,7 @@ function StockDetail() {
                 </div>
             </div>
         </div>
+    </>
     );
 }
 
