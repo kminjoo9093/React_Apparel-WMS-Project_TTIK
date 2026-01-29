@@ -402,7 +402,7 @@ function ProductList(){
                                         <li key={product.productCd}
                                             className={`${styleList.productItem} ${statusClass}`} 
                                         >
-                                            <a href="#" 
+                                            <Link to={`/product/productDetail/${product.productCd}`} // 변수명 확인: productCd
                                             className={`${styleList.itemCard} `
                                             }>
                                                 <div className={styleList.itemNo}>
@@ -439,7 +439,7 @@ function ProductList(){
                                                         {product.frstRegDt.split('T')[0]}
                                                     </div>
                                                 </div>
-                                            </a>
+                                            </Link>
                                         </li>
                                     )
                                     

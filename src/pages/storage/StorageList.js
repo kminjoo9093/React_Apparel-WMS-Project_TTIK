@@ -85,11 +85,6 @@ function StorageList({storageList:storageOptions=[]}){
             console.log("창고 랙 디테일 받아오기 실패 : ", error);
         }
     }
-    // useEffect(()=>{
-        
-    //     }
-       
-    // }, [selectedRack])
     
 
     const onCloseModal = () => {
@@ -226,7 +221,7 @@ function StorageList({storageList:storageOptions=[]}){
         <>
             <h2 className={styleStorage.contentTitle}>창고 조회</h2>
             <div className={styleStorage.listTopWrap}>
-                <span className={styleStorage.notice}>클릭 시 적재된 박스 정보 확인과 위치 수정이 가능합니다.</span>
+                <span className={styleStorage.notice}>클릭 시 적재된 박스 정보 확인과 <br className={styleStorage.brMo}></br>위치 수정이 가능합니다.</span>
                 <select name="storageFilter" 
                         value={storageFilter} 
                         className={styleStorage.listFilter}
@@ -271,12 +266,15 @@ function StorageList({storageList:storageOptions=[]}){
                 </tbody>
             </table>
 
-            <Pagination 
-                totalPages={totalPages}
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-                blockSize={5}
-            />
+            <div className={styleStorage.paginationArea}>
+                <Pagination 
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    blockSize={5}
+                />
+            </div>
+
 
             { isOpen && 
                 <div className={styleModal.modalOverlay}>

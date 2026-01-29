@@ -3,7 +3,7 @@ import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
 
-function StorageDelete ({storageList, onUpdate}) {
+function StorageDelete ({storageList, onUpdate, setView}) {
 
     const SERVER_URL = serverUrl.SERVER_URL;
     const [selectedStorage, setSelectedStorage] = useState(1); //창고 일련번호
@@ -92,6 +92,8 @@ function StorageDelete ({storageList, onUpdate}) {
                 if(onUpdate) onUpdate();
                 resetForm();
 
+                setView("list"); //수정 후 창고 조회 리스트가 보이도록
+
             } else {
                 const errorData = await res.json();
                 alert(errorData.message);
@@ -137,30 +139,33 @@ function StorageDelete ({storageList, onUpdate}) {
                     <div>
                         <div className={`${styleStorage.contentRow} ${styleStorage.row2}`}>
                             <h3 className={styleStorage.modifyHeading}>구역</h3>
-                            <select name="zone" value={selectedZone} 
-                                    className={styleStorage.modifyZoneSelect} 
-                                    disabled={isCheckedDelete.deleteStorage}
-                                    onChange={(e)=>setSelectedZone(Number(e.target.value))}>
-                                <option value="">구역 선택</option>
-                                {
-                                    zoneOptions.map((item) => (
-                                        <option key={item.zoneSn} value={item.zoneSn}>{item.zoneNm.slice(1)}({item.zoneNm})</option>
-                                    ))
-                                }
-                            </select>
-                            <label className={styleStorage.checkDelete} htmlFor="deleteZone">
-                                <input type="checkbox" 
-                                        name="deleteZone" 
-                                        checked={isCheckedDelete.deleteZone}
-                                        onChange={handleCheckChange} 
-                                        id="deleteZone"/>삭제
-                            </label>
+                            <div className={styleStorage.selectWrap}>
+                                <select name="zone" value={selectedZone} 
+                                        className={styleStorage.modifyZoneSelect} 
+                                        disabled={isCheckedDelete.deleteStorage}
+                                        onChange={(e)=>setSelectedZone(Number(e.target.value))}>
+                                    <option value="">구역 선택</option>
+                                    {
+                                        zoneOptions.map((item) => (
+                                            <option key={item.zoneSn} value={item.zoneSn}>{item.zoneNm.slice(1)}({item.zoneNm})</option>
+                                        ))
+                                    }
+                                </select>
+                                <label className={styleStorage.checkDelete} htmlFor="deleteZone">
+                                    <input type="checkbox" 
+                                            name="deleteZone" 
+                                            checked={isCheckedDelete.deleteZone}
+                                            onChange={handleCheckChange} 
+                                            id="deleteZone"/>삭제
+                                </label>
+                            </div>
+                            
                             
                         </div>
                         <div className={`${styleStorage.contentRow} ${styleStorage.row3}`}>
                             <h3 className={styleStorage.modifyHeading}>선반</h3>
                             <div className={styleStorage.rackArea}>
-                                <div className={styleStorage.rackSelectWrap}>
+                                <div className={styleStorage.selectWrap}>
                                     <select name="rack" 
                                             value={selectedRack} 
                                             disabled={isCheckedDelete.deleteStorage || isCheckedDelete.deleteZone}
