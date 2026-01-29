@@ -10,6 +10,7 @@ function StorageRegister({storageList, onUpdate}){
 
     const SERVER_URL = serverUrl.SERVER_URL;
     const [storageNm, setStorageNm] = useState("");
+    const closeModal = () => setModal({ ...modal, isOpen: false });
     const [zoneList, setZoneList] = useState([{zone: 1, rack: ""}]);
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
     const navigate = useNavigate();
@@ -51,8 +52,14 @@ function StorageRegister({storageList, onUpdate}){
         let value = storageNm;
 
         console.log(value);
+        //창고명 입력하지 않은 경우
         if(!value) {
-            alert("창고명을 입력해주세요");    
+            setModal({
+                isOpen: true,
+                title: '등록 실패',
+                message: '창고명을 입력해주세요',
+                onConfirm: closeModal
+            });    
             return;
         };
 
@@ -62,11 +69,28 @@ function StorageRegister({storageList, onUpdate}){
            value = value.split("동").join("");
         }
 
+        const adminCreate = () => {
+            setModal({
+            isOpen: true,
+            title: '등록이 완료되었습니다',
+            message: '관리자/모니터 등록을 진행해 주세요',
+            onConfirm: () => {
+                navigate("/register/admin");
+            }
+            });
+            
+        };
+
         //알파벳이 맞는지 확인, 자릿수 확인
         const isAlphabet = (value) => value >= "A" && value <= "Z";
 
         if(value.length > 1 || !isAlphabet(value)){
-            alert("창고명을 다시 입력하세요.");
+            setModal({
+                isOpen: true,
+                title: '등록 실패',
+                message: '창고명을 다시 입력해주세요',
+                onConfirm: closeModal
+            });
             return;
         } 
 
@@ -74,8 +98,14 @@ function StorageRegister({storageList, onUpdate}){
         const hasStorage = storageList.some(storage => (
             storage.storageNm === storageNm
         ));
+
         if(hasStorage) {
-            alert("이미 등록된 창고입니다.");
+            setModal({
+                isOpen: true,
+                title: '등록 실패',
+                message: '이미 등록된 창고입니다.',
+                onConfirm:closeModal
+            });
             return;
         }
 
@@ -90,48 +120,42 @@ function StorageRegister({storageList, onUpdate}){
 
         console.log(submitData);
 
-        try{
+        try {
             const res = await fetch(`${SERVER_URL}/ttik/storage/register`, {
                 method: 'POST',
-                credentials: 'include', 
-                headers: {'Content-type': 'application/json'},
+                credentials: 'include',
+                headers: { 'Content-type': 'application/json' },
                 body: JSON.stringify(submitData)
-            })
-            if(res.ok){
-                //alert("등록이 완료되었습니다.");
+            });
 
-                const data = await res.json();
+            console.log("응답 상태 코드:", res.status); // 상태 코드 확인
 
+            if (res.ok) {
+                console.log("성공 블록 진입");
+                
+                // 폼 초기화
                 setStorageNm("");
-                setZoneList([{zone: 1, rack: ""}]);
+                setZoneList([{ zone: 1, rack: "" }]);
 
+                // 알림 띄우기 
+                adminCreate();
+               
+                //const data = await res.json(); post일땐 빈 객체 (200ok)를 보내서 데이터가 비어있음 -> 파싱오류 
+            } else {
+                const errText = await res.text(); // 실패 원인 파악용
+                alert("등록에 실패했습니다.");
             }
-            
         } catch(error){
             console.log(error);
         }
 
     }
 
-    const adminCreate = () => {
-        setModal({
-          isOpen: true,
-          title: '등록이 완료되었습니다',
-          message: '관리자/모니터 등록을 진행해 주세요',
-          onConfirm: () => {
-            navigate("/register/admin");
-          }
-        });
-        
-    };
-
+    
     return (
         <>
         <Modal 
-            isOpen={modal.isOpen} 
-            title={modal.title} 
-            message={modal.message} 
-            onConfirm={modal.onConfirm} 
+           {...modal}
         />
             <h2 className={styleStorage.contentTitle}>창고 등록</h2>
             <form onSubmit={handleSubmit}>
@@ -178,7 +202,7 @@ function StorageRegister({storageList, onUpdate}){
                                                     
                                                     validateNumber(e, index);
                                                 }}
-                                                placeholder="선반 별 층수 입력"
+                                                placeholder="선반 층수 입력"
                                                 ></input>
                                         <p className={`${styleRegister.errorMsg} ${styleStorage.errorMsg}`} 
                                             style={{ visibility: error ? "visible" : "hidden"}}
@@ -200,7 +224,7 @@ function StorageRegister({storageList, onUpdate}){
                     <button type="button" className={styleStorage.btnPlus} onClick={handleAddBtn}></button>
                 </div>
                 <div className={styleStorage.btnSubmitWrap}>
-                    <button type="submit" className={`${styleStorage.btnRegister} btnSubmit`} onClick={adminCreate}>등록</button> 
+                    <button type="submit" className={`${styleStorage.btnRegister} btnSubmit`} >등록</button> 
                 </div>
             </form>
         </>
