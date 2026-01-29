@@ -142,26 +142,29 @@
         align-items: center;
     }
     .col{
-        margin-bottom: 2rem;
-        width: 100%;        /* [추가] col 너비를 전체로 확장 */
-        max-width: 50rem;   /* [추가] 너무 퍼지지 않게 적절한 최대 너비 설정 (선택사항) */
-        justify-content: center; /* [추가] 라벨과 인풋 묶음을 중앙 정렬 */
+        margin-bottom: 4rem;
+        width: 100%;        
+        max-width: 50rem;  
+        justify-content: flex-start; 
     }
     .col:last-child{
         justify-content: flex-start;
+    }
+    .numberWrapper{
+        width: 100%;
+        max-width: none;
     }
     .registerForm input, .registerForm select{
         height: 5rem;
         font-size: 1.5rem;
 
-        width: 100%;        /* [수정] 60% 대신 100%로 가득 채우기 */
-        flex: 1;            /* [추가] 라벨 제외 남은 공간 다 쓰기 */
-        max-width: none;    /* [수정] 기존 max-width 해제 (col에서 제어하므로) */
+        width: 100%;        
+        flex: 1;           
+        max-width: none;   
     }
 }
 @media (max-width: 480px){
     .productInfo, .stockInfo, .codeInfo{
-        /* border-bottom: none; */
         padding: 0;
         padding-top: 2rem;
     }
