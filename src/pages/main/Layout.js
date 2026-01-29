@@ -182,10 +182,14 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
               </div>
             </div>
 
-            <nav className={styleLayout.sidebarNav}>
+           <nav className={styleLayout.sidebarNav}>
               {menus.map((menu) => {
-                const isActive = location.pathname === menu.path || 
-                                (menu.path !== '/' && location.pathname.startsWith(menu.path));
+                const isBasicActive = location.pathname === menu.path || 
+                                    (menu.path !== '/' && location.pathname.startsWith(menu.path));
+                const isProductDetailActive = location.pathname.includes('/product/productDetail/') && 
+                                            (menu.path.includes('/product/productDetail') || menu.name.includes('상품'));
+
+                const isActive = isBasicActive || isProductDetailActive;
 
                 return (
                   <Link 
@@ -213,7 +217,11 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
             <h2 className={styleLayout.sageTitle}>
               {
                 allMenus.find(m => m.path === location.pathname)?.name || 
-                (location.pathname === "/stock/plans/qr/print" ? "QR코드 인쇄" : "입·출고 검수 시스템") 
+                (location.pathname === "/stock/plans/qr/print" 
+                  ? "QR코드 인쇄" 
+                  : (location.pathname.includes("/product/productDetail/") 
+                      ? "상품 상세" 
+                      : "입·출고 검수 시스템"))
               }
             </h2>
           </div>
