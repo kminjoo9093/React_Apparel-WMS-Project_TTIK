@@ -240,7 +240,8 @@
     color: var(--red-cf);
 }
 .waiting .stkStatus{
-    color: var(--secondary-color);
+    /* 입고대기는 파란색으로하면어떨까요? - 김윤중 */
+    color: var(--primary-color); 
 }
 .date{
     color: var(--gray-64);

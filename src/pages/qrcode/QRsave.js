@@ -170,12 +170,8 @@ const QRsave = () => {
     return (
         <>
         <Modal 
-            isOpen={modal.isOpen} 
-            title={modal.title} 
-            message={modal.message} 
-            onConfirm={modal.onConfirm} 
+            {...modal} 
         />
-        
         <div className={style.container}>
             {/* 좌측: 설정창 */}
             <aside className={style.leftSection}>
