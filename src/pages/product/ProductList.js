@@ -403,7 +403,7 @@ function ProductList(){
                                             className={`${styleList.productItem} ${statusClass}`} 
                                         >
                                             <Link to={`/product/productDetail/${product.productCd}`} // 변수명 확인: productCd
-                                            className={`${styleList.itemCard} `
+                                                className={`${styleList.itemCard} `
                                             }>
                                                 <div className={styleList.itemNo}>
                                                     {isMobile 
