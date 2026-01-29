@@ -66,7 +66,13 @@ const QRsave = () => {
         const { productId, boxQty, boxStart, boxEnd, itemStart, itemEnd, includeItems } = printConfig;
         
         if (!boxStart || !boxEnd || parseInt(boxStart) > parseInt(boxEnd)) {
-            alert("박스 범위를 확인하세요."); return;
+            setModal({
+                isOpen: true,
+                title: 'Again',
+                message: '박스 범위를 확인하세요.',
+                onConfirm: closeModal
+            });   
+            return;
         }
 
         let list = [];
@@ -85,7 +91,12 @@ const QRsave = () => {
 
    const handleServerPrint = async () => {
     if (generatedQrs.length === 0) {
-        alert("인쇄할 QR 코드가 없습니다. 먼저 시퀀스를 생성하세요.");
+        setModal({
+                isOpen: true,
+                title: 'Error',
+                message: '인쇄할 QR 코드가 없습니다. 먼저 시퀀스를 생성하세요.',
+                onConfirm: closeModal
+            }); 
         return;
     }
     setIsDownloading(true);
@@ -116,7 +127,7 @@ const QRsave = () => {
             qrContent: code,
             qrNumber: code,
             productName: productNameRaw,
-            productCode: printConfig.productId
+            productCode: printConfig.productId // 이 부분을 수정했습니다.
         }));
 
         const response = await fetch(`${SERVER_URL}/test/labels/download/${userId}`, {
@@ -163,19 +174,20 @@ const QRsave = () => {
         }, 700);
     } catch (error) {
         clearInterval(progressTimer);
-        alert('다운로드 중 오류가 발생했습니다: ' + error.message);
+        setModal({
+                isOpen: true,
+                title: 'Error',
+                message: '다운로드 중 오류가 발생했습니다: ' + error.message,
+                onConfirm: closeModal
+            }); 
         setIsDownloading(false);
     } 
   };
     return (
         <>
         <Modal 
-            isOpen={modal.isOpen} 
-            title={modal.title} 
-            message={modal.message} 
-            onConfirm={modal.onConfirm} 
+            {...modal} 
         />
-        
         <div className={style.container}>
             {/* 좌측: 설정창 */}
             <aside className={style.leftSection}>
