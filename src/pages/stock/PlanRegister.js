@@ -78,15 +78,27 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
 
             // 브랜드 변경 시 하위 항목 초기화
             if (name === 'targetName' || name === 'brand') {
-                nextData.category = ''; nextData.itemName = ''; nextData.untprc = 0;
-                nextData.boxCode = ''; nextData.currentStock = 0;
+                nextData.category = '';
+                nextData.itemName = '';
+                nextData.untprc = 0;
+                nextData.boxCode = '';
+                nextData.currentStock = 0;
             }
 
-            // 상품 선택 시 단가 매칭 및 박스 정보 초기화
+            // 상품 선택 시 단가 매칭 및 박스 정보 초기화 + 입수량 기본값 세팅
             if (name === 'itemName') {
-                const selectedProduct = selectOptions.Product?.find(p => String(p.GDS_CD) === String(value));
+                const selectedProduct = selectOptions.Product?.find(
+                    p => String(p.GDS_CD) === String(value)
+                );
+
                 nextData.untprc = selectedProduct ? (selectedProduct.UNTPRC || 0) : 0;
-                nextData.boxCode = ''; nextData.currentStock = 0;
+                nextData.boxCode = '';
+                nextData.currentStock = 0;
+
+                // ⭐ 입고일 때만 INBOX_QTY를 eaQuantity 기본값으로 세팅
+                if (currentType === "InBound") {
+                    nextData.eaQuantity = selectedProduct?.INBOX_QTY ?? 1;
+                }
             }
 
             // [출고] 박스 선택 시 해당 박스 재고 업데이트
@@ -108,6 +120,7 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
             return nextData;
         });
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -138,11 +151,9 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
                 // 3. [입고] 박스 및 아이템 코드 생성 규칙 적용
                 for (let i = 1; i <= Number(formData.boxQuantity); i++) {
                     const currentBoxNo = startNo + i;
-                    // 규칙: [상품코드]-b[입수량]-[박스번호]
-                    const boxCode = `${formData.itemName}-b${formData.eaQuantity}-${currentBoxNo}`;
+                    const boxCode = `${formData.itemName}-B${formData.eaQuantity}-${currentBoxNo}`;
                     
                     const itemCodes = [];
-                    // 규칙: 입수량만큼 아이템 코드 반복 생성
                     for (let j = 1; j <= Number(formData.eaQuantity); j++) {
                         itemCodes.push(`${boxCode}-${j}`);
                     }
@@ -153,13 +164,14 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
                 boxesData = [{ boxCode: formData.boxCode, eaQuantity: formData.eaQuantity }];
             }
 
-            // 5. 서버 전송용 데이터 구성
+            // 5. 서버 전송용 데이터 구성 (gdsCd 추가 수정)
             const payload = { 
                 ...formData, 
+                gdsCd: formData.itemName, // 💡 itemName에 담긴 상품 코드를 gdsCd 필드로 전달
                 type: currentType === "InBound" ? 0 : 1,
                 date: formData.date.substring(0, 10),
                 targetName: Number(formData.targetName),
-                generatedBoxes: boxesData // 생성된 바코드 리스트 포함
+                generatedBoxes: boxesData 
             };
 
             const endpoint = currentType === "InBound" ? "inbound" : "outbound";
@@ -242,7 +254,6 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
                         <input name="untprc" type="text" value={Number(formData.untprc).toLocaleString() + " 원"} readOnly style={{textAlign: 'right', backgroundColor: '#f5f5f5'}} />
                     </div>
 
-                    {/* --- 입고/출고 분기점 --- */}
                     {currentType === "InBound" ? (
                         <div className={stylePlans.doubleBox}>
                             <div className={stylePlans.inputBox}>

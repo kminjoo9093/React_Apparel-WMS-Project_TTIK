@@ -260,11 +260,11 @@ function ProductList(){
                 
                 if(nextDataList.length > 0){
                     setProductList((prev) => [...prev, ...nextDataList]);
-                     setProductList((prev) => {
-                         const existingCds = new Set(prev.map(item => item.productCd));
-                         const uniqueNewItems = nextDataList.filter(item => !existingCds.has(item.productCd));
-                         return [...prev, ...uniqueNewItems];
-                    });
+                    // setProductList((prev) => {
+                    //     const existingCds = new Set(prev.map(item => item.productCd));
+                    //     const uniqueNewItems = nextDataList.filter(item => !existingCds.has(item.productCd));
+                    //     return [...prev, ...uniqueNewItems];
+                    // });
 
                     if(nextDataList.length < 5){
                         setHasMore(false);
@@ -451,9 +451,6 @@ function ProductList(){
                                                         {product.frstRegDt.split('T')[0]}
                                                     </div>
                                                 </div>
-                                            {/* </div> */}
-
-                                            
                                         </Link>
                                         
                                     </li>
