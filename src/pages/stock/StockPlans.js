@@ -164,11 +164,11 @@ function StockPlans() {
                                                     }
                                                     if (plansType === "InBound") {
                                                         navigate(`/stock/plans/inbound/${productCode}`, {
-                                                            state: { planYmd: date }
+                                                             state: { planYmd: date, type: "InBound" }
                                                         });
                                                     } else {
                                                         navigate(`/stock/plans/outbound/${productCode}`, {
-                                                            state: { planYmd: date }
+                                                             state: { planYmd: date, type: "OutBound" }
                                                         });
                                                     }
                                                 }}

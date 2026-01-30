@@ -246,12 +246,12 @@ const handleBarcodeScanned = async (fullBarcode) => {
                 <div className={styles.rightCol}>
                     <div className={styles.card}>
                         <div className={styles.cardTitle}>📜 출고 스캔 로그
-                            <input type="checkbox" onChange={handleAllCheck} checked={scanHistory.length > 0 && checkedItems.size === scanHistory.length} />
+                            {/* <input type="checkbox" onChange={handleAllCheck} checked={scanHistory.length > 0 && checkedItems.size === scanHistory.length} /> */}
                         </div>
                         <div className={styles.historyList}>
                             {scanHistory.map((h, i) => (
                                 <div key={i} className={styles.historyRow}>
-                                    <input type="checkbox" checked={checkedItems.has(h.barcode)} onChange={() => handleCheckItem(h.barcode)} />
+                                    {/* <input type="checkbox" checked={checkedItems.has(h.barcode)} onChange={() => handleCheckItem(h.barcode)} /> */}
                                     <div style={{flex: 1, marginLeft: '10px'}}>
                                         <div>{h.barcode}</div>
                                         <small>{h.time}</small>

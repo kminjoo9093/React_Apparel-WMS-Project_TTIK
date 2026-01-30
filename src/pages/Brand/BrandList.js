@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 import BrandRegister from './BrandRegister';
 import styleBrand from "../../css/Brand.module.css";
 import serverUrl from "../../db/server.json";
+import Modal from '../../components/Modal';
 
 function BrandList() {
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const closeModal = () => setModal({ ...modal, isOpen: false });
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -61,7 +65,12 @@ function BrandList() {
 
     const handleDelete = async () => {
         if (selectedIds.length === 0) {
-            alert("삭제할 브랜드를 선택해 주세요.");
+            setModal({
+                isOpen: true,
+                title: 'Again',
+                message: '삭제할 브랜드를 선택해 주세요.',
+                onConfirm: closeModal
+            });
             return;
         }
         if (window.confirm(`선택한 ${selectedIds.length}개의 브랜드를 삭제하시겠습니까?`)) {
@@ -96,6 +105,10 @@ function BrandList() {
     };
 
     return (
+        <>
+        <Modal 
+            {...modal} 
+        />
         <div> 
             <h1 className={styleBrand.brandTitle}>Brand</h1>
             <p className={styleBrand.brandSubTitle}>브랜드를 관리 하세요.</p>
@@ -193,6 +206,7 @@ function BrandList() {
                 )}
             </div>
         </div>
+        </>
     );
 }
 

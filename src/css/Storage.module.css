@@ -1,23 +1,30 @@
+/* 창고 관리 페이지 */
 .contentArea{
+    width: 100%;
+    padding-inline: 0.5rem;
+
+}
+.contentWidth{
     display: grid;
     grid-template-columns: 1fr 2.5fr;
     column-gap: 4rem;
+    position: relative;
 }
 .mainContentWrap{
     padding: 3rem;
     border-radius: 1.5rem;
-    width: 100%; 
+    width: 100%;
     position: relative;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1);
     background-color: #fff;
+    max-width: 120rem;
+    margin-inline: auto;
 }
 
 .contentTitle{
     font-size: 1.8rem;
     color: var(--gray-64);
     margin-bottom: 3rem;
-    /* padding-bottom: 1.5rem;
-    border-bottom: 2px solid var(--gray-e2); */
 }
 
 .storage input, .storage select{
@@ -26,12 +33,10 @@
 
 /* 좌측 메뉴 선택 */
 .menuArea{
-    /* border: 1px solid #000; */
     position: sticky;
     top: 0;
 }
 .menuBox{
-    /* border: 1px solid red; */
     box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.05);
     border: 1px solid #e2e8f0;
     border-radius: 1.5rem;
@@ -58,17 +63,15 @@
     border: 3px solid var(--primary-color);
 }
 .menu{
-    position: relative;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
 }
 .menu::before{
     content: "";
-    display: inline-block;
     width: 3rem;
     aspect-ratio: 1;
-    position: absolute;
-    left: 2rem;
-    top: 50%;
-    transform: translateY(-50%);
     background-repeat: no-repeat;
     background-position: center;
     background-size: 2rem auto;
@@ -80,13 +83,12 @@
 .menuModify::before{
     background-image: url(/src/resources/images/storage/iconSetting.svg);
 }
-.menuList::before{
+.menuViewList::before{
     background-image: url(/src/resources/images/storage/iconSearch.svg);
 }
 .contentRow{
     display: flex;
     align-items: center;
-    /* justify-content: space-between; */
     padding: 4rem;
     gap: 3rem;
     border-top: 1px solid var(--gray-e2);
@@ -126,7 +128,7 @@
 }
 
 .storageTable td, .storageTable th {
-    padding: 1.2rem;
+    padding: 1.5rem 1.2rem;
     border-bottom: 1px solid #eee;
     vertical-align: middle;
 }
@@ -140,7 +142,6 @@
     text-align: left;
     margin-inline: 2rem;
     padding: 1rem 3rem;
-    /* font-weight: 500; */
     border-bottom: 1px solid var(--gray-cb);
     background: url(/src/resources/images/storage/iconLoc.svg) no-repeat left center / 2rem auto;
 }
@@ -150,6 +151,7 @@
 .storageModal select{
     height: 4rem;
     width: 90%;
+    min-width: 7rem;
     cursor: pointer;
 }
 .storageModal tbody tr:hover{
@@ -165,7 +167,7 @@
     margin-bottom: 3rem;
 }
 .storageName{
-    width: 30%;
+    width: 40%;
 }
 .storageGuide{
     font-size: 1.4rem;
@@ -184,7 +186,6 @@
     display: flex;
     gap: 3rem;
     margin-bottom: 3rem;
-    padding-right: 3rem;
     position: relative;
 }
 .zoneRackBox > div{
@@ -193,6 +194,12 @@
     align-items: center;
     gap: 2rem;
     position: relative;
+}
+.zoneRackBox div{
+    width: 100%;
+}
+.zoneRackBox input{
+    width: 100%;
 }
 .errorMsg{
     bottom: -3rem;
@@ -208,6 +215,7 @@
     background: #fff url(/src/resources/images/storage/iconPlus.svg) no-repeat center / 70% auto;
     margin-top: 3rem;
     border: 3px solid var(--primary-color);
+    margin-inline: auto;
 }
 .btnPlus:hover{
     box-shadow: 0 1rem 2rem rgba(37, 100, 235, 0.3);
@@ -224,15 +232,34 @@
 }
 
 /* 창고 수정 */
+
+.contentType{
+    text-align: center;
+    padding-bottom: 2rem;
+}
+.typeBtn{
+    width: 20%;
+    min-width: 10rem;
+    height: 4rem;
+    border-radius: 4rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--gray-47);
+    margin-inline: 1.5rem;
+    background-color: var(--gray-e2);
+}
+
+.typeBtn.active{
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
 .modifyHeading{
-    /* color: #fff; */
-    /* background-color: var(--primary-color); */
     background-color: rgba(37, 100, 235, 0.2);
     border-radius: 50px;
     font-size: 1.8rem;
     width: 10rem;
     padding-block: 0.5em;
-    /* margin-right: 2rem; */
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -241,29 +268,27 @@
 
 .storageBtnWrap{
     flex: 1;
-    /* display: flex;
-    flex-wrap: wrap; */
+    /* grid->flex로 변경 */
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    background-color: var(--gray-e2);
+    border-radius: 10px;
 
-    /* gap: 2rem; */
-    /* justify-content: space-between; */
-    /* justify-content: center; */
-
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    gap: 2rem;
+    flex-wrap: wrap;
 }
 
 .storageBtnWrap > div{
-    width: 100%;
+    flex: 1 1 5rem;
 }
 
 .btnStorage{
     display: inline-block;
-    font-size: 2rem;
-    /* padding: 1em 3em; */
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--gray-47);
     width: 100%;
-    padding-block: 1em;
-    background-color: var(--gray-e2);
+    padding-block: 0.5em;
     border-radius: 10px;
     display: inline-flex;
     align-items: center;
@@ -272,8 +297,8 @@
 }
 
 .btnStorage.selected{
-    background-color: var(--primary-color);
-    color: #fff;
+    background-color: #fff;
+    color: var(--primary-color);
 }
 
 .modifyRadio{
@@ -285,34 +310,38 @@
 }
 
 .contentRow.row3{
-    /* align-items: flex-end; */
     border-top: none;
     padding-top: 0;
+
 }
 
-.rackStatusWrap{
-    display: inline-flex;
-    align-items: center;
-    gap: 3rem;
+.updateForm .contentRow.row3{
+    align-items: flex-start;
+}
+
+.rackArea{
     flex: 1;
 }
-.rackStatusWrap > select{
-    flex-basis: 30%;
+
+.selectWrap{
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    width: 100%;
+}
+.selectWrap > select{
+    width: 100%;
+    min-width: 15rem;
 }
 
 .statusSelectWrap{
-    text-align: center;
-}
-
-.statusSelectWrap label{
-    font-weight: 500;
-    line-height: 2em;
-    color: var(--gray-64);
-    display: inline-block;
+    padding-block: 2rem;
+    display: flex;
+    gap: 2rem;
 }
 
 .modifyZoneSelect{
-    width: 40%;
+    width: 100%;
     min-width: 15rem;
 }
 
@@ -320,31 +349,51 @@
     text-align: center;
 }
 .btnModify{
-    /* height: 5rem; */
     display: block;
     margin-block: 3rem 1.5rem;
     margin-inline: auto;
 }
 
+.addForm .row2{
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.addForm .addItem{
+    margin-top: 2rem;
+}
+
 .checkDelete, .addZone{
+    font-size: 1.4rem;
     font-weight: 600;
     color: #fff;
     cursor: pointer;
-    padding: 1rem 1.5rem;
+    padding: 0.8rem 1.5rem;
     border-radius: 100px;
 }
 .checkDelete{
-    /* color: var(--red-cf); */
-    /* border: 2px solid var(--red-ff); */
     background-color: var(--red-ff);
+    text-wrap: nowrap;
+    width: 8rem;
 }
-.addZone{
-    /* color: var(--primary-color); */
-    /* border: 2px solid var(--primary-color); */
-    background-color: var(--primary-color);
+
+.addRackArea, .addZoneArea{
+    width: 100%;
+    height: auto;
+    position: relative;
+}
+.informRackCount, .informZoneCount{
     position: absolute;
-    top: 3rem;
-    left: 4rem;
+    width: 100%;
+    top: -2.5rem;
+    left: 0;
+    text-align: right;
+    font-size: 1.3rem;
+    color: var(--gray-64);
+}
+
+.addZone{
+    background-color: var(--primary-color);
 }
 
 .checkDelete input[type="checkbox"], 
@@ -354,6 +403,54 @@
     aspect-ratio: 1;
     margin-right: 1rem;
     border-color: var(--red-cf);
+}
+
+.disableButton{
+    min-width: 6rem;
+    max-width: 8rem;
+    height: 3rem;
+    text-wrap: nowrap;
+    border-radius: 3rem;
+    background-color: var(--gray-cb);
+    border: 1px solid var(--gray-e2);
+    position: relative;
+    cursor: pointer;
+}
+
+.disableButton::after{
+    content: "";
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--gray-f1);
+    margin-inline: 0.2rem;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    transition: 0.3s;
+}
+
+.disableButton.disable{
+    background-color: var(--primary-color);
+}
+
+.disableButton.disable::after{
+    left: 100%;
+    transform: translate(-120%, -50%);
+}
+
+.disableText{
+    font-size: 1.3rem;
+    position: absolute;
+    bottom: -2rem;
+    left: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.disableButton input{
+    display: none;
 }
 
 .row4{
@@ -371,6 +468,148 @@
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 2rem;
+    position: relative;
+}
+
+.errorMsg{
+    color: var(--red-cf);
+    font-size: 1.3rem;
+    position: absolute;
+    bottom: 0;
+    transform: translateY(100%);
+    width: 100%;
+    text-align: right;
+}
+
+.brMo{
+    display: none;
+}
+
+/* 태블릿 세로 */
+@media (max-width: 1024px){ 
+    /* 레이아웃 */
+    .contentWidth{
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        row-gap: 2rem;
+        column-gap: 0;
+        margin-block: 4rem;
+    }
+
+    .menuArea{
+        position: static;
+        height: auto;
+    }
+    .menuList{
+        display: flex;
+        gap: 2rem;
+    }
+    .menuList li{
+        margin-block: 0;
+        flex: 1;
+    }
+}
+
+/* 모바일 세로, 가로 */
+@media (max-width: 768px){
+    /* 레이아웃 */
+    .menuList{
+        display: block;
+    }
+    .menu:not(:last-child){
+        margin-bottom: 1.5rem;
+    }
+    .contentRow{
+        padding-inline: 2rem;
+    }
+    .zoneRackBox{
+        flex-direction: column;
+        gap: 2rem;
+        padding-block: 4rem;
+        margin-bottom: 0;
+        position: relative;
+        border-top: 1px solid var(--gray-e2);
+    }
+    .zoneRackBox:first-child{
+        border: none;
+        padding-top: 0;
+    }
+    .zoneRackBox > div{
+        width: 90%;
+    }
+    .btnRemove{
+        right: 0;
+    }
+
+     .contentRow{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+    .storageBtnWrap{
+        width: 100%;
+    }
+    .rackArea{
+        width: 100%;
+    }
+    .selectWrap{
+        width: 100%;
+    }
+    .deleteForm .row1 .checkDelete{
+        align-self: flex-end;
+    }
+
+    .addContents{
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .updateForm .row1{
+        padding-bottom: 0;
+    }
+}
+
+@media (max-width: 580px){
+    /* 창고 조회 */
+    .listTopWrap{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2rem;
+    }
+
+}
+
+@media (max-width: 480px){
+    .menuBox, .mainContentWrap{
+        padding: 1.5rem;
+    }
+    .modifyHeading{
+        width: 8rem;
+        font-size: 1.6rem;
+    }
+    .typeBtn:first-child, .typeBtn:last-child{
+        margin-inline: 0;
+    }
+    .typeBtn{
+        margin-inline: 1rem;
+    }
+    .contentRow{
+        padding-inline: 0;
+    }
+    .storageName{
+        width: 80%;
+    }
+    .storageGuide{
+        position: static;
+        display: block;
+        padding-top: 1rem;
+    }
+    .brMo{
+        display: block;
+    }
+    .btnRemove{
+        right: -1rem;
+    }
+   
 }

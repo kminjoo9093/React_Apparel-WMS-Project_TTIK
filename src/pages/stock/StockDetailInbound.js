@@ -3,8 +3,11 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Html5QrcodeScanner } from "html5-qrcode";
 import serverUrl from "../../db/server.json";
 import styles from "../../css/StockDetail.module.css"; 
+import Modal from '../../components/Modal';
 
-function StockDetail() {
+function StockDetailInbound() {
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const closeModal = () => setModal({ ...modal, isOpen: false });
     const { productCd } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -18,8 +21,7 @@ function StockDetail() {
         zone: '',
         rack: ''
     });
-
-    const planType = "InBound"; 
+    const planType = (location.state?.type); 
     const planYmd = location.state?.planYmd;
 
     const [product, setProduct] = useState(null);
@@ -92,6 +94,7 @@ function StockDetail() {
                 if (response.ok) {
                     const data = await response.json();
                     setSelectOptions(data); 
+                    console.log(data);
                 }
             } catch (error) {
                 console.error("기초 데이터 로드 실패:", error);
@@ -130,10 +133,20 @@ function StockDetail() {
         osc.start(); osc.stop(ctx.currentTime + 0.1);
     };
 
+
     const handleBarcodeScanned = async (fullBarcode) => {
-        // 1. 중복 스캔 방지
         if (scanHistoryRef.current.some(h => h.barcode === fullBarcode)) {
-            alert("이미 스캔된 고유 번호입니다: " + fullBarcode);
+            setModal({
+                isOpen: true,
+                title: '중복 스캔',
+                message: (
+                    <>
+                        이미 스캔된 고유 번호입니다:<br />
+                        {fullBarcode}
+                    </>
+                ),
+                onConfirm: closeModal
+            });
             return;
         }
 
@@ -156,29 +169,64 @@ function StockDetail() {
 
             // 3. 대소문자 구분 없이 박스 여부 및 상품코드 추출
             const parts = fullBarcode.split('-');
-            const isBoxScan = fullBarcode.toUpperCase().includes('-B');
+            //const isBoxScan = fullBarcode.toUpperCase().includes('-B');
+            const boxMatch = fullBarcode.match(/^(.*)-B(\d+)-(\d+)(?:-(\d+))?$/);
+        
             let productId = "";
+            let incrementValue = 1;
+            let isBoxScan = false;
 
-            if (isBoxScan) {
-                // 'B' 또는 'b'로 시작하는 파트 앞까지가 상품코드
-                const bIndex = parts.findIndex(p => p.toUpperCase().startsWith('B'));
-                productId = bIndex !== -1 ? parts.slice(0, bIndex).join('-') : parts.slice(0, 3).join('-');
+            if (boxMatch) {
+                productId = boxMatch[1];
+                const bQty = parseInt(boxMatch[2], 10);
+                const isSingleItem = !!boxMatch[4]; 
+
+                if (!isSingleItem) {
+                    isBoxScan = true;
+                    incrementValue = bQty;
+                } else {
+                    isBoxScan = false;
+                    incrementValue = 1;
+                }
             } else {
-                productId = parts.slice(0, 3).join('-');
+                productId = fullBarcode.split('-').slice(0, 3).join('-');
             }
 
-            // 4. 상품코드 일치 여부 확인 (대소문자 무시 비교)
-            if (productId.toUpperCase() !== productCd.toUpperCase()) {
-                alert(`상품 불일치!\n현재 페이지: ${productCd}\n스캔 바코드: ${productId}`);
-                return;
-            }
+            // 상품코드 불일치 차단
+        if (productId.toUpperCase() !== productCd.toUpperCase()) {
+            setModal({
+                isOpen: true,
+                title: '상품 불일치',
+                message: (
+                    <span>
+                        상품 불일치! 더 이상 스캔할 수 없습니다.<br />
+                        현재 페이지: {productCd} <br/>
+                        스캔 바코드: {productId}
+                    </span>
+                ),
+                onConfirm: closeModal
+            });
+            return;
+        }
 
-            // 5. 전체 예정 수량 초과 체크
-            const currentSum = scanHistoryRef.current.reduce((sum, item) => sum + item.increment, 0);
+            // 실시간 수량 합산 및 초과 체크
+            const currentSum = scanHistoryRef.current.reduce(
+                    (sum, item) => sum + item.increment, 0
+                );
             const limitQty = product?.stkQty || 0;
 
-            if (currentSum + actualQty > limitQty) {
-                alert(`❌ 초과 차단! (예정: ${limitQty} / 현재: ${currentSum} / 추가시도: ${actualQty})`);
+            if (currentSum + incrementValue > limitQty) {
+                setModal({
+                    isOpen: true,
+                    title: '수량 초과',
+                    message: (
+                        <span>
+                            ❌ 초과 차단! 더 이상 스캔할 수 없습니다.<br />
+                            (예정: {limitQty} / 현재: {currentSum} / 추가시도: {incrementValue})
+                        </span>
+                    ),
+                    onConfirm: closeModal
+                });
                 return; 
             }
 
@@ -209,12 +257,23 @@ function StockDetail() {
         const itemsToProcess = scanHistory.filter(h => checkedItems.has(h.barcode));
 
         if (itemsToProcess.length === 0) {
-            alert("등록할 항목을 선택해주세요.");
+            setModal({
+                isOpen: true,
+                title: '항목 선택',
+                message: '등록할 항목을 선택해주세요.',
+                onConfirm: closeModal
+            });
             return;
         }
 
+        //수정여부확인(창고인지 선반인지)
         if (!selections.rack) {
-            alert("적재할 선반(Rack)을 선택해주세요.");
+            setModal({
+                isOpen: true,
+                title: '선반 선택',
+                message: '선반(Rack)를 선택해주세요.',
+                onConfirm: closeModal
+            });
             return;
         }
 
@@ -303,6 +362,10 @@ function StockDetail() {
     if (!product) return <div className={styles.loading}>데이터를 불러오는 중입니다...</div>;
 
     return (
+        <>
+        <Modal
+            {...modal} 
+        />
         <div className={styles.container}>
             <div className={styles.headerSection}>
                 <div className={styles.headerInfo}>
@@ -482,7 +545,8 @@ function StockDetail() {
                 </div>
             </div>
         </div>
+    </>
     );
 }
 
-export default StockDetail;
+export default StockDetailInbound;

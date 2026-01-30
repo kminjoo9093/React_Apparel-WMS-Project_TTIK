@@ -13,28 +13,28 @@ function Storage(){
     const [view, setView] = useState("list");
     const [storageList, setStorageList] = useState([]);
 
-
     //현재 존재하는 창고 리스트
-    useEffect(()=>{
-        const getStorageData = async () => {
-            try{
-                const res = await fetch(`${SERVER_URL}/ttik/storage/allStorages`, {
-                    method: 'GET',
-                    credentials: 'include', 
-                })
+    const getStorageData = async () => {
+        try{
+            const res = await fetch(`${SERVER_URL}/ttik/storage/allStorages`, {
+                method: 'GET',
+                credentials: 'include', 
+            })
 
-                if(res.ok){
-                    const storageData = await res.json();
-                    console.log(storageData);
+            if(res.ok){
+                const storageData = await res.json();
+                console.log(storageData);
 
-                    setStorageList(storageData);
-                }
-            } catch(error){
-                console.log(error);
-                return [];
+                setStorageList(storageData);
             }
-            
+        } catch(error){
+            console.log(error);
+            return [];
         }
+        
+    }
+
+    useEffect(()=>{
         getStorageData();
     }, [])
 
@@ -45,27 +45,30 @@ function Storage(){
                 <p>창고 정보를 조회하고 관리하세요.</p>
             </div>
             <div className={styleStorage.contentArea}>
-                <div className={styleStorage.menuArea}>
-                    <div className={`${styleStorage.menuBox} ${styleList.filterCard}`}>
-                        <ul className={styleStorage.menuList}>
-                            <li onClick={()=>setView("list")} 
-                                className={`${view === "list" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuList}`}
-                            >창고 조회</li>
-                            <li onClick={()=>setView("register")} 
-                                className={`${view === "register" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuRegister}`}
-                            >창고 등록</li>
-                            <li onClick={()=>setView("modify")} 
-                                className={`${view === "modify" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuModify}`}
-                            >창고 정보 수정</li>
-                        </ul>
+                <div className={styleStorage.contentWidth}>
+                    <div className={styleStorage.menuArea}>
+                        <div className={`${styleStorage.menuBox} ${styleList.filterCard}`}>
+                            <ul className={styleStorage.menuList}>
+                                <li onClick={()=>setView("list")} 
+                                    className={`${view === "list" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuViewList}`}
+                                >창고 조회</li>
+                                <li onClick={()=>setView("register")} 
+                                    className={`${view === "register" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuRegister}`}
+                                >창고 등록</li>
+                                <li onClick={()=>setView("modify")} 
+                                    className={`${view === "modify" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuModify}`}
+                                >창고 정보 수정</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className={styleStorage.mainContentWrap}>
+                        {view === "register" && <StorageRegister storageList={storageList} onUpdate={getStorageData} setView={setView}/>}
+                        {view === "modify" && <StorageModify storageList={storageList} onUpdate={getStorageData} setView={setView}/>}
+                        {view === "list" && <StorageList storageList={storageList} onUpdate={getStorageData} setView={setView}/>}
                     </div>
                 </div>
-
-                <div className={styleStorage.mainContentWrap}>
-                    {view === "register" && <StorageRegister storageList={storageList} />}
-                    {view === "modify" && <StorageModify storageList={storageList} />}
-                    {view === "list" && <StorageList storageList={storageList} />}
-                </div>
+                
             </div>
         </div>
     )

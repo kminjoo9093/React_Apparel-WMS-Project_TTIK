@@ -1,12 +1,19 @@
-import React from 'react';
 import style from '../css/Modal.module.css';
 
-const Modal = ({ isOpen, title, message, type, onConfirm, onCancel }) => {
+const Modal = ({ isOpen, title, message, type, onConfirm, onCancel, onClose }) => {
   if (!isOpen) return null;
 
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      if (onCancel) onCancel();
+      else if (onClose) onClose();
+      else onConfirm(); 
+    }
+  };
+
   return (
-    <div className={style.modalOverlay}>
-      <div className={`${style.modalContent} ${style[type]}`}>
+    <div className={style.modalOverlay} onClick={handleOverlayClick}>
+      <div className={`${style.modalContent} ${type ? style[type] : ''}`}>
         <div className={style.modalHeader}>
           <h3>{title}</h3>
         </div>

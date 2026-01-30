@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Modal from "../../components/Modal";
 import serverUrl from "../../db/server.json";
 
-function StorageRegister({storageList}){
+function StorageRegister({storageList, onUpdate}){
 
     const SERVER_URL = serverUrl.SERVER_URL;
     const [storageNm, setStorageNm] = useState("");
@@ -65,8 +65,9 @@ function StorageRegister({storageList}){
         //알파벳이 맞는지 확인, 자릿수 확인
         const isAlphabet = (value) => value >= "A" && value <= "Z";
 
-        if(value.length > 1 || !isAlphabet){
+        if(value.length > 1 || !isAlphabet(value)){
             alert("창고명을 다시 입력하세요.");
+            return;
         } 
 
         //창고명 존재 여부 검사
@@ -97,12 +98,13 @@ function StorageRegister({storageList}){
                 body: JSON.stringify(submitData)
             })
             if(res.ok){
-                alert("등록이 완료되었습니다.");
+                //alert("등록이 완료되었습니다.");
+
+                const data = await res.json();
+
                 setStorageNm("");
                 setZoneList([{zone: 1, rack: ""}]);
 
-                const data = await res.json();
-                console.log(data);
             }
             
         } catch(error){
@@ -147,7 +149,7 @@ function StorageRegister({storageList}){
                                 }}
                                 /> 동
                         <span className={styleStorage.storageGuide}>
-                            * 창고 이름은 A부터 Z까지의 알파벳으로 입력하세요.<br/>
+                            * 창고 이름은 A부터 Z까지의 <br className={styleStorage.brMo}></br>알파벳으로 입력하세요.<br/>
                             예시 ) A
                         </span>
                     </div>
@@ -198,7 +200,7 @@ function StorageRegister({storageList}){
                     <button type="button" className={styleStorage.btnPlus} onClick={handleAddBtn}></button>
                 </div>
                 <div className={styleStorage.btnSubmitWrap}>
-                    <button type="submit" className={`${styleStorage.btnRegister} btnSubmit`} onClick={adminCreate}>등록</button>
+                    <button type="submit" className={`${styleStorage.btnRegister} btnSubmit`} onClick={adminCreate}>등록</button> 
                 </div>
             </form>
         </>
