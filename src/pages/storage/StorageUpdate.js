@@ -83,9 +83,9 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
         e.preventDefault();
 
         //선반 선택을 하고, 비활성화가 아닌경우 적재 상태를 선택해야하도록
-        if(!selectedRack && !disableValues.disabledRack){
-            return null;
-        }
+        // if(!selectedRack && !disableValues.disabledRack){
+        //     return null;
+        // }
 
         //창고 정보 수정 파라미터
         const storageModifyReq = {
