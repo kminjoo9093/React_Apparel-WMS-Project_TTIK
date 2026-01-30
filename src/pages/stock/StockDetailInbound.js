@@ -170,7 +170,7 @@ function StockDetailInbound() {
             // 3. 대소문자 구분 없이 박스 여부 및 상품코드 추출
             const parts = fullBarcode.split('-');
             //const isBoxScan = fullBarcode.toUpperCase().includes('-B');
-            const boxMatch = fullBarcode.match(/^(.*)-B(\d+)-(\d+)(?:-(\d+))?$/);
+            const boxMatch = fullBarcode.match(/^(.*)-B(\d+)-(\d+)(?:-(\d+))?$/i);
         
             let productId = "";
             let incrementValue = 1;
