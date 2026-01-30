@@ -63,6 +63,12 @@ function StorageDelete ({storageList, onUpdate, setView}) {
 
         e.preventDefault();
 
+        //삭제 체크가 하나도 없을 경우
+        if(!isCheckedDelete.deleteStorage && !isCheckedDelete.deleteZone && !isCheckedDelete.deleteRack) {
+            alert("삭제 버튼을 눌러 체크 후 삭제를 진행하세요");
+            return;
+        }
+
         // 창고 삭제시 관련 관리자 삭제
         const currentStorageNm = storageList.find(s => s.storageSn === selectedStorage)?.storageNm;
 

@@ -255,20 +255,20 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
                     <div className={styleLayout.notiHeader}>
                       <span>최근 알림</span>
                       <button 
-                        onClick={() => {
-                          localStorage.removeItem('readNotifications');
-                          window.location.reload();
-                        }}
-                        style={{ fontSize: '10px', color: '#ef4444', cursor: 'pointer', border: 'none', background: 'none' }}
-                          // onClick={handleAllRead} // 분리한 함수 연결
-                          // style={{ 
-                          //   fontSize: '12px', 
-                          //   color: '#64748b', 
-                          //   cursor: 'pointer', 
-                          //   border: 'none', 
-                          //   background: 'none', 
-                          //   fontWeight: '500' 
-                          // }}
+                        // onClick={() => {
+                        //   localStorage.removeItem('readNotifications');
+                        //   window.location.reload();
+                        // }}
+                        // style={{ fontSize: '10px', color: '#ef4444', cursor: 'pointer', border: 'none', background: 'none' }}
+                          onClick={handleAllRead} // 분리한 함수 연결
+                          style={{ 
+                            fontSize: '12px', 
+                            color: '#64748b', 
+                            cursor: 'pointer', 
+                            border: 'none', 
+                            background: 'none', 
+                            fontWeight: '500' 
+                          }}
                       >
                         [모두 읽음]
                       </button>

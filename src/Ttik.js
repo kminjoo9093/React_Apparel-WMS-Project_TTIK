@@ -16,7 +16,8 @@ import ProductList from "./pages/product/ProductList";
 import Plans from "../src/pages/stock/StockPlans";
 import QRsave from "./pages/qrcode/QRsave";
 import History from "../src/pages/stock/StockHistory";
-import StockDetail from "./pages/stock/StockDetail";
+import StockDetailInbound from "./pages/stock/StockDetailInbound";
+import StockDetailOutbound from "./pages/stock/StockDetailOutbound";
 import Storage from "./pages/storage/Storage";
 
 function Ttik() {
@@ -75,7 +76,9 @@ function Ttik() {
                 <Route path="/brand" element={<Brand />} />
                 <Route path="/partner" element={<Partner />} />
                 <Route path="/stock/plans" element={<Plans />} />
-                <Route path="/stock/plans/:productCd" element={<StockDetail />} />
+                <Route path="/stock/plans/inbound/:productCd" element={<StockDetailInbound />} />
+                <Route path="/stock/plans/outbound/:productCd" element={<StockDetailOutbound />} />
+                {/* <Route path="/register" element={<ProductRegister />} /> */}
                 <Route path="/product/register" element={<ProductRegister />} />
                 <Route path="/register/admin" element={<RegisterAdmin />} />
                 <Route path="/product/productDetail/:gds_cd" element={<ProductDetail />} />
