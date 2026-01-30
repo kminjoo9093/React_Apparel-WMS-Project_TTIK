@@ -101,7 +101,6 @@ function ProductRegister(){
         qty: "",
         price: "",
         threshold: "",
-        // init: ""
     });
 
     const validateNumber = (e) => {        
@@ -116,8 +115,6 @@ function ProductRegister(){
                     break;
                 case "threshold" : setThreshold(value);
                     break;
-                // case "frstStock" : setFrstStock(value);
-                //     break;
             }
         }
 
@@ -138,7 +135,6 @@ function ProductRegister(){
         console.log("카테고리", cat);
         setCategory(cat);
         setSizeCd("");
-        // setSizeList(sizeMap[cat] || []);
     }
 
     //스타일 넘버 -> 품번
@@ -153,7 +149,11 @@ function ProductRegister(){
         const startAlphas = ["W", "M", "U", "K"];
         const isValid = startAlphas.some(alpha => value.startsWith(alpha));
 
-        if(value.length > 0 && isValid){
+        //첫 글자 뒤 3자리가 숫자인지 확인
+        const num = Number(value.substring(1));
+        const isNumber = Number.isInteger(num) && num > 0 && num < 1000;
+
+        if(value.length === 4 && isValid && isNumber){ 
             setStyleNo(value);
 
             const target = value.substring(0, 1);
@@ -230,10 +230,9 @@ function ProductRegister(){
 
         // 상품 코드 생성
         const newProductCd = await generateProductCd();
-        console.log("qr1 -> ", newProductCd);
 
         // 모달 오픈
-        openModal("QR코드 생성", <ProductCode onClose={closeModal} productCd={newProductCd} setProductCd={setProductCd}/>)
+        openModal("상품 코드 생성", <ProductCode onClose={closeModal} productCd={newProductCd} setProductCd={setProductCd}/>)
     }
 
     // 인풋 값 변경 시 상품 코드 초기화
