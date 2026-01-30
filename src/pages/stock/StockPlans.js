@@ -17,7 +17,7 @@ function StockPlans() {
     
     // 페이지네이션 상태
     const [currentPage, setCurrentPage] = useState(1);
-    const postsPerPage = 5;
+    const postsPerPage = 10;
 
     // 데이터 호출 함수
     const fetchStockPlanList = async () => {
@@ -63,8 +63,6 @@ function StockPlans() {
     const totalPages = Math.ceil(currentList.length / postsPerPage);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-    
 
     return (
         <div>
@@ -125,24 +123,31 @@ function StockPlans() {
                                     <tr><td colSpan="8" style={{textAlign:'center', padding:'2rem'}}>데이터를 불러오는 중입니다...</td></tr>
                                 ) : currentPosts.length > 0 ? (
                                     currentPosts.map((item, index) => {
-                                        const date = item.IN_PLAN_DATE || item.OUT_PLAN_DATE || item.PLAN_YMD;
-                                        const target = item.BRAND_NM || item.PARTNER_NM || item.PARTNER_SN;
-                                        const product = item.GDS_NM || item.GDS_CD;
+                                        const date = item.IN_PLAN_DATE || item.OUT_PLAN_DATE || item.PLAN_YMD || '-';
+                                        const product = item.GDS_NM || item.GDS_CD || '상품정보없음';
                                         const price = item.UNTPRC || 0;
-                                        const qty = plansType === "InBound" 
-                                            ? (item.TOTAL_EA_QTY || 0) 
-                                            : (item.OUT_PLAN_QTY || item.GDS_QTY || 0);
 
-                                        const boxCount = item.BOX_COUNT || 1;
+                                        const target = plansType === "OutBound" 
+                                            ? (item.PARTNER_NM || item.BRAND_NM || item.PARTNER_SN || "미지정")
+                                            : (item.BRAND_NM || item.PARTNER_NM || item.PARTNER_SN || "미지정");
+                                        
+                                        const doneQty = Number(item.COMPLETED_QTY || 0);
+                                        const totalQty = plansType === "InBound" 
+                                            ? Number(item.TOTAL_EA_QTY || 0) 
+                                            : Number(item.TOTAL_QTY || item.TOTAL_OUT_QTY || item.GDS_QTY || 0);
+
+                                        let statusText = item.STATUS || "대기";
+                                        if (totalQty > 0) {
+                                            if (doneQty >= totalQty) statusText = "완료";
+                                            else if (doneQty > 0) statusText = "진행중";
+                                            else statusText = "대기";
+                                        }
 
                                         return (
                                             <tr 
                                                 key={item.IN_PLAN_SN || item.OUT_PLAN_SN || index} 
                                                 onClick={() => {
-                                                    // API에서 직접 내려주는 GDS_CD 확인
                                                     let productCode = item.GDS_CD || item.gdsCd;
-
-                                                    // GDS_CD가 없다면 BOX_LIST에서 추출 
                                                     if (!productCode && item.BOX_LIST) {
                                                         const firstBox = item.BOX_LIST.split(',')[0].trim();
                                                         const parts = firstBox.split('-');
@@ -150,25 +155,22 @@ function StockPlans() {
                                                             productCode = parts.slice(0, 3).join('-');
                                                         }
                                                     }
-                                                    // 그 외 BOX_CD 확인
                                                     if (!productCode && item.BOX_CD) {
                                                         productCode = item.BOX_CD.split('-').slice(0, 3).join('-');
                                                     }
-
-                                                    console.log("최종 추출된 상품코드:", productCode);
-
                                                     if (!productCode || productCode === "undefined") {
                                                         alert(`상품 코드를 인식할 수 없습니다.`);
                                                         return;
                                                     }
-                                                    
-                                                    // 상세 페이지로 이동
-                                                   navigate(`/stock/plans/${productCode}`, { 
-                                                                state: { 
-                                                                    type: plansType, 
-                                                                    planYmd: date    
-                                                                } 
-                                                            });
+                                                    if (plansType === "InBound") {
+                                                        navigate(`/stock/plans/inbound/${productCode}`, {
+                                                             state: { planYmd: date, type: "InBound" }
+                                                        });
+                                                    } else {
+                                                        navigate(`/stock/plans/outbound/${productCode}`, {
+                                                             state: { planYmd: date, type: "OutBound" }
+                                                        });
+                                                    }
                                                 }}
                                                 className={stylePlans.tableRow}
                                             >
@@ -176,12 +178,21 @@ function StockPlans() {
                                                 <td>{date}</td>
                                                 <td>{target}</td>
                                                 <td>{product}</td> 
-                                                <td>{0}/{qty.toLocaleString()}</td> 
-                                                <td>{price.toLocaleString()}</td>
-                                                <td>{(qty * price).toLocaleString()}</td>
                                                 <td>
-                                                    <span className={stylePlans.statusBadge}>
-                                                        {0 === qty ? '완료' : '대기'}
+                                                    <span style={{ 
+                                                        fontWeight: 'bold', 
+                                                        color: (doneQty === totalQty && totalQty !== 0) ? '#28a745' : '#007bff' 
+                                                    }}>
+                                                        {doneQty.toLocaleString()}
+                                                    </span>
+                                                    <span style={{ color: '#999', margin: '0 2px' }}>/</span>
+                                                    {totalQty.toLocaleString()}
+                                                </td> 
+                                                <td>{price.toLocaleString()}</td>
+                                                <td>{(totalQty * price).toLocaleString()}</td>
+                                                <td>
+                                                    <span className={`${stylePlans.statusBadge} ${statusText === '완료' ? stylePlans.statusDone : ''}`}>
+                                                        {statusText}
                                                     </span>
                                                 </td>
                                             </tr>
