@@ -123,12 +123,12 @@ function StorageList({storageList:storageOptions=[]}){
 
     const handleRackStts = (rackStts, hasBox, rackEnabled) => {
         
-        if(rackEnabled === "N") return "비었음"; //사용불가
+        if(rackEnabled === "N") return {text:"비었음", color:"#333"}; //사용불가
 
         if(rackStts === "Y"){ //선반 사용가능 상태
-            return hasBox ? "사용중" : "비었음";
+            return hasBox ? {text:"사용중", color:"#10b981"} : {text:"비었음", color:"#333"};
         } else {
-            return "포화";
+            return {text:"포화", color:"#cf1322"};
         }
 
         // return hasBox ? "포화" : "사용대기";
@@ -258,7 +258,9 @@ function StorageList({storageList:storageOptions=[]}){
                                 <td>{(currentPage-1)*postsPerPage + index + 1}</td>
                                 <td>{data.storageNm}</td>
                                 <td>{data.rackNm}</td>
-                                <td>{handleRackStts(data.rackStts, data.hasBox, data.rackEnabled)}</td>
+                                <td style={{color: handleRackStts(data.rackStts, data.hasBox, data.rackEnabled).color}}>
+                                    {handleRackStts(data.rackStts, data.hasBox, data.rackEnabled).text}
+                                </td>
                                 <td>{data.rackEnabled === "Y" ? "활성화" : "비활성화"}</td>
                             </tr>
                         ))
@@ -293,6 +295,8 @@ function StorageList({storageList:storageOptions=[]}){
                                 </thead>
                                 <tbody>
                                      {
+                                        rackDetailList?.boxes && rackDetailList.boxes.length > 0
+                                        ? 
                                         rackDetailList?.boxes?.map((box, index) => {
                                         return (
                                              <tr key={box.boxQr}>
@@ -312,6 +316,12 @@ function StorageList({storageList:storageOptions=[]}){
                                                 </td>
                                             </tr>
                                         )})
+                                        :
+                                        (
+                                            <tr className={styleStorage.emptyRack}>
+                                                <td colSpan={5}>해당 선반에 적재된 상자가 없습니다.</td>
+                                            </tr>
+                                        )
                                     }
                                 </tbody>
                             </table>
