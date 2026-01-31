@@ -30,7 +30,14 @@ const RegisterAdmin = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
+    const trimmedId = formData.id.trim();
+    const trimmedPassword = formData.password.trim();
+    const trimmedConfirmPassword = formData.confirmPassword.trim();
+    const trimmedNickname = formData.nickname.trim();
+    const trimmedMonitorStorage = formData.monitorStorage.trim();
+
+    // 비밀번호 일치 확인 시 trim 적용값 사용
+    if (trimmedPassword !== trimmedConfirmPassword) {
       setModal({
         isOpen: true,
         title: 'Input Error',
@@ -50,7 +57,7 @@ const RegisterAdmin = () => {
       return;
     }
 
-    if (formData.storage === 'MONITOR' && !formData.monitorStorage) {
+    if (formData.storage === 'MONITOR' && !trimmedMonitorStorage) {
       setModal({
         isOpen: true,
         title: 'Input Error',
@@ -61,10 +68,10 @@ const RegisterAdmin = () => {
     }
 
     const submitData = {
-      mngrId: formData.id,
-      mngrPswd: formData.password,
-      nickname: formData.nickname,
-      tkcgStorage: formData.storage === 'MONITOR' ? formData.monitorStorage : formData.storage
+      mngrId: trimmedId,
+      mngrPswd: trimmedPassword,
+      nickname: trimmedNickname,
+      tkcgStorage: formData.storage === 'MONITOR' ? trimmedMonitorStorage : formData.storage
     };
 
     try {
