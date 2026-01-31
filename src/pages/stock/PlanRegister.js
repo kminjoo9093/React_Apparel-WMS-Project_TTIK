@@ -78,15 +78,27 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
 
             // 브랜드 변경 시 하위 항목 초기화
             if (name === 'targetName' || name === 'brand') {
-                nextData.category = ''; nextData.itemName = ''; nextData.untprc = 0;
-                nextData.boxCode = ''; nextData.currentStock = 0;
+                nextData.category = '';
+                nextData.itemName = '';
+                nextData.untprc = 0;
+                nextData.boxCode = '';
+                nextData.currentStock = 0;
             }
 
-            // 상품 선택 시 단가 매칭 및 박스 정보 초기화
+            // 상품 선택 시 단가 매칭 및 박스 정보 초기화 + 입수량 기본값 세팅
             if (name === 'itemName') {
-                const selectedProduct = selectOptions.Product?.find(p => String(p.GDS_CD) === String(value));
+                const selectedProduct = selectOptions.Product?.find(
+                    p => String(p.GDS_CD) === String(value)
+                );
+
                 nextData.untprc = selectedProduct ? (selectedProduct.UNTPRC || 0) : 0;
-                nextData.boxCode = ''; nextData.currentStock = 0;
+                nextData.boxCode = '';
+                nextData.currentStock = 0;
+
+                // ⭐ 입고일 때만 INBOX_QTY를 eaQuantity 기본값으로 세팅
+                if (currentType === "InBound") {
+                    nextData.eaQuantity = selectedProduct?.INBOX_QTY ?? 1;
+                }
             }
 
             // [출고] 박스 선택 시 해당 박스 재고 업데이트
@@ -108,6 +120,7 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
             return nextData;
         });
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
