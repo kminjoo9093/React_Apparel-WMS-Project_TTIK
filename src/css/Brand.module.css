@@ -206,3 +206,14 @@
 .submitBtn:hover{
     background-color: #e2e8f0;
 }
+
+
+@media (max-width: 876px){
+    .searchBox{
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        margin-bottom: 2rem;
+    }
+
+}
