@@ -31,7 +31,7 @@ function ProductList(){
     const [currentPage, setCurrentPage] = useState(1);
     const postsPerPagePC = 10; // 한페이지에 10개씩 (Pc)
     const [totalPages, setTotalPages] = useState(null);
-    const [totalElements, setTotalElements] = useState(null);
+    const [totalElements, setTotalElements] = useState(null); //전체 상품 수
     const indexOfLast = currentPage * postsPerPagePC;
     const indexOfFirst = indexOfLast - postsPerPagePC;
 
@@ -161,25 +161,25 @@ function ProductList(){
                 console.log("응답 상태:", res.status);
                 if(res.ok){
                     const data = await res.json();
+
+                    const products = data.content || [];
+                    const total = data.totalPages || 0;
                     
                     if(isMobile) {
-                        // data가 배열인지, Page 객체의 content인지 확인 후 적용
-                        const newItems = data.content || data; 
-
-                        setProductList(newItems);
-
-                        if(data.length > 0){
-                            if (data.length < 5){
+                        setProductList(products);
+                        setTotalElements(total);
+                        if(products.length > 0){
+                            if (products.length < 5){
                                 setHasMore(false); // 가져온 데이터가 요청한 size(5개)보다 적으면 더 가져올 게 없다고 판단
                                 return;
                             } 
                         } else {
                             setHasMore(false);
                         }
-                    } else {
+                    } else { //pc
                         setTotalElements(data.totalElements);
-                        setProductList(data.content);
-                        setTotalPages(data.totalPages);
+                        setProductList(products); 
+                        setTotalPages(total);
                     }
                 }
             } catch (error){
@@ -213,6 +213,7 @@ function ProductList(){
         const observer = new IntersectionObserver((entries) => {
             if(entries[0].isIntersecting){
                 console.log("바닥 감지");
+                if (isScrollingToTop.current) return;
 
                 if(productList.length > 0){
                     //모바일 리스트 fetch
@@ -333,6 +334,68 @@ function ProductList(){
         setCurrentPage(1);
     }
 
+    const isScrollingToTop = useRef(false);
+    const scrollContainerRef = useRef(null);
+    // const listRef = useRef(null);
+    const [showBtn, setShowBtn] = useState(false);
+
+
+    // useEffect(() => {
+    //     const scrollContainer = document.querySelector('.scrollArea'); // 상위 scroll div
+    //     if (!scrollContainer) {
+    //         console.warn('scrollArea not found, fallback to window');
+    //     }
+    //     scrollContainerRef.current = scrollContainer || document.scrollingElement;
+
+    //     const handleScroll = () => {
+    //         if (!scrollContainerRef.current) return;
+    //         setShowBtn(scrollContainerRef.current.scrollTop > 300);
+    //     };
+
+    //     const el = scrollContainerRef.current;
+    //     el.addEventListener('scroll', handleScroll);
+
+    //     return () => el.removeEventListener('scroll', handleScroll);
+    // }, []);
+
+    useEffect(()=>{
+
+        const el = document
+        .querySelector(`.${styleList.productListBox}`)
+        ?.closest('[style*="overflow"], [class]');
+
+        let current = el;
+
+        while (current) {
+            const style = getComputedStyle(current);
+            if (
+                /(auto|scroll)/.test(style.overflowY) &&
+                current.scrollHeight > current.clientHeight
+            ) {
+                scrollContainerRef.current = current;
+                break;
+            }
+            current = current.parentElement;
+        }
+
+        if (!scrollContainerRef.current) {
+            scrollContainerRef.current = document.scrollingElement;
+        }
+    }, [])
+
+    useEffect(() => {
+        const el = scrollContainerRef.current;
+        if (!el) return;
+
+        const handleScroll = () => {
+            setShowBtn(el.scrollTop > 300);
+        };
+
+        el.addEventListener("scroll", handleScroll);
+        return () => el.removeEventListener("scroll", handleScroll);
+    }, []);
+
+
     return(
         <div>
             <div className={styleMainDashBoard.welcomeSection}>
@@ -442,7 +505,7 @@ function ProductList(){
                                                         </div>
                                                     </div>
                                                     <div className={styleList.date}>
-                                                        <span className={styleList.infoLabel}>등록일</span>
+                                                        <span className={styleList.infoLabel}>최초 등록일</span>
                                                         {product.frstRegDt.split('T')[0]}
                                                     </div>
                                                 </div>
@@ -473,6 +536,21 @@ function ProductList(){
                             )
                 }
             </div>
+            {
+                isMobile && showBtn && (
+                    <button className={styleList.scrollToTopBtn} 
+                            onClick={()=>{
+                                isScrollingToTop.current = true;
+                                console.log("위로 가기 버튼 클릭");
+                                scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+
+                                setTimeout(() => {
+                                    isScrollingToTop.current = false;
+                                    }, 800); // smooth scroll 끝날 시간
+                                }}
+                    ></button>
+                )
+            }
         </div>
     )
 }
