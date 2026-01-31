@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import styleLogin from '../../css/Login.module.css';
 import Modal from '../../components/Modal';
 import serverUrl from "../../db/server.json"
@@ -9,7 +9,7 @@ const Login = ({ setUser, setIsLoggedIn }) => {
   const closeModal = () => setModal({ ...modal, isOpen: false });
   const [formData, setFormData] = useState({ id: '', password: '' });
   const [isAltSlogan, setIsAltSlogan] = useState(false);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const SERVER_URL = serverUrl.SERVER_URL;
 
   const handleChange = (e) => {
@@ -21,44 +21,44 @@ const Login = ({ setUser, setIsLoggedIn }) => {
     setIsAltSlogan(!isAltSlogan);
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const params = new URLSearchParams();
-  params.append('mngrId', formData.id);
-  params.append('mngrPswd', formData.password);
+    const params = new URLSearchParams();
+    params.append('mngrId', formData.id);
+    params.append('mngrPswd', formData.password);
 
-  try {
-    const response = await fetch(`${SERVER_URL}/ttik/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: params,
-      credentials: 'include',
-    });
-
-    if (response.ok) {
-      const meResponse = await fetch(`${SERVER_URL}/ttik/me`, {
-        method: 'GET',
+    try {
+      const response = await fetch(`${SERVER_URL}/ttik/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params,
         credentials: 'include',
       });
-      
-      if (meResponse.ok) {
-        const userData = await meResponse.json();
-        
-        setModal({
-          isOpen: true,
-          title: 'Welcome',
-          message: `${userData.nickname}님, 환영합니다.`,
-          onConfirm: () => {
-            setUser(userData);
-            setIsLoggedIn(true);
-            navigate("/ttik");
-          }
+
+      if (response.ok) {
+        const meResponse = await fetch(`${SERVER_URL}/ttik/me`, {
+          method: 'GET',
+          credentials: 'include',
         });
-      }
-    } else if (response.status === 401) {
+
+        if (meResponse.ok) {
+          const userData = await meResponse.json();
+
+          setModal({
+            isOpen: true,
+            title: 'Welcome',
+            message: `${userData.nickname}님, 환영합니다.`,
+            onConfirm: () => {
+              setUser(userData);
+              setIsLoggedIn(true);
+              navigate("/ttik");
+            }
+          });
+        }
+      } else if (response.status === 401) {
         setModal({
           isOpen: true,
           title: 'Again',
@@ -86,68 +86,68 @@ const Login = ({ setUser, setIsLoggedIn }) => {
 
   return (
     <>
-    <Modal 
-        {...modal} 
-    />
-    <div className={styleLogin.modernLoginContainer}>
-      <div className={styleLogin.loginGlassCard}>
-        <div className={styleLogin.loginBrandSection}>
-          <div className={styleLogin.brandLogoLarge}>TTIK</div>
-          
-          <div className={styleLogin.brandContent}>
-            <div className={styleLogin.sloganWrapper} onClick={toggleSlogan}>
-              <div className={`${styleLogin.sloganShifter} ${isAltSlogan ? styleLogin.shifted : ''}`}>
-                <div className={`${styleLogin.sloganItem} ${styleLogin.sloganItemMain}`}>
-                  Tap To Inventory Keeping
-                </div>
-                <div className={`${styleLogin.sloganItem} ${styleLogin.sloganItemAlt}`}>
-                  Time To Inventory Keep
+      <Modal
+        {...modal}
+      />
+      <div className={styleLogin.modernLoginContainer}>
+        <div className={styleLogin.loginGlassCard}>
+          <div className={styleLogin.loginBrandSection}>
+            <div className={styleLogin.brandLogoLarge}>TTIK</div>
+
+            <div className={styleLogin.brandContent}>
+              <div className={styleLogin.sloganWrapper} onClick={toggleSlogan}>
+                <div className={`${styleLogin.sloganShifter} ${isAltSlogan ? styleLogin.shifted : ''}`}>
+                  <div className={`${styleLogin.sloganItem} ${styleLogin.sloganItemMain}`}>
+                    Tap To Inventory Keeping
+                  </div>
+                  <div className={`${styleLogin.sloganItem} ${styleLogin.sloganItemAlt}`}>
+                    Time To Inventory Keep
+                  </div>
                 </div>
               </div>
+              <p className={styleLogin.subText}>스마트한 재고 관리의 시작, 띡</p>
             </div>
-            <p className={styleLogin.subText}>스마트한 재고 관리의 시작, 띡</p>
+
+            <div className={styleLogin.visualElements}>
+              <div className={styleLogin.floatingBox}>📦</div>
+              <div className={styleLogin.floatingBox}>📦</div>
+              <div className={styleLogin.floatingBox}>📦</div>
+            </div>
           </div>
 
-          <div className={styleLogin.visualElements}>
-            <div className={styleLogin.floatingBox}>📦</div>
-            <div className={styleLogin.floatingBox}>📦</div>
-            <div className={styleLogin.floatingBox}>📦</div>
-          </div>
-        </div>
+          <div className={styleLogin.loginFormSection}>
+            <div className={styleLogin.formHeader}>
+              <h3>Login</h3>
+            </div>
 
-        <div className={styleLogin.loginFormSection}>
-          <div className={styleLogin.formHeader}>
-            <h3>Login</h3>
+            <form className={styleLogin.modernForm} onSubmit={handleSubmit}>
+              <div className={styleLogin.inputField}>
+                <label>아이디</label>
+                <input
+                  type="text"
+                  name="id"
+                  value={formData.id}
+                  placeholder="ID"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className={styleLogin.inputField}>
+                <label>비밀번호</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  placeholder="••••••••"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <button type="submit" className={styleLogin.loginSubmitBtn}>접속하기</button>
+            </form>
           </div>
-          
-          <form className={styleLogin.modernForm} onSubmit={handleSubmit}>
-            <div className={styleLogin.inputField}>
-              <label>아이디</label>
-              <input 
-                type="text" 
-                name="id" 
-                value={formData.id} 
-                placeholder="ID" 
-                onChange={handleChange} 
-                required 
-              />
-            </div>
-            <div className={styleLogin.inputField}>
-              <label>비밀번호</label>
-              <input 
-                type="password" 
-                name="password" 
-                value={formData.password} 
-                placeholder="••••••••" 
-                onChange={handleChange} 
-                required 
-              />
-            </div>
-            <button type="submit" className={styleLogin.loginSubmitBtn}>접속하기</button>
-          </form>
         </div>
       </div>
-    </div>
     </>
   );
 };

@@ -74,12 +74,14 @@ function StockPlans() {
                     <button 
                         className={`${stylePlans.plansBtn} ${plansType === 'InBound' ? stylePlans.active : ''}`} 
                         onClick={() => handleTypeChange("InBound")}
+                        style={{ backgroundColor : plansType === "InBound" ? "lightgray" : ""}}
                     >
                         입고 예정 조회
                     </button>
                     <button 
                         className={`${stylePlans.plansBtn} ${plansType === 'OutBound' ? stylePlans.active : ''}`} 
                         onClick={() => handleTypeChange("OutBound")}
+                        style={{ backgroundColor : plansType === "OutBound" ? "lightgray" : ""}}
                     >
                         출고 예정 조회
                     </button>
@@ -87,6 +89,7 @@ function StockPlans() {
                         style={plansType === null ? { display: 'none' } : {}}
                         className={stylePlans.plansBtn} 
                         onClick={() => setIsModalOpen(true)}
+                        
                     >
                         + 새 일정 등록
                     </button>
@@ -136,11 +139,11 @@ function StockPlans() {
                                             ? Number(item.TOTAL_EA_QTY || 0) 
                                             : Number(item.TOTAL_QTY || item.TOTAL_OUT_QTY || item.GDS_QTY || 0);
 
-                                        let statusText = item.STATUS || "대기";
+                                        let statusText = item.STATUS || (plansType === "InBound" ? "입고 대기" : "출고 대기");
                                         if (totalQty > 0) {
-                                            if (doneQty >= totalQty) statusText = "완료";
-                                            else if (doneQty > 0) statusText = "진행중";
-                                            else statusText = "대기";
+                                            if (doneQty >= totalQty) { statusText = plansType === "InBound" ? "입고 완료" : "출고 완료"; }
+                                            else if (doneQty > 0) { statusText = plansType === "InBound" ? "입고 진행중" : "출고 진행중"; }
+                                            else { statusText = plansType === "InBound" ? "입고 대기" : "출고 대기"; }
                                         }
 
                                         return (

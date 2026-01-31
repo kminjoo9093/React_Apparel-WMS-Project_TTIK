@@ -222,7 +222,7 @@
 .btnRemove{
     position: absolute;
     top: 50%;
-    right: -2rem;
+    right: -5rem;
     transform: translateY(-50%) scale(0.8);
     background: var(--gray-e2) url(/src/resources/images/storage/iconDash.svg) no-repeat center / 50% auto;
 }
