@@ -34,6 +34,7 @@ function ProductRegister(){
     // const [frstStock, setFrstStock] = useState(0); //초기 재고량
     
     const [productCd, setProductCd] = useState("");
+    
     // const [boxCd, setBoxCd] = useState("");
 
     const [searchWord, setSearchWord] = useState("");
@@ -190,6 +191,7 @@ function ProductRegister(){
             
             if(sizeData){
                 setSizeMap(sizeData);
+                console.log("데이터 확인 ~~~~" + sizeData);
             } else {
                 setSizeMap({});
             }

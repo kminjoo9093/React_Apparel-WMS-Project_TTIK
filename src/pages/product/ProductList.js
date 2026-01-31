@@ -66,11 +66,16 @@ function ProductList(){
         const urlSearch = params.get('search') || "";
         const urlStatus = params.get('status') || "";
 
+        // 1. 필터 상태 업데이트
         setSearchFilters(prev => ({
             ...prev,
             keyword: urlSearch,
             stkStatus: urlStatus
         }));
+
+        // 2. 입력창 상태 업데이트 (이 부분이 추가되어야 검색창에 글자가 남습니다)
+        setKeywordInput(urlSearch);
+
         setCurrentPage(1); // 검색 시 1페이지로
     }, [location.search]);
 
@@ -284,11 +289,13 @@ function ProductList(){
 
     // 검색 버튼 클릭 시 (실제 필터 적용)
     const handleSearchClick = () => {
+        const trimmedKeyword = keywordInput.trim();
         setSearchFilters(prev => ({
             ...prev,
             keyword: keywordInput.trim() // 현재 입력된 값을 필터에 세팅
         }));
 
+        setKeywordInput(trimmedKeyword);
         setCurrentPage(1);
 
         if(isMobile){

@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import PartnerRegister from './PartnerRegister';
 import stylePartner from "../../css/Partner.module.css";
 import serverUrl from "../../db/server.json";
+import Modal from '../../components/Modal';
 
 function PartnerList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [partners, setPartners] = useState([]); // 변수명 소문자 권장
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const closeModal = () => setModal({ ...modal, isOpen: false });
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const postsPerPage = 10; 
@@ -67,7 +70,12 @@ function PartnerList() {
     // 4. 삭제 로직
     const handleDelete = async () => {
         if (selectedIds.length === 0) {
-            alert("삭제할 거래처를 선택해 주세요.");
+            setModal({
+                isOpen: true,
+                title: 'Again',
+                message: '삭제할 거래처를 선택해 주세요.',
+                onConfirm: closeModal
+            });  
             return;
         }
         if (window.confirm(`선택한 ${selectedIds.length}개의 거래처를 삭제하시겠습니까?`)) {
@@ -79,12 +87,22 @@ function PartnerList() {
                     body: JSON.stringify(selectedIds), 
                 });
                 if (response.ok) {
-                    alert("삭제되었습니다.");
+                    setModal({
+                        isOpen: true,
+                        title: 'DELETE',
+                        message: '삭제되었습니다.',
+                        onConfirm: closeModal
+                    }); 
                     // 서버를 다시 호출하는 대신 로컬 상태에서 즉시 제거 (성능 최적화)
                     setPartners(prev => prev.filter(p => !selectedIds.includes(p.partnerSn)));
                     setSelectedIds([]);
                 } else {
-                    alert("삭제 실패");
+                    setModal({
+                        isOpen: true,
+                        title: 'Error',
+                        message: '삭제 실패',
+                        onConfirm: closeModal
+                    }); 
                 }
             } catch (error) {
                 console.error("삭제 에러:", error);
@@ -98,6 +116,10 @@ function PartnerList() {
     };
 
     return (
+        <>
+        <Modal
+            {...modal} 
+        />
         <div> 
             {/* CSS Module 클래스명은 소문자로 시작하는 파일 내용과 일치시킴 */}
             <h1 className={stylePartner.partnerTitle}>Partner</h1>
@@ -197,6 +219,7 @@ function PartnerList() {
                 )}
             </div>
         </div>
+        </>
     );
 }
 

@@ -147,13 +147,15 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
   
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
-      if (searchKeyword.trim() === "") {
-        navigate('/product/list');
+      const trimmedKeyword = searchKeyword.trim(); // 공백 제거
+      
+    if (trimmedKeyword === "") {
+      navigate('/product/list');
       } else {
-        navigate(`/product/list?search=${encodeURIComponent(searchKeyword)}`);
+      navigate(`/product/list?search=${encodeURIComponent(trimmedKeyword)}`);
       }
-      setSearchKeyword("");
-    }
+      
+    } 
   };
 
   
