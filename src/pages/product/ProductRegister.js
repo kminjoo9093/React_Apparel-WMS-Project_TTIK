@@ -7,6 +7,7 @@ import ProductSeason from "./ProductSeason";
 import ProductCode from "./ProductCode";
 import ModalBrandSearch from "./ModalBrandSearch";
 import serverUrl from "../../db/server.json";
+import Modal from "../../components/Modal";
 
 function ProductRegister(){
 
@@ -29,6 +30,7 @@ function ProductRegister(){
     // const [frstStock, setFrstStock] = useState(0); //초기 재고량
     
     const [productCd, setProductCd] = useState("");
+    
     // const [boxCd, setBoxCd] = useState("");
 
     const [searchWord, setSearchWord] = useState("");
@@ -179,6 +181,7 @@ function ProductRegister(){
             
             if(sizeData){
                 setSizeMap(sizeData);
+                console.log("데이터 확인 ~~~~" + sizeData);
             } else {
                 setSizeMap({});
             }
