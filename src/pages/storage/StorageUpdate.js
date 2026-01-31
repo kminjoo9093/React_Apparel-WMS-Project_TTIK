@@ -2,6 +2,7 @@ import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
+import Modal from "../../components/Modal";
 
 function StorageUpdate ({storageList, onUpdate, setView}) {
 
@@ -17,6 +18,10 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
         disabledRack: false
     })
 
+    //alert
+    const closeAlert = () => setModal({ ...modal, isOpen: false });
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+
 
     const handleSelectStorage = (e) => {
         setSelectedStorage(Number(e.target.value));
@@ -31,12 +36,24 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
         const {name, checked} = e.target;
 
         if(name === "disabledZone" && !selectedZone){
-            alert("구역을 먼저 선택해주세요.");
+            setModal({
+                isOpen: true,
+                title: '입력값 확인',
+                message: '구역을 먼저 선택해주세요.',
+                onConfirm: closeAlert
+            });
+            // alert("구역을 먼저 선택해주세요.");
             return;
         }
 
         if(name === "disabledRack" && !selectedRack){
-            alert("선반을 먼저 선택해주세요.");
+            setModal({
+                isOpen: true,
+                title: '입력값 확인',
+                message: '선반을 먼저 선택해주세요.',
+                onConfirm: closeAlert
+            });
+            // alert("선반을 먼저 선택해주세요.");
             return;
         }
 
@@ -83,9 +100,19 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
         e.preventDefault();
 
         //선반 선택을 하고, 비활성화가 아닌경우 적재 상태를 선택해야하도록
-        // if(!selectedRack && !disableValues.disabledRack){
-        //     return null;
-        // }
+        if(selectedRack !== "" && !disableValues.disabledRack){
+            if(rackCapacity === ""){
+                setModal({
+                    isOpen: true,
+                    title: '입력값 확인',
+                    message: '선반 적재 상태를 선택하세요.',
+                    onConfirm: closeAlert
+                });
+                // alert("선반 적재 상태를 선택하세요.");
+                return;
+            }
+        }
+
 
         //창고 정보 수정 파라미터
         const storageModifyReq = {
@@ -101,16 +128,19 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
 
         let confirmMsg = "수정을 진행하시겠습니까?";
 
+        const newRackStatus = rackCapacity === "Y" ? "여유" : "포화";
+
         // 구역만 활성화하는 경우
         if (selectedZone && !disableValues.disabledZone && !selectedRack) {
-            confirmMsg = "해당 구역을 활성화 상태로 수정하시겠습니까?";
+            // confirmMsg = "해당 구역을 활성화 상태로 수정하시겠습니까?";
+            confirmMsg = `해당 구역을 활성화 상태로 수정하시겠습니까?`;
         } 
         // 선반을 수정하는 경우
         else if (selectedZone && selectedRack) {
             if (disableValues.disabledRack) {
                 confirmMsg = "해당 선반을 비활성화 상태로 수정하시겠습니까?";
             } else {
-                confirmMsg = "해당 선반을 활성화 상태로 수정하시겠습니까?";
+                confirmMsg = `해당 선반을 ${newRackStatus}상태로 활성화하시겠습니까?`;
             }
         }
         // 구역 자체를 비활성화하는 경우 
@@ -129,7 +159,13 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
             });
             if(res.ok){
                 const data = await res.json();
-                alert(data.message);
+                setModal({
+                    isOpen: true,
+                    title: '수정 성공',
+                    message: data.message,
+                    onConfirm: closeAlert
+                });
+                // alert(data.message);
 
                 resetForm();
                 if(onUpdate) onUpdate();
@@ -138,7 +174,13 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
             } else {
                 console.log("수정 요청 실패-->", res.status);
                 const errorData = await res.json();
-                alert(errorData.message);
+                setModal({
+                    isOpen: true,
+                    title: '수정 실패',
+                    message: errorData.message,
+                    onConfirm: closeAlert
+                });
+                // alert(errorData.message);
             }
         } catch(error){
             console.log("수정 요청 실패", error);
@@ -147,6 +189,7 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
 
     return (
         <>
+            <Modal {...modal}/>
             <form className={styleStorage.updateForm} onSubmit={handelSubmit}>
                 <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
                     <h3 className={styleStorage.modifyHeading}>창고</h3>

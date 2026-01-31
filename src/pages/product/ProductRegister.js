@@ -7,12 +7,17 @@ import ProductSeason from "./ProductSeason";
 import ProductCode from "./ProductCode";
 import ModalBrandSearch from "./ModalBrandSearch";
 import serverUrl from "../../db/server.json";
+import Modal from "../../components/Modal";
 
 function ProductRegister(){
 
     const SERVER_URL = serverUrl.SERVER_URL;
     const URL = `${SERVER_URL}/ttik/product`;
     const navigate = useNavigate();
+
+    //alert
+    const closeAlert = () => setModal({ ...modal, isOpen: false });
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
 
     // 입력값
     const [brandCd, setBrandCd] = useState("");
@@ -151,7 +156,7 @@ function ProductRegister(){
 
         //첫 글자 뒤 3자리가 숫자인지 확인
         const num = Number(value.substring(1));
-        const isNumber = Number.isInteger(num) && num > 0 && num < 1000;
+        const isNumber = Number.isInteger(num) && num >= 0 && num < 1000;
 
         if(value.length === 4 && isValid && isNumber){ 
             setStyleNo(value);
@@ -159,7 +164,13 @@ function ProductRegister(){
             const target = value.substring(0, 1);
             setTarget(target);
         } else {
-            alert("입력 형식을 확인하세요.");
+            // alert("입력 형식을 확인하세요.");
+            setModal({
+            isOpen: true,
+            title: '입력값 오류',
+            message: '입력 형식을 확인하세요.',
+            onConfirm: closeAlert
+            });
             setInputValue("");
         }
     
@@ -211,7 +222,13 @@ function ProductRegister(){
                 return code;
             }
         } catch(error){
-            alert("생성 실패. 입력한 정보를 확인하세요.")
+            setModal({
+            isOpen: true,
+            title: '생성 실패',
+            message: '입력한 정보를 확인하세요.',
+            onConfirm: closeAlert
+            });
+            // alert("생성 실패. 입력한 정보를 확인하세요.")
         }
 
         // const code = brandCd + seasonCd + "-" + category + sizeCd + "-" + styleNo;
@@ -224,7 +241,13 @@ function ProductRegister(){
 
         if(!brandCd || !seasonCd || !category || !sizeCd) {
             console.log(brandCd, seasonCd, category, sizeCd);
-            alert("브랜드, 스타일넘버, 시즌, 카테고리, 사이즈를 모두 입력해야 합니다.");
+            setModal({
+            isOpen: true,
+            title: '입력값 확인',
+            message: '브랜드, 품번, 시즌, 카테고리, 사이즈를 모두 입력해야 합니다.',
+            onConfirm: closeAlert
+            });
+            // alert("브랜드, 품번, 시즌, 카테고리, 사이즈를 모두 입력해야 합니다.");
             return;
         }
 
@@ -249,12 +272,23 @@ function ProductRegister(){
         e.preventDefault();
 
         if(!productCd){
-            alert("상품QR코드를 생성해야 등록이 가능합니다.");
+            setModal({
+            isOpen: true,
+            title: '상품코드 확인',
+            message: '상품코드를 생성해야 등록이 가능합니다.',
+            onConfirm: closeAlert
+            });
+            // alert("상품코드를 생성해야 등록이 가능합니다.");
             return;
         }
         
         const hasError = Object.values(errors).some(val => val === true);
-        if(hasError) alert("입력값을 확인하세요.");
+        if(hasError) setModal({
+            isOpen: true,
+            title: '입력값 확인',
+            message: '입력값을 확인하세요',
+            onConfirm: closeAlert
+            });
 
         try{
             const res = await fetch(`${URL}/register`, {
@@ -276,7 +310,13 @@ function ProductRegister(){
                 })
             })
             if(res.ok){
-                alert("등록이 완료되었습니다.");
+                setModal({
+                isOpen: true,
+                title: '등록 성공',
+                message: '상품 등록이 완료되었습니다.',
+                onConfirm: closeAlert
+                });
+                // alert("등록이 완료되었습니다.");
                 setBrandCd("");
                 setProductNm("");
                 setCategory("");
@@ -295,12 +335,19 @@ function ProductRegister(){
                 navigate("/product/list");
             }
         } catch(error){
-            alert("등록 실패 입력한 정보를 확인하세요.")
+            setModal({
+                isOpen: true,
+                title: '등록 실패',
+                message: '입력한 정보를 확인하세요.',
+                onConfirm: closeAlert
+                });
+            // alert("등록 실패 입력한 정보를 확인하세요.")
         }
     }
 
     return (
         <div className={`${styleRegister.register} container`}>
+            <Modal {...modal}/>
             <div className={styleMainDashBoard.welcomeSection}>
                 <h1>Register</h1>
                 <p>상품을 등록하세요. </p>
@@ -326,14 +373,17 @@ function ProductRegister(){
                                 <input id="style" 
                                         type="text" 
                                         required 
-                                        placeholder="ex) M001"
+                                        placeholder="ex) M001 (성별 영문 + 숫자3자리)"
+                                        maxLength={4}
                                         value={inputValue}
                                         onChange={(e)=>setInputValue(e.target.value)}
                                         onBlur={handleStyleNo}
                                         style={{textTransform: 'uppercase'}}
                                 >
                                 </input>
-                                <p className={styleRegister.guide}>첫 글자 남성: M, 여성: W, 공용: U, 키즈: K</p>
+                                <p className={styleRegister.guide}>
+                                   M:남성 W:여성 U:공용 K:키즈
+                                </p>
                             </div> 
                         </div>
                         <div className={styleRegister.row}>
@@ -400,9 +450,9 @@ function ProductRegister(){
                                 </div>
                             </div>
                             <div className={`${styleRegister.col} ${styleRegister.right}`}>
-                                <label className={styleRegister.label}>단가 (원)</label>
+                                <label className={`${styleRegister.label} ${styleRegister.required}`}>단가 (원)</label>
                                 <div className={styleRegister.numberWrapper}>
-                                    <input type="number" name="price" min="0" placeholder="개별 단가를 입력해주세요" value={price} onChange={validateNumber}></input>
+                                    <input type="number" name="price" min="0" required placeholder="개별 단가를 입력해주세요" value={price} onChange={validateNumber}></input>
                                     <p className={styleRegister.errorMsg} style={{ visibility: errors.price ? "visible" : "hidden" }}>{errorMsg.price}</p>
                                 </div>
                             </div>
