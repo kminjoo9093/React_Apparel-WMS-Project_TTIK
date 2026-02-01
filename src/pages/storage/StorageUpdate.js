@@ -42,7 +42,6 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
                 message: '구역을 먼저 선택해주세요.',
                 onConfirm: closeAlert
             });
-            // alert("구역을 먼저 선택해주세요.");
             return;
         }
 
@@ -53,7 +52,6 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
                 message: '선반을 먼저 선택해주세요.',
                 onConfirm: closeAlert
             });
-            // alert("선반을 먼저 선택해주세요.");
             return;
         }
 
@@ -108,7 +106,6 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
                     message: '선반 적재 상태를 선택하세요.',
                     onConfirm: closeAlert
                 });
-                // alert("선반 적재 상태를 선택하세요.");
                 return;
             }
         }
@@ -132,7 +129,6 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
 
         // 구역만 활성화하는 경우
         if (selectedZone && !disableValues.disabledZone && !selectedRack) {
-            // confirmMsg = "해당 구역을 활성화 상태로 수정하시겠습니까?";
             confirmMsg = `해당 구역을 활성화 상태로 수정하시겠습니까?`;
         } 
         // 선반을 수정하는 경우
@@ -165,7 +161,6 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
                     message: data.message,
                     onConfirm: closeAlert
                 });
-                // alert(data.message);
 
                 resetForm();
                 if(onUpdate) onUpdate();
@@ -180,7 +175,6 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
                     message: errorData.message,
                     onConfirm: closeAlert
                 });
-                // alert(errorData.message);
             }
         } catch(error){
             console.log("수정 요청 실패", error);
