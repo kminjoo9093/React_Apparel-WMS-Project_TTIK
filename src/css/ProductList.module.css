@@ -356,4 +356,7 @@
     .itemInfoL, .itemInfoR{
         padding-inline: 1.5rem;
     }
+    .itemCard{
+        padding: 3rem;
+    }
 }

@@ -31,12 +31,9 @@ function ProductRegister(){
     const [inboxQty, setInboxQty] = useState(""); //입수량
     const [price, setPrice] = useState(""); //단가
     const [threshold, setThreshold] = useState(""); //임계치
-    // const [frstStock, setFrstStock] = useState(0); //초기 재고량
     
     const [productCd, setProductCd] = useState("");
     
-    // const [boxCd, setBoxCd] = useState("");
-
     const [searchWord, setSearchWord] = useState("");
     const [inputValue, setInputValue] = useState(""); //임시 인풋값
 
@@ -85,11 +82,9 @@ function ProductRegister(){
             const brandData = await getData(`${URL}/brands`);
             const categoryData = await getData(`${URL}/category`);
             const seasonData = await getData(`${URL}/season`);
-            // const sizeData = await getData(`${URL}/size`);
             setBrandList(brandData);
             setCategoryList(categoryData);
             setSeasonList(seasonData);
-            // setSizeMap(sizeData);
             console.log("여기" + seasonData);
         };
 
@@ -101,7 +96,6 @@ function ProductRegister(){
         qty: false,    // 박스 입수량
         price: false,    // 단가
         threshold: false, // 임계치
-        // init: false    //초기재고량
     })
     const [errorMsg, setErrorMsg] = useState({
         qty: "",
@@ -165,12 +159,11 @@ function ProductRegister(){
             const target = value.substring(0, 1);
             setTarget(target);
         } else {
-            // alert("입력 형식을 확인하세요.");
             setModal({
-            isOpen: true,
-            title: '입력값 오류',
-            message: '입력 형식을 확인하세요.',
-            onConfirm: closeAlert
+                isOpen: true,
+                title: '입력값 오류',
+                message: '입력 형식을 확인하세요.',
+                onConfirm: closeAlert
             });
             setInputValue("");
         }
@@ -230,13 +223,8 @@ function ProductRegister(){
             message: '입력한 정보를 확인하세요.',
             onConfirm: closeAlert
             });
-            // alert("생성 실패. 입력한 정보를 확인하세요.")
         }
 
-        // const code = brandCd + seasonCd + "-" + category + sizeCd + "-" + styleNo;
-
-        // setProductCd(code);
-        // return code;
     }
 
     async function handleProductCd(){
@@ -249,7 +237,6 @@ function ProductRegister(){
             message: '브랜드, 품번, 시즌, 카테고리, 사이즈를 모두 입력해야 합니다.',
             onConfirm: closeAlert
             });
-            // alert("브랜드, 품번, 시즌, 카테고리, 사이즈를 모두 입력해야 합니다.");
             return;
         }
 
@@ -280,7 +267,6 @@ function ProductRegister(){
             message: '상품코드를 생성해야 등록이 가능합니다.',
             onConfirm: closeAlert
             });
-            // alert("상품코드를 생성해야 등록이 가능합니다.");
             return;
         }
         
@@ -308,7 +294,6 @@ function ProductRegister(){
                     "inboxQty": Number(inboxQty),  //입수량
                     "price": Number(price), //단가
                     "threshold": Number(threshold), //임계치
-                    // "frstStock": Number(frstStock) //초기재고량
                 })
             })
             if(res.ok){
@@ -318,7 +303,6 @@ function ProductRegister(){
                 message: '상품 등록이 완료되었습니다.',
                 onConfirm: closeAlert
                 });
-                // alert("등록이 완료되었습니다.");
                 setBrandCd("");
                 setProductNm("");
                 setCategory("");
@@ -342,8 +326,7 @@ function ProductRegister(){
                 title: '등록 실패',
                 message: '입력한 정보를 확인하세요.',
                 onConfirm: closeAlert
-                });
-            // alert("등록 실패 입력한 정보를 확인하세요.")
+            });
         }
     }
 
@@ -403,7 +386,6 @@ function ProductRegister(){
                             </div>
                             <div className={`${styleRegister.col} ${styleRegister.right}`}>
                                 <label htmlFor="category" className={styleRegister.label}>카테고리</label>
-                                {/* <select name="category" id="category" onChange={(e) => setSelectedCat(e.target.value)}> */}
                                 <select name="category" id="category" value={category} onChange={changedCategory}>
                                     <option value="">선택하세요</option>
                                     {
@@ -430,9 +412,6 @@ function ProductRegister(){
                                 <label htmlFor="size" className={styleRegister.label}>사이즈</label>
                                 <select name="size" id="size" disabled={!category || !target} value={sizeCd} onChange={(e)=>setSizeCd(e.target.value)}>
                                     <option value="">선택하세요</option>
-                                    {/* {
-                                        (!target || !category) && <option value="">스타일 넘버와 카테고리를 먼저 선택하세요</option>
-                                    } */}
                                     { target && category && 
                                         sizeMap[target]?.[category]?.map((record) => (
                                             <option key={record.sizeCd} value={record.sizeCd}>{record.sizeNm}</option>
@@ -480,7 +459,6 @@ function ProductRegister(){
                     </fieldset>
                     <div className={styleRegister.formBtnWrap}>
                         <button type="submit" className={`${styleRegister.registerBtn} btnSubmit`}>등록</button>
-                        {/* <button type="button" className={styleRegister.cancelBtn}>취소</button> */}
                     </div>
                 </form>
             </div>
@@ -493,8 +471,6 @@ function ProductRegister(){
                 >
                     {modalConfig.children} 
             </ModalFrame>
-            {/* { (clickedSeasonBtn && isDimmedOpen ) && <SeasonModal />} */}
-            {/* {isDimmedOpen && <div className={styleRegister.dimmed} onClick={()=>{setIsDimmedOpen(false)}}></div>} */}
         </div>
     )
 }

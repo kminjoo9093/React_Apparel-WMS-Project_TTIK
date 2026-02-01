@@ -207,9 +207,6 @@ function ProductList(){
 
         if (!isMobile || !hasMore) return; // || isLoading
 
-        //모바일 일때 상품 리스트 초기화
-        // setProductList([]); 
-
         const observer = new IntersectionObserver((entries) => {
             if(entries[0].isIntersecting){
                 console.log("바닥 감지");
