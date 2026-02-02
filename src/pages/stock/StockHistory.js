@@ -77,19 +77,25 @@ function StockHistory() {
                                 <div className={styleHistory.timelineContent}>
                                     <div className={styleHistory.contentTop}>
                                         <span className={item.type === 0 ? styleHistory.inBadge : styleHistory.outBadge}>
-                                            {item.type === 0 ? "입고" : "출고"}
-                                            {item.status === 0 ? "완료" : "예정"}
+                                            처리일 - 
                                         </span>
                                         <span className={styleHistory.timeText}>
-                                            {item.date} {item.time}
+                                            {item.date} / {item.time}
                                         </span>
                                     </div>
 
-                                    <div>
+                                    {item.remark.includes('입고') && (
                                         <span className={styleHistory.targetText}>
                                             거래처 {item.target_name}
                                         </span>
-                                    </div>
+                                    )}
+
+
+                                    {item.remark.includes('출고') && (
+                                        <span className={styleHistory.targetText}>
+                                            거래처 {item.target_name}
+                                        </span>
+                                    )}
 
                                     <div className={styleHistory.contentBottom}>
                                         <span className={styleHistory.remarkText}>

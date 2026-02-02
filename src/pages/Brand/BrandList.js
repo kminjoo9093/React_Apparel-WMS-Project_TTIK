@@ -114,21 +114,17 @@ function BrandList() {
             <p className={styleBrand.brandSubTitle}>브랜드를 관리 하세요.</p>
 
             <div className={styleBrand.brandListbox}>
-                <div >
-                    <div className={styleBrand.searchBox}>
-                        <label style={{fontWeight: "bold", marginLeft: "0.5rem"}}>브랜드 검색</label>
-                        <input 
-                            className={styleBrand.searchInput}
-                            type="text"
-                            placeholder="브랜드 정보 검색"
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                        />
-                    </div>
-                    <div >
-                        <button className={styleBrand.brandBtn} onClick={() => setIsModalOpen(true)} >브랜드 등록</button>
-                        <button className={styleBrand.brandBtn} onClick={handleDelete} >삭제</button>
-                    </div>
+                <div className={styleBrand.searchBox}>
+                    <label style={{fontWeight: "bold", marginLeft: "0.5rem"}}>브랜드 검색</label>
+                    <input 
+                        className={styleBrand.searchInput}
+                        type="text"
+                        placeholder="브랜드 정보 검색"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
+                    <button className={styleBrand.brandBtn} onClick={() => setIsModalOpen(true)} >브랜드 등록</button>
+                    <button className={styleBrand.brandBtn} onClick={handleDelete} >삭제</button>
                 </div>
 
                 <BrandRegister 

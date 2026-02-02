@@ -186,6 +186,14 @@
 .tableRow:hover{
     background-color: rgb(37, 99, 235,0.2);
 }
+
+.SearchBox{
+    display: inline-flex;
+}
+
+
+
+
 /* --- 모바일 반응형만 추가 --- */
 @media screen and (max-width: 768px) {
     .plansListbox {
