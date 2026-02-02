@@ -87,10 +87,7 @@ const Login = ({ setUser, setIsLoggedIn }) => {
   return (
     <>
     <Modal 
-      isOpen={modal.isOpen} 
-      title={modal.title} 
-      message={modal.message} 
-      onConfirm={modal.onConfirm} 
+        {...modal} 
     />
     <div className={styleLogin.modernLoginContainer}>
       <div className={styleLogin.loginGlassCard}>

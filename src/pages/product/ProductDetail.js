@@ -131,13 +131,13 @@ const handleDelete = async (product) => {
               <div style={{ background: '#fff', padding: '30px', borderRadius: '25px', marginBottom: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    <h2 style={{ fontSize: '2.4rem', fontWeight: '900', color: '#1e293b', margin: 0 }}>{gdsNm}</h2>
-                    <p style={{ color: '#64748b', fontSize: '1.1rem', marginTop: '10px' }}>{product.SEASON_NM || product.season_nm} | {gdsCd}</p>
+                    <h2 style={{ fontSize: '2.8rem', fontWeight: '900', color: '#1e293b', margin: 0 }}>{gdsNm}</h2>
+                    <p style={{ color: '#64748b', fontSize: '1.5rem', marginTop: '10px' }}>{product.SEASON_NM || product.season_nm} | {gdsCd}</p>
                   </div>
                   {isLowStock ? (
-                    <div style={{ background: '#fff1f2', color: '#e11d48', padding: '10px 15px', borderRadius: '12px', fontWeight: 'bold', border: '1px solid #e11d48', fontSize: '0.9rem' }}>⚠️ 재고 위험</div>
+                    <div style={{ background: '#fff1f2', color: '#e11d48', padding: '10px 15px', borderRadius: '12px', fontWeight: 'bold', border: '1px solid #e11d48', fontSize: '1.7rem' }}>⚠️ 재고 위험</div>
                   ) : (
-                    <div style={{ background: '#f0fdf4', color: '#16a34a', padding: '10px 15px', borderRadius: '12px', fontWeight: 'bold', border: '1px solid #bbf7d0', fontSize: '0.9rem' }}>✅ 정상</div>
+                    <div style={{ background: '#f0fdf4', color: '#16a34a', padding: '10px 15px', borderRadius: '12px', fontWeight: 'bold', border: '1px solid #bbf7d0', fontSize: '1.7rem' }}>✅ 정상</div>
                   )}
                 </div>
               </div>
@@ -162,7 +162,7 @@ const handleDelete = async (product) => {
                 <div className={style['info-item']}><span className={style['info-label']}>카테고리</span><span className={style['info-value']}>{product.GDS_CAT_NM || product.gds_cat_nm || "-"}</span></div>
                 <div className={style['info-item']}><span className={style['info-label']}>사이즈</span><span className={style['info-value']}>{product.SIZE_NM || product.size_nm || "-"}</span></div>
                 <div className={style['info-item']}><span className={style['info-label']}>최초 등록일</span><span className={style['info-value']}>{product.FRST_REG_DT || product.frst_reg_dt}</span></div>
-                <div className={style['info-item']}><span className={style['info-label']}>입수 수량</span><span className={style['info-value']}>{inbox} EA</span></div>
+                <div className={style['info-item']}><span className={style['info-label']}>박스 입수 수량</span><span className={style['info-value']}>{inbox} EA</span></div>
                 <div className={style['info-item']}><span className={style['info-label']}>임계치</span><span className={style['info-value']} style={{color: '#e11d48', fontWeight: 'bold'}}>{threshold} EA</span></div>
                 <div className={style['info-item']} style={{border: 'none'}}>
                   <span className={style['info-label']}>현재 재고</span>
@@ -175,16 +175,16 @@ const handleDelete = async (product) => {
                 <h3 style={{ borderBottom: '2px solid #1e293b', paddingBottom: '10px', marginBottom: '20px', fontSize: '1.4rem' }}>📉 실시간 재고 지표 분석</h3>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <div style={{ flex: 1, background: '#f8fafc', padding: '15px 10px', borderRadius: '15px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                    <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '5px' }}>자산 가치</p>
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>{(stock * untprc).toLocaleString()}원</h4>
+                    <p style={{ fontSize: '1.8rem', color: '#64748b', marginBottom: '5px' }}>자산 가치</p>
+                    <h4 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{(stock * untprc).toLocaleString()}원</h4>
                   </div>
                   <div style={{ flex: 1, background: '#f8fafc', padding: '15px 10px', borderRadius: '15px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                    <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '5px' }}>박스 환산</p>
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#2563eb' }}>{Math.floor(stock / inbox)} BOX</h4>
+                    <p style={{ fontSize: '1.8rem', color: '#64748b', marginBottom: '5px' }}>박스 환산</p>
+                    <h4 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#2563eb' }}>{Math.floor(stock / inbox)} BOX</h4>
                   </div>
                   <div style={{ flex: 1, background: '#f8fafc', padding: '15px 10px', borderRadius: '15px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                    <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '5px' }}>충족률</p>
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: 'bold', color: isLowStock ? '#ef4444' : '#16a34a' }}>{Math.round((stock / (threshold || 1)) * 100)}%</h4>
+                    <p style={{ fontSize: '1.8rem', color: '#64748b', marginBottom: '5px' }}>충족률</p>
+                    <h4 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: isLowStock ? '#ef4444' : '#3b82f6' }}>{Math.round((stock / (threshold || 1)) * 100)}%</h4>
                   </div>
                 </div>
               </div>
@@ -211,8 +211,8 @@ const handleDelete = async (product) => {
 
               {/* 6. 하단 버튼 (카드 판 밖으로 빼서 강조) */}
               <div style={{ display: 'flex', gap: '15px', marginBottom: '50px' }}>
-                <button onClick={(e) => { e.stopPropagation(); handleDelete(product); }} style={{ flex: 1, height: '60px', borderRadius:'20px', border:'none', background:'#fff', color:'#e11d48', fontSize: '1.4rem', fontWeight:'bold', cursor:'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', border: '1px solid #fee2e2' }}>제품 삭제</button>
-                <button onClick={(e) => { e.stopPropagation(); handleModifyClick(product); }} style={{ flex: 1, height: '60px', borderRadius:'20px', border:'none', background:'#1e293b', color:'#fff', fontSize: '1.4rem', fontWeight:'bold', cursor:'pointer', boxShadow: '0 10px 20px rgba(0,0,0,0.2)' }}>정보 수정</button>
+                <button onClick={(e) => { e.stopPropagation(); handleDelete(product); }} style={{ flex: 1, height: '60px', borderRadius:'20px', border:'none', background:'#fff', color:'#e11d48', fontSize: '1.8rem', fontWeight:'bold', cursor:'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', border: '1px solid #fee2e2' }}>보관소(Archive)로 이동</button>
+                <button onClick={(e) => { e.stopPropagation(); handleModifyClick(product); }} style={{ flex: 1, height: '60px', borderRadius:'20px', border:'none', background:'#1e293b', color:'#fff', fontSize: '1.8rem', fontWeight:'bold', cursor:'pointer', boxShadow: '0 10px 20px rgba(0,0,0,0.2)' }}>정보 수정</button>
               </div>
 
             </motion.div>

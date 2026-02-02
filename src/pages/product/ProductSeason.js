@@ -17,7 +17,7 @@ function ProductSeason({onClose, setSeasonList}){
         const season = seasonRef.current.value;
 
         //유효성 검사 로직
-        if(!year || year.length !== 4){
+        if(!year || year.length !== 4 ){
             alert("연도 4자리 숫자를 정확히 입력하세요.");
             return;
         }
