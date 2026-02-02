@@ -143,7 +143,12 @@ function StorageRegister({storageList, onUpdate}){
                 //const data = await res.json(); post일땐 빈 객체 (200ok)를 보내서 데이터가 비어있음 -> 파싱오류 
             } else {
                 const errText = await res.text(); // 실패 원인 파악용
-                alert("등록에 실패했습니다.");
+                setModal({
+                    isOpen: true,
+                    title: 'Error',
+                    message: '등록에 실패했습니다.',
+                    onConfirm: closeModal
+                });
             }
         } catch(error){
             console.log(error);

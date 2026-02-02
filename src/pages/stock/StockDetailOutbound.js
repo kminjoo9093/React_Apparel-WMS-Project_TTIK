@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Html5QrcodeScanner } from "html5-qrcode";
 import serverUrl from "../../db/server.json";
 import styles from "../../css/StockDetail.module.css"; 
+import Modal from '../../components/Modal';
 
 function StockDetailOutbound() {
     const { productCd } = useParams();
@@ -14,6 +15,8 @@ function StockDetailOutbound() {
     const planType = "OutBound"; 
     const planYmd = location.state?.planYmd;
 
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const closeModal = () => setModal({ ...modal, isOpen: false });
     const [product, setProduct] = useState(null);
     const [alreadyDoneQty, setAlreadyDoneQty] = useState(0); // [추가] 이미 출고된 수량 상태
     const [isScannerOpen, setIsScannerOpen] = useState(false);
@@ -97,7 +100,12 @@ function StockDetailOutbound() {
     // 2. 바코드 스캔 처리 (출고 수량 조회)
 const handleBarcodeScanned = async (fullBarcode) => {
     if (scanHistoryRef.current.some(h => h.barcode === fullBarcode)) {
-        alert("이미 스캔된 고유 번호입니다.");
+        setModal({
+          isOpen: true,
+          title: 'Again',
+          message: '이미 스캔된 고유 번호입니다.',
+          onConfirm: closeModal
+        });
         return;
     }
 
@@ -124,12 +132,22 @@ const handleBarcodeScanned = async (fullBarcode) => {
         const limitQty = product?.stkQty || 0;
 
         if (currentTotal + actualQty > limitQty) {
-            alert(`❌ 출고 수량 초과!\n지시 수량: ${limitQty}\n현재까지 스캔: ${currentTotal}\n이번 박스 수량: ${actualQty}\n\n박스 내 일부 아이템만 출고해야 한다면 박스를 해체하고 낱개 스캔하세요.`);
+            setModal({
+                isOpen: true,
+                title: 'Error',
+                message: `❌ 출고 수량 초과!\n지시 수량: ${limitQty}\n현재까지 스캔: ${currentTotal}\n이번 박스 수량: ${actualQty}\n\n박스 내 일부 아이템만 출고해야 한다면 박스를 해체하고 낱개 스캔하세요.`,
+                onConfirm: closeModal
+            });
             return;
         }
 
         if (actualQty <= 0) {
-            alert("출고 가능한 아이템이 없습니다.");
+            setModal({
+                isOpen: true,
+                title: 'Again',
+                message: '출고 가능한 아이템이 없습니다.',
+                onConfirm: closeModal
+            });
             return;
         }
 
@@ -155,7 +173,12 @@ const handleBarcodeScanned = async (fullBarcode) => {
         const itemsToProcess = scanHistory.filter(h => checkedItems.has(h.barcode));
 
         if (itemsToProcess.length === 0) {
-            alert("등록할 항목을 선택해주세요.");
+            setModal({
+                isOpen: true,
+                title: 'Again',
+                message: '등록할 항목을 선택해주세요.',
+                onConfirm: closeModal
+            });
             return;
         }
 
@@ -181,12 +204,23 @@ const handleBarcodeScanned = async (fullBarcode) => {
                     if (response.ok) successCount++;
                 }
 
-                alert(`${successCount}건의 출고 처리가 완료되었습니다.`);
-                navigate('/stock/plans', { state: { activeTab: "OutBound" } });
+                setModal({
+                    isOpen: true,
+                    title: 'Success',
+                    message: `${successCount}건의 출고 처리가 완료되었습니다.`,
+                    onConfirm: () => {
+                        navigate('/stock/plans', { state: { activeTab: "OutBound" } });
+                    }
+                });     
 
             } catch (error) {
+                setModal({
+                    isOpen: true,
+                    title: 'Error',
+                    message: '처리 중 오류가 발생했습니다.',
+                    onConfirm: closeModal
+                });
                 console.error("출고 등록 실패:", error);
-                alert("처리 중 오류가 발생했습니다.");
             }
         }
     };
@@ -218,6 +252,10 @@ const handleBarcodeScanned = async (fullBarcode) => {
     if (!product) return <div className={styles.loading}>출고 데이터를 불러오는 중...</div>;
 
     return (
+        <>
+        <Modal
+            {...modal} 
+        />
         <div className={styles.container}>
             <div className={styles.headerSection}>
                 <div className={styles.headerInfo}>
@@ -304,6 +342,7 @@ const handleBarcodeScanned = async (fullBarcode) => {
                 </div>
             </div>
         </div>
+        </>
     );
 }
 

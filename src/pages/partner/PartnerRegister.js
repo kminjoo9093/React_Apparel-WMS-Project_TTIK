@@ -24,7 +24,6 @@ function PartnerRegister({ isOpen, onClose, onRegisterSuccess }) {
         try {
             const res = await fetch(url, {
                 method: "POST",
-                credentials: 'include',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ "b_no": [brNo] }),
             });

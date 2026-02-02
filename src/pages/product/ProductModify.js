@@ -3,12 +3,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import style from '../../css/ProductModify.module.css'; 
 import serverUrl from "../../db/server.json" 
+import Modal from '../../components/Modal';
 
 const ProductModify = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const SERVER_URL = serverUrl.SERVER_URL;
 
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+  const closeModal = () => setModal({ ...modal, isOpen: false });
   const [product, setProduct] = useState({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [tempCode, setTempCode] = useState("");
@@ -66,18 +69,32 @@ useEffect(() => {
                                           withCredentials: true 
                                         });
       if (response.status === 200) {
-        alert(fromArchive ? "복구 및 수정 완료!" : "수정 완료!");
         
-        // 📍 state를 넘기지 말고 깔끔하게 경로만 이동!
-        navigate(`/product/productDetail/${finalData.gds_cd}`); 
+        setModal({
+          isOpen: true,
+          title: 'Again',
+          message: fromArchive ? "복구 및 수정 완료!" : "수정 완료!",
+          onConfirm: () => {
+            navigate(`/product/productDetail/${finalData.gds_cd}`);
+          }
+        });
       }
     } catch (error) {
-      alert("서버 연동 실패!");
+      setModal({
+          isOpen: true,
+          title: 'Again',
+          message: "서버 연동 실패!",
+          onConfirm: closeModal
+        });
     }
   };
 
   return (
-    /* 📍 기존의 넓은 패딩과 중앙 정렬 디자인 그대로 유지 */
+    <>
+    <Modal
+        {...modal} 
+    />
+    {/* 📍 기존의 넓은 패딩과 중앙 정렬 디자인 그대로 유지 */ }
     <div style={{ padding: '5% 40px', width: '90%', maxWidth: '1100px', margin: '0 auto', background: '#fff', borderRadius: '30px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
       
       <div style={{ marginBottom: '50px' }}>
@@ -149,6 +166,7 @@ useEffect(() => {
       )}
       */}
     </div>
+    </>
   );
 };
 
