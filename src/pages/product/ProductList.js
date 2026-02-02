@@ -36,7 +36,7 @@ function ProductList(){
     const indexOfFirst = indexOfLast - postsPerPagePC;
 
     const scrollRef = useRef(null);
-    // const [visibleCount, setVisibleCount] = useState(5); // 모바일에서 한번에 보여줄 개수
+    const visibleCount = 5; // 한 번에 5개씩 (모바일)
     const [isLoading, setIsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true); //더 가져올 데이터가 있는지
 
@@ -142,7 +142,7 @@ function ProductList(){
                 const { brandCd, categoryCd, seasonCd, stkStatus, keyword } = searchFilters;
                 const filterQuery = `&brandCd=${brandCd}&catCd=${categoryCd}&seasonCd=${seasonCd}&stkStatus=${stkStatus}&keyword=${encodeURIComponent(keyword)}`;
                 if(isMobile){
-                    fetchUrl = `${URL}/list/mobile?size=5${filterQuery}`;
+                    fetchUrl = `${URL}/list/mobile?size=${visibleCount}${filterQuery}`;
                     
                     // 모바일에서 필터가 바뀌면 '더보기' 상태도 초기화해줘야 함
                     setHasMore(true);
@@ -169,7 +169,7 @@ function ProductList(){
                         setProductList(products);
                         setTotalElements(total);
                         if(products.length > 0){
-                            if (products.length < 5){
+                            if (products.length < visibleCount){
                                 setHasMore(false); // 가져온 데이터가 요청한 size(5개)보다 적으면 더 가져올 게 없다고 판단
                                 return;
                             } 
@@ -249,7 +249,7 @@ function ProductList(){
 
         const { brandCd, categoryCd, seasonCd, stkStatus, keyword } = searchFilters;
         const filterQuery = `&lastDate=${encodedDate}&lastProCd=${lastItemProCd}&brandCd=${brandCd}&catCd=${categoryCd}&seasonCd=${seasonCd}&stkStatus=${stkStatus}&keyword=${encodeURIComponent(keyword)}`;
-        let fetchUrl = `${URL}/list/scroll?size=5${filterQuery}`;
+        let fetchUrl = `${URL}/list/scroll?size=${visibleCount}${filterQuery}`;
 
         try{
             const response = await fetch(fetchUrl, {
@@ -263,7 +263,7 @@ function ProductList(){
                 if(nextDataList.length > 0){
                     setProductList((prev) => [...prev, ...nextDataList]);
 
-                    if(nextDataList.length < 5){
+                    if(nextDataList.length < visibleCount){
                         setHasMore(false);
                         return;
                     } 
