@@ -3,12 +3,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import style from '../../css/ProductArchive.module.css';
 import serverUrl from "../../db/server.json";
+import Modal from '../../components/Modal';
 
 const ProductArchive = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const SERVER_URL = serverUrl.SERVER_URL;
   
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+  const closeModal = () => setModal({ ...modal, isOpen: false });
   const [archiveList, setArchiveList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
@@ -47,10 +50,18 @@ const ProductArchive = () => {
 
   // 수정 후 복구
   const handleEditAndRestore = (product) => {
-    if (window.confirm(`[${product.gds_nm}] 상품 정보를 수정하며 복구하시겠습니까?`)) {
-      navigate('/product/productModify', { state: { product, fromArchive: true } });
-    }
+    setModal({
+      isOpen: true,
+      title: 'Restoration',
+      message: `[${product.gds_nm}] 상품 정보를 수정하며 복구하시겠습니까?`,
+      onCancel: closeModal,
+      onConfirm: () => {
+        navigate('/product/productModify', { state: { product, fromArchive: true } });
+        closeModal();
+      }
+    });
   };
+
 
   /* [운영 정책 변경] 데이터 이력 보존을 위해 영구 삭제(Hard Delete) 기능은 UI 및 로직에서 제외함
   // 영구 삭제 (DB에서 진짜 지우기)
@@ -70,7 +81,12 @@ const ProductArchive = () => {
   };
   */
 
+
   return (
+    <>
+    <Modal
+        {...modal} 
+    />
     <div className={style['archive-wrapper']}>
       <h2 className={style['archive-title']}>
         📦 관리 제외 품목 (Archive)
@@ -131,6 +147,7 @@ const ProductArchive = () => {
         </table>
       </div>
     </div>
+    </>
   );
 };
 

@@ -115,7 +115,6 @@
 .errorMsg{
     color: var(--red-ff);
     left: 0;
-    /* height: 1.7rem; */
 }
 
 .guide{
@@ -124,6 +123,10 @@
     bottom: 0;
     transform: translateY(100%);
     color: var(--gray-64);
+}
+
+.guide span{
+    display: block;
 }
 
 

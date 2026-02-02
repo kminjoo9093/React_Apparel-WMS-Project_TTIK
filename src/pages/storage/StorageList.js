@@ -5,6 +5,7 @@ import styleModal from "../../css/Modal.module.css";
 import serverUrl from "../../db/server.json";
 import Pagination from '../Pagination';
 import { useLocation } from "react-router-dom";
+import Modal from "../../components/Modal";
 
 function StorageList({storageList:storageOptions=[]}){
 
@@ -35,6 +36,10 @@ function StorageList({storageList:storageOptions=[]}){
 
     const indexOfLast = currentPage * postsPerPage;
     const indexOfFirst = indexOfLast - postsPerPage;
+
+    //alert
+    const closeAlert = () => setModal({ ...modal, isOpen: false });
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
 
     //메인 대시보드에서 창고 적재현황 클릭시 넘어오는 페이지
     useEffect(() => {
@@ -131,16 +136,11 @@ function StorageList({storageList:storageOptions=[]}){
             return {text:"포화", color:"#cf1322"};
         }
 
-        // return hasBox ? "포화" : "사용대기";
     }
 
 
     //위치 변경할 선반 선택
     const handleChangeRackInfo = (e, boxQr, oldRackSn)=>{
-        // setBoxQr(boxQr);
-        // setOldRackSn(oldRackSn);
-        // setNewRackSn(e.target.value);
-        // setNewRackNm(e.target.options[e.target.selectedIndex].text);
 
         const selectedValue = e.target.value;
         const selectedName = e.target.options[e.target.selectedIndex].text;
@@ -155,53 +155,71 @@ function StorageList({storageList:storageOptions=[]}){
         }));
     }
 
-    //선반 위치 수정 서버 요청
-    const confirmModifyRack = async (e)=>{
+// 선반 위치 수정 서버 요청
+    const confirmModifyRack = async (e) => {
         e.preventDefault();
 
         // 변경 위치가 선택된 박스들만 필터링
         const modifiedBoxes = rackDetailList.boxes.filter(box => box.nextRackSn);
 
-        if (modifiedBoxes.length === 0) { //위치변경하는 박스가 없는 경우
+        if (modifiedBoxes.length === 0) { // 위치변경하는 박스가 없는 경우
             onCloseModal();
             return;
         }
 
-        if (!window.confirm(`${modifiedBoxes.length}개의 박스를 이동시키겠습니까?`)) return;
-
-        // alert(`${boxQr}상자를 ${newRackNm}으로 옮기시겠습니까?`);
-
-        try{
-            const moveRequests = modifiedBoxes.map((box)=>
-                    fetch(`${SERVER_URL}/ttik/storage/rack/modify`, {
-                        method: 'PUT',
-                        credentials: 'include', 
-                        headers: {'Content-type': 'application/json'},
-                        body: JSON.stringify(
-                            {
+        setModal({
+            isOpen: true,
+            title: 'Confirm',
+            message: `${modifiedBoxes.length}개의 박스를 이동시키겠습니까?`,
+            onCancel: closeAlert,
+            onConfirm: async () => {
+                try {
+                    const moveRequests = modifiedBoxes.map((box) =>
+                        fetch(`${SERVER_URL}/ttik/storage/rack/modify`, {
+                            method: 'PUT',
+                            credentials: 'include',
+                            headers: { 'Content-type': 'application/json' },
+                            body: JSON.stringify({
                                 boxQr: box.boxQr,
                                 oldRack: selectedRack,
                                 newRack: box.nextRackSn
+                            })
+                        })
+                    );
+
+                    const response = await Promise.all(moveRequests);
+
+                    if (response.every(res => res.ok)) {
+                        setModal({
+                            isOpen: true,
+                            title: 'Success',
+                            message: "모든 박스의 위치 변경 및 이력 등록이 완료되었습니다.",
+                            onConfirm: () => {
+                                closeAlert();
+                                onCloseModal(); // 위치 수정 모달 닫기
+                                getStorageListData(); // 리스트 새로고침
                             }
-                        )
-                    })
-                );
-            
-            const response = await Promise.all(moveRequests);
-
-            if (response.every(res => res.ok)) {
-                alert("모든 박스의 위치 변경 및 이력 등록이 완료되었습니다.");
-                onCloseModal();
-
-                // 리스트 새로고침
-                getStorageListData();
-            } else {
-                alert("오류가 발생했습니다.");
+                        });
+                    } else {
+                        setModal({
+                            isOpen: true,
+                            title: 'Error',
+                            message: '일부 처리 중 오류가 발생했습니다.',
+                            onConfirm: closeAlert
+                        });
+                    }
+                } catch (error) {
+                    console.error("수정 요청 실패:", error);
+                    setModal({
+                        isOpen: true,
+                        title: 'Error',
+                        message: '서버 통신 중 에러가 발생했습니다.',
+                        onConfirm: closeAlert
+                    });
+                }
             }
-        } catch(error){
-            console.log(error);
-        }
-    }
+        });
+    };
 
     // 창고 필터
     // useEffect(()=>{
@@ -219,6 +237,7 @@ function StorageList({storageList:storageOptions=[]}){
 
     return (
         <>
+            <Modal {...modal}/>
             <h2 className={styleStorage.contentTitle}>창고 조회</h2>
             <div className={styleStorage.listTopWrap}>
                 <span className={styleStorage.notice}>클릭 시 적재된 박스 정보 확인과 <br className={styleStorage.brMo}></br>위치 수정이 가능합니다.</span>

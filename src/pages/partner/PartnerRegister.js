@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import stylePartner from "../../css/Partner.module.css";
 import serverUrl from "../../db/server.json";
+import Modal from '../../components/Modal';
 
 function PartnerRegister({ isOpen, onClose, onRegisterSuccess }) {
     const [brNo, setBrNo] = useState("");
+    
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const closeModal = () => setModal({ ...modal, isOpen: false });
     const [brResult, setBrResult] = useState(null);
     const [brError, setBrError] = useState("");
     const [Tel, setTel] = useState("");
@@ -20,7 +24,6 @@ function PartnerRegister({ isOpen, onClose, onRegisterSuccess }) {
         try {
             const res = await fetch(url, {
                 method: "POST",
-                credentials: 'include',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ "b_no": [brNo] }),
             });
@@ -62,13 +65,26 @@ function PartnerRegister({ isOpen, onClose, onRegisterSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!Partner) { alert("거래처명을 입력해 주세요."); return; }
+        if (!Partner) { 
+            setModal({
+                isOpen: true,
+                title: 'Again',
+                message: '거래처명을 입력해 주세요.',
+                onConfirm: closeModal
+            });
+            return; 
+        }
         if (brResult?.status !== "인증되었습니다.") {
             setBrError("사업자 번호 인증이 필요합니다.");
             return;
         }
         if (telError || Tel.length < 9) {
-            alert("올바른 연락처를 입력해 주세요.");
+            setModal({
+                isOpen: true,
+                title: 'Again',
+                message: '올바른 연락처를 입력해 주세요.',
+                onConfirm: closeModal
+            }); 
             return;
         }
 
@@ -86,7 +102,12 @@ function PartnerRegister({ isOpen, onClose, onRegisterSuccess }) {
             });
 
             if (response.ok) {
-                alert("등록되었습니다!");
+                setModal({
+                    isOpen: true,
+                    title: 'Register',
+                    message: '등록되었습니다!',
+                    onConfirm: closeModal
+                });
                 // 초기화
                 setPartner("");
                 setBrNo("");
@@ -97,15 +118,29 @@ function PartnerRegister({ isOpen, onClose, onRegisterSuccess }) {
                 onClose();
                 if (onRegisterSuccess) onRegisterSuccess(); 
             } else {
-                alert("서버 등록에 실패했습니다. (500 에러)");
+                setModal({
+                    isOpen: true,
+                    title: 'Error',
+                    message: '서버 등록에 실패했습니다. (500 에러)',
+                    onConfirm: closeModal
+                });
             }
         } catch (error) {
             console.error("등록 에러:", error);
-            alert("네트워크 오류가 발생했습니다.");
+            setModal({
+                isOpen: true,
+                title: 'Error',
+                message: '네트워크 오류 발생',
+                onConfirm: closeModal
+            });
         }
     };
 
     return (
+        <>
+        <Modal
+            {...modal} 
+        />
         <div className={stylePartner.modalOverlay}>
             <div className={stylePartner.modalContent} onClick={(e) => e.stopPropagation()}>
                 <button className={stylePartner.closeBtn} onClick={onClose}>&times;</button>
@@ -151,6 +186,7 @@ function PartnerRegister({ isOpen, onClose, onRegisterSuccess }) {
                 </form>
             </div>
         </div>
+        </>
     );
 }
 

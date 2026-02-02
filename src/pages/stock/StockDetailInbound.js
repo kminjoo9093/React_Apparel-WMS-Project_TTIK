@@ -138,7 +138,7 @@ function StockDetailInbound() {
         if (scanHistoryRef.current.some(h => h.barcode === fullBarcode)) {
             setModal({
                 isOpen: true,
-                title: '중복 스캔',
+                title: 'Again',
                 message: (
                     <>
                         이미 스캔된 고유 번호입니다:<br />
@@ -151,7 +151,7 @@ function StockDetailInbound() {
         }
 
         try {
-            // 2. DB에서 실제 박스/아이템 수량 조회
+            // DB에서 실제 박스/아이템 수량 조회
             const res = await fetch(`${SERVER_URL}/ttik/productdetail/scan-check/${fullBarcode}`, {
                 method: 'GET',
                 credentials: 'include', 
@@ -163,13 +163,17 @@ function StockDetailInbound() {
             const actualQty = await res.json();
 
             if (actualQty <= 0) {
-                alert("해당 박스에 입고 가능한 아이템이 없습니다.");
+                setModal({
+                    isOpen: true,
+                    title: 'Again',
+                    message: '해당 박스에 입고 가능한 아이템이 없습니다.',
+                    onConfirm: closeModal
+                });
                 return;
             }
 
-            // 3. 대소문자 구분 없이 박스 여부 및 상품코드 추출
+            // 대소문자 구분 없이 박스 여부 및 상품코드 추출
             const parts = fullBarcode.split('-');
-            //const isBoxScan = fullBarcode.toUpperCase().includes('-B');
             const boxMatch = fullBarcode.match(/^(.*)-B(\d+)-(\d+)(?:-(\d+))?$/i);
         
             let productId = "";
@@ -196,7 +200,7 @@ function StockDetailInbound() {
         if (productId.toUpperCase() !== productCd.toUpperCase()) {
             setModal({
                 isOpen: true,
-                title: '상품 불일치',
+                title: 'Again',
                 message: (
                     <span>
                         상품 불일치! 더 이상 스캔할 수 없습니다.<br />
@@ -218,7 +222,7 @@ function StockDetailInbound() {
             if (currentSum + incrementValue > limitQty) {
                 setModal({
                     isOpen: true,
-                    title: '수량 초과',
+                    title: 'Again',
                     message: (
                         <span>
                             ❌ 초과 차단! 더 이상 스캔할 수 없습니다.<br />
@@ -249,7 +253,12 @@ function StockDetailInbound() {
 
         } catch (error) {
             console.error("스캔 처리 오류:", error);
-            alert("정보 조회 중 오류가 발생했습니다.");
+            setModal({
+                isOpen: true,
+                title: 'Error',
+                message: '정보 조회 중 오류가 발생했습니다.',
+                onConfirm: closeModal
+            });
         }
     };
 
@@ -259,7 +268,7 @@ function StockDetailInbound() {
         if (itemsToProcess.length === 0) {
             setModal({
                 isOpen: true,
-                title: '항목 선택',
+                title: 'Again',
                 message: '등록할 항목을 선택해주세요.',
                 onConfirm: closeModal
             });
@@ -270,67 +279,82 @@ function StockDetailInbound() {
         if (!selections.rack) {
             setModal({
                 isOpen: true,
-                title: '선반 선택',
+                title: 'Again',
                 message: '선반(Rack)를 선택해주세요.',
                 onConfirm: closeModal
             });
             return;
         }
 
-        if (window.confirm(`선택한 ${itemsToProcess.length}건을 [${selections.rack}] 위치에 등록하시겠습니까?`)) {
-            try {
-                let successCount = 0;
+        setModal({
+            isOpen: true,
+            title: 'Register',
+            message: `선택한 ${itemsToProcess.length}건을 [${selections.rack}] 위치에 등록하시겠습니까?`,
+            onCancel: closeModal,
+            onConfirm: async () => {
+                try {
+                    let successCount = 0;
 
-                // ⚠️ 주의: for문 내부에서 중복 호출되지 않도록 구조 정돈
-                for (const item of itemsToProcess) {
-                    const payload = {
-                        boxCd: item.barcode,
-                        gdsCd: productCd,
-                        rackSn: Number(selections.rack), // 확실하게 숫자로 변환
-                        brandNm: product?.brandNm || '',
-                        qty: item.increment 
-                    };
+                    for (const item of itemsToProcess) {
+                        const payload = {
+                            boxCd: item.barcode,
+                            gdsCd: productCd,
+                            rackSn: Number(selections.rack), 
+                            brandNm: product?.brandNm || '',
+                            qty: item.increment 
+                        };
 
-                    // 🔍 [디버깅 로그] 전송 직전 데이터 확인
-                    console.log(`🚀 [${item.barcode}] 전송 시도...`);
-                    console.log("📦 Payload:", payload);
+                        console.log(`🚀 [${item.barcode}] 전송 시도...`);
+                        console.log("📦 Payload:", payload);
 
-                    // URL 확인: /ttik/productdetail/inbound/process 가 맞는지 백엔드와 맞출 것
-                    const response = await fetch(`${SERVER_URL}/ttik/productdetail/inbound/process`, {
-                        method: 'POST',
-                        credentials: 'include',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
+                        const response = await fetch(`${SERVER_URL}/ttik/productdetail/inbound/process`, {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (response.ok) {
+                            console.log(`✅ [${item.barcode}] 전송 성공!`);
+                            successCount++;
+                        } else {
+                            const errorText = await response.text();
+                            console.error(`❌ [${item.barcode}] 전송 실패:`, response.status, errorText);
+                            throw new Error(`${item.barcode} 처리 중 서버 에러 발생`);
+                        }
+                    }
+
+                    // 모든 항목 처리 성공 시
+                    setModal({
+                        isOpen: true,
+                        title: 'Success',
+                        message: `${successCount}건의 입고 및 적재 처리가 완료되었습니다.`,
+                        onConfirm: () => {
+                            closeModal();
+                            // 성공 후 상태 업데이트 및 페이지 이동
+                            const remainingHistory = scanHistory.filter(h => !checkedItems.has(h.barcode));
+                            setScanHistory(remainingHistory);
+                            scanHistoryRef.current = remainingHistory;
+                            setCheckedItems(new Set());
+
+                            if (remainingHistory.length === 0) {
+                                navigate('/stock/plans', { state: { activeTab: planType } });
+                            }
+                        }
                     });
 
-                    if (response.ok) {
-                        console.log(`✅ [${item.barcode}] 전송 성공!`);
-                        successCount++;
-                    } else {
-                        const errorText = await response.text();
-                        console.error(`❌ [${item.barcode}] 전송 실패:`, response.status, errorText);
-                        throw new Error(`${item.barcode} 처리 중 서버 에러 발생`);
-                    }
+                } catch (error) {
+                    console.error("🏁 최종 등록 실패:", error);
+                    setModal({
+                        isOpen: true,
+                        title: 'Error',
+                        message: "처리 중 오류가 발생했습니다. 콘솔창(F12)의 에러 메시지를 확인해주세요.",
+                        onConfirm: closeModal
+                    });
                 }
-
-                alert(`${successCount}건의 입고 및 적재 처리가 완료되었습니다.`);
-
-                // 성공 후 상태 업데이트
-                const remainingHistory = scanHistory.filter(h => !checkedItems.has(h.barcode));
-                setScanHistory(remainingHistory);
-                scanHistoryRef.current = remainingHistory;
-                setCheckedItems(new Set());
-
-                if (remainingHistory.length === 0) {
-                    navigate('/stock/plans', { state: { activeTab: planType } });
-                }
-
-            } catch (error) {
-                console.error("🏁 최종 등록 실패:", error);
-                alert("처리 중 오류가 발생했습니다. 콘솔창(F12)의 에러 메시지를 확인해주세요.");
             }
-        }
-    };
+        });
+    }
 
     useEffect(() => {
         if (isScannerOpen) {
@@ -548,5 +572,6 @@ function StockDetailInbound() {
     </>
     );
 }
+
 
 export default StockDetailInbound;

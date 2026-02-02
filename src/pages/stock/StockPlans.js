@@ -3,10 +3,14 @@ import stylePlans from "../../css/plarns.module.css";
 import PlanRegister from './PlanRegister';
 import serverUrl from "../../db/server.json";
 import { useLocation, useNavigate } from 'react-router-dom';
+import Modal from '../../components/Modal';
 
 function StockPlans() {
     const navigate = useNavigate();
     const location = useLocation(); 
+    const [searchTerm, setSearchTerm] = useState(""); 
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const closeModal = () => setModal({ ...modal, isOpen: false });
 
     const [plansType, setPlansType] = useState(location.state?.activeTab || "InBound");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,6 +18,24 @@ function StockPlans() {
     const [outboundList, setOutboundList] = useState([]);
     const [loading, setLoading] = useState(false);
     const SERVER_URL = serverUrl.SERVER_URL;
+
+    // --- 변수 선언 위치를 상태(state) 선언 아래로 이동 ---
+    const originalList = plansType === "InBound" ? inboundList : outboundList;
+
+    const filteredList = originalList.filter((item) => {
+        if (!searchTerm) return true;
+        
+        const lowerSearch = searchTerm.toLowerCase();
+        // 상품명 검색
+        const nameMatch = item.GDS_NM?.toLowerCase().includes(lowerSearch);
+        // 입/출고처 검색 (BRAND_NM 또는 PARTNER_NM)
+        const brandMatch = item.BRAND_NM?.toLowerCase().includes(lowerSearch);
+        const partnerMatch = item.PARTNER_NM?.toLowerCase().includes(lowerSearch);
+        // 상품 코드 검색
+        const codeMatch = item.GDS_CD?.toLowerCase().includes(lowerSearch);
+        
+        return nameMatch || brandMatch || partnerMatch || codeMatch;
+    });
     
     // 페이지네이션 상태
     const [currentPage, setCurrentPage] = useState(1);
@@ -53,50 +75,81 @@ function StockPlans() {
     const handleTypeChange = (type) => {
         setPlansType(type);
         setCurrentPage(1); 
+        setSearchTerm(""); 
     };
 
-    // --- 페이지네이션 로직 ---
-    const currentList = plansType === "InBound" ? inboundList : outboundList;
+    // --- 페이지네이션 로직 (filteredList 기준) ---
     const indexOfLastPost = currentPage * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
-    const currentPosts = currentList.slice(indexOfFirstPost, indexOfLastPost);
-    const totalPages = Math.ceil(currentList.length / postsPerPage);
+    
+    const currentPosts = filteredList.slice(indexOfFirstPost, indexOfLastPost);
+    const totalPages = Math.ceil(filteredList.length / postsPerPage);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1); 
+    };
+
     return (
+        <>
+        <Modal
+            {...modal} 
+        />
         <div>
             <h1 className={stylePlans.plansTitle}>Stock Plans</h1>
             <p className={stylePlans.plansSubTitle}>입·출고 예정을 확인하고 관리하세요.</p>
             
             <div className={stylePlans.plansListbox}>
-                <div className={stylePlans.buttonGroup}>
-                    <button 
-                        className={`${stylePlans.plansBtn} ${plansType === 'InBound' ? stylePlans.active : ''}`} 
-                        onClick={() => handleTypeChange("InBound")}
-                    >
-                        입고 예정 조회
-                    </button>
-                    <button 
-                        className={`${stylePlans.plansBtn} ${plansType === 'OutBound' ? stylePlans.active : ''}`} 
-                        onClick={() => handleTypeChange("OutBound")}
-                    >
-                        출고 예정 조회
-                    </button>
-                    <button
-                        style={plansType === null ? { display: 'none' } : {}}
-                        className={stylePlans.plansBtn} 
-                        onClick={() => setIsModalOpen(true)}
-                    >
-                        + 새 일정 등록
-                    </button>
-                    <button 
-                        style={{backgroundColor: "var(--primary-color)", color:"white"}} 
-                        className={stylePlans.plansBtn}
-                        onClick={()=> navigate("qr/print")}
-                    >
-                        🖨️ QR코드 인쇄
-                    </button>
+                <div style={{display : 'flex', justifyContent : 'space-between'}}>
+                    <div className={stylePlans.buttonGroup}>
+                        <button 
+                            className={`${stylePlans.plansBtn} ${plansType === 'InBound' ? stylePlans.active : ''}`} 
+                            onClick={() => handleTypeChange("InBound")}
+                            style={{ backgroundColor : plansType === "InBound" ? "lightgray" : ""}}
+                        >
+                            입고 예정 조회
+                        </button>
+                        <button 
+                            className={`${stylePlans.plansBtn} ${plansType === 'OutBound' ? stylePlans.active : ''}`} 
+                            onClick={() => handleTypeChange("OutBound")}
+                            style={{ backgroundColor : plansType === "OutBound" ? "lightgray" : ""}}
+                        >
+                            출고 예정 조회
+                        </button>
+                        <button
+                            style={plansType === null ? { display: 'none' } : {}}
+                            className={stylePlans.plansBtn} 
+                            onClick={() => setIsModalOpen(true)}
+                        >
+                            + 새 일정 등록
+                        </button>
+                        <button 
+                            style={{backgroundColor: "var(--primary-color)", color:"white"}} 
+                            className={stylePlans.plansBtn}
+                            onClick={()=> navigate("qr/print")}
+                        >
+                            🖨️ QR코드 인쇄
+                        </button>
+
+
+                    </div>
+
+                    <div className={stylePlans.SearchBox}>
+                        {/* <label style={{color : "black", display : 'inline-block'}}>일정 검색</label> */}
+                        <input 
+                            type="text"
+                            placeholder="상품명 또는 거래처 검색"
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            style={{
+                                marginLeft: "0.5rem",
+                                borderRadius: "1.2rem",
+                                border: "0.1rem solid #ccc"
+                            }}
+                        />
+                    </div>
                 </div>
                 
                 {plansType ? (
@@ -136,11 +189,11 @@ function StockPlans() {
                                             ? Number(item.TOTAL_EA_QTY || 0) 
                                             : Number(item.TOTAL_QTY || item.TOTAL_OUT_QTY || item.GDS_QTY || 0);
 
-                                        let statusText = item.STATUS || "대기";
+                                        let statusText = item.STATUS || (plansType === "InBound" ? "입고 대기" : "출고 대기");
                                         if (totalQty > 0) {
-                                            if (doneQty >= totalQty) statusText = "완료";
-                                            else if (doneQty > 0) statusText = "진행중";
-                                            else statusText = "대기";
+                                            if (doneQty >= totalQty) { statusText = plansType === "InBound" ? "입고 완료" : "출고 완료"; }
+                                            else if (doneQty > 0) { statusText = plansType === "InBound" ? "입고 진행중" : "출고 진행중"; }
+                                            else { statusText = plansType === "InBound" ? "입고 대기" : "출고 대기"; }
                                         }
 
                                         return (
@@ -159,7 +212,12 @@ function StockPlans() {
                                                         productCode = item.BOX_CD.split('-').slice(0, 3).join('-');
                                                     }
                                                     if (!productCode || productCode === "undefined") {
-                                                        alert(`상품 코드를 인식할 수 없습니다.`);
+                                                        setModal({
+                                                            isOpen: true,
+                                                            title: 'Error',
+                                                            message: '상품 코드를 인식할 수 없습니다.',
+                                                            onConfirm: closeModal
+                                                        });
                                                         return;
                                                     }
                                                     if (plansType === "InBound") {
@@ -199,13 +257,13 @@ function StockPlans() {
                                         );
                                     })
                                 ) : (
-                                    <tr><td colSpan="8" style={{textAlign:'center', padding:'2rem'}}>조회된 내역이 없습니다.</td></tr>
+                                    <tr><td colSpan="8" style={{textAlign:'center', padding:'2rem'}}>검색 결과가 없습니다.</td></tr>
                                 )}
                             </tbody>
                         </table>
 
                         {/* --- 페이지네이션 UI --- */}
-                        {currentList.length > 0 && (
+                        {filteredList.length > 0 && (
                             <div className={stylePlans.pagination}>
                                 <button 
                                     className={stylePlans.pageMoveBtn}
@@ -251,6 +309,7 @@ function StockPlans() {
                 />
             )}
         </div>
+        </>
     );
 }
 

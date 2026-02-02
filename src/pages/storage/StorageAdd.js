@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
+import Modal from "../../components/Modal";
 
 function StorageAdd ({storageList, onUpdate, setView}) {
 
@@ -23,12 +24,15 @@ function StorageAdd ({storageList, onUpdate, setView}) {
     const [currentZoneCount, setCurrentZoneCount] = useState(null);
     const [currentZoneNm, setCurrentZoneNm] = useState(null);
 
+    //alert
+    const closeAlert = () => setModal({ ...modal, isOpen: false });
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+
     const handleSelectStorage = (e) => {
         setSelectedStorage(Number(e.target.value));
     }
 
-    // 선택한 창고 별 구역 옵션 리스트
-    // 선택한 구역 별 선반 옵션 리스트
+    // 선택한 창고 별 구역 옵션 리스트, 구역 별 선반 옵션 리스트
     const {zoneOptions, rackOptions} = useStorageData(SERVER_URL, selectedStorage, selectedZone);
 
     // 구역에 해당하는 선반 층 수 
@@ -156,11 +160,23 @@ function StorageAdd ({storageList, onUpdate, setView}) {
         ));
 
         if(hasZone){
-            alert("이미 등록된 구역입니다.");
+            setModal({
+                isOpen: true,
+                title: '',
+                message: "이미 등록된 구역입니다.",
+                onConfirm: closeAlert
+            });
+            // alert("이미 등록된 구역입니다.");
             return;
         }
 
-        alert("수정을 진행하시겠습니까?");
+        setModal({
+            isOpen: true,
+            title: '',
+            message: "수정을 진행하시겠습니까?",
+            onConfirm: closeAlert
+        });
+        // alert("수정을 진행하시겠습니까?");
 
         try{
             const res = await fetch(`${SERVER_URL}/ttik/storage/add`, {
@@ -172,7 +188,13 @@ function StorageAdd ({storageList, onUpdate, setView}) {
             if(res.ok){
                 const data = await res.json();
                 console.log("수정 요청 응답-->", data);
-                alert(data.message);
+                setModal({
+                    isOpen: true,
+                    title: 'Success',
+                    message: data.message,
+                    onConfirm: closeAlert
+                });
+                // alert(data.message);
 
                 resetForm();
                 if(onUpdate) onUpdate();
@@ -181,7 +203,13 @@ function StorageAdd ({storageList, onUpdate, setView}) {
             } else {
                 console.log("수정 요청 실패-->", res.status);
                 const errorData = await res.json();
-                alert(errorData.message);
+                setModal({
+                    isOpen: true,
+                    title: 'Again',
+                    message: errorData.message,
+                    onConfirm: closeAlert
+                });
+                // alert(errorData.message);
             }
         } catch(error){
             console.log("수정 요청 실패", error);
@@ -190,6 +218,7 @@ function StorageAdd ({storageList, onUpdate, setView}) {
 
     return (
         <>
+            <Modal {...modal}/>
             <form className={styleStorage.addForm} onSubmit={handelSubmit}>
                 <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
                     <h3 className={styleStorage.modifyHeading}>창고</h3>

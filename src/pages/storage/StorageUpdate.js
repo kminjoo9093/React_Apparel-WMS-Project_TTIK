@@ -2,6 +2,7 @@ import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
+import Modal from "../../components/Modal";
 
 function StorageUpdate ({storageList, onUpdate, setView}) {
 
@@ -17,6 +18,10 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
         disabledRack: false
     })
 
+    //alert
+    const closeAlert = () => setModal({ ...modal, isOpen: false });
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+
 
     const handleSelectStorage = (e) => {
         setSelectedStorage(Number(e.target.value));
@@ -31,12 +36,22 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
         const {name, checked} = e.target;
 
         if(name === "disabledZone" && !selectedZone){
-            alert("구역을 먼저 선택해주세요.");
+            setModal({
+                isOpen: true,
+                title: 'Again',
+                message: '구역을 먼저 선택해주세요.',
+                onConfirm: closeAlert
+            });
             return;
         }
 
         if(name === "disabledRack" && !selectedRack){
-            alert("선반을 먼저 선택해주세요.");
+            setModal({
+                isOpen: true,
+                title: 'Again',
+                message: '선반을 먼저 선택해주세요.',
+                onConfirm: closeAlert
+            });
             return;
         }
 
@@ -82,66 +97,102 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
 
         e.preventDefault();
 
-        //창고 정보 수정 파라미터
+        // 선반 선택을 하고, 비활성화가 아닌경우 적재 상태를 선택해야하도록
+        if(selectedRack !== "" && !disableValues.disabledRack){
+            if(rackCapacity === ""){
+                setModal({
+                    isOpen: true,
+                    title: 'Again',
+                    message: '선반 적재 상태를 선택하세요.',
+                    onConfirm: closeAlert
+                });
+                return;
+            }
+        }
+
+        // 창고 정보 수정 파라미터
         const storageModifyReq = {
             "storageSn" : selectedStorage,
             "zoneSn" : selectedZone,
-            "isDisabledZone" : disableValues.disabledZone, //boolean
+            "isDisabledZone" : disableValues.disabledZone,
             "rackSn" : selectedRack,
-            "isDisabledRack": disableValues.disabledRack, //boolean
+            "isDisabledRack": disableValues.disabledRack,
             "rackEnabled": disableValues.disabledRack ? "N" : "Y",
-            "rackStts": disableValues.disabledRack ? "Y": (rackCapacity || "N") // 선반 비활성화상태면 rackStts는 무조건 Y(사용중/비었음)로 설정
+            "rackStts": disableValues.disabledRack ? "Y": (rackCapacity || "N")
         }
 
-
         let confirmMsg = "수정을 진행하시겠습니까?";
+        const newRackStatus = rackCapacity === "Y" ? "여유" : "포화";
 
-        // 구역만 활성화하는 경우
+        // 조건별 메시지 생성 로직 (기존 로직 유지)
         if (selectedZone && !disableValues.disabledZone && !selectedRack) {
-            confirmMsg = "해당 구역을 활성화 상태로 수정하시겠습니까?";
+            confirmMsg = `해당 구역을 활성화 상태로 수정하시겠습니까?`;
         } 
-        // 선반을 수정하는 경우
         else if (selectedZone && selectedRack) {
             if (disableValues.disabledRack) {
                 confirmMsg = "해당 선반을 비활성화 상태로 수정하시겠습니까?";
             } else {
-                confirmMsg = "해당 선반을 활성화 상태로 수정하시겠습니까?";
+                confirmMsg = `해당 선반을 ${newRackStatus}상태로 활성화하시겠습니까?`;
             }
         }
-        // 구역 자체를 비활성화하는 경우 
         else if (selectedZone && disableValues.disabledZone) {
             confirmMsg = "해당 구역과 하위 모든 선반을 비활성화하시겠습니까?";
         }
 
-        if (!window.confirm(confirmMsg)) return;
+        // 📍 커스텀 모달 적용
+        setModal({
+            isOpen: true,
+            title: 'Modify',
+            message: confirmMsg,
+            onCancel: closeAlert,
+            onConfirm: async () => {
+                try {
+                    const res = await fetch(`${SERVER_URL}/ttik/storage/modify`, {
+                        method: 'PUT',
+                        credentials: 'include', 
+                        headers: {'Content-type': 'application/json'},
+                        body: JSON.stringify(storageModifyReq)
+                    });
 
-        try{
-            const res = await fetch(`${SERVER_URL}/ttik/storage/modify`, {
-                method: 'PUT',
-                credentials: 'include', 
-                headers: {'Content-type': 'application/json'},
-                body: JSON.stringify(storageModifyReq)
-            });
-            if(res.ok){
-                const data = await res.json();
-                alert(data.message);
-
-                resetForm();
-                if(onUpdate) onUpdate();
-
-                setView("list"); //수정 후 창고 조회 리스트가 보이도록
-            } else {
-                console.log("수정 요청 실패-->", res.status);
-                const errorData = await res.json();
-                alert(errorData.message);
+                    if(res.ok){
+                        const data = await res.json();
+                        setModal({
+                            isOpen: true,
+                            title: 'Success',
+                            message: data.message,
+                            onConfirm: () => {
+                                closeAlert();
+                                resetForm();
+                                if(onUpdate) onUpdate();
+                                setView("list"); // 수정 후 리스트 보기
+                            }
+                        });
+                    } else {
+                        console.log("수정 요청 실패-->", res.status);
+                        const errorData = await res.json();
+                        setModal({
+                            isOpen: true,
+                            title: 'Again',
+                            message: errorData.message,
+                            onConfirm: closeAlert
+                        });
+                    }
+                } catch(error){
+                    console.log("수정 요청 실패", error);
+                    setModal({
+                        isOpen: true,
+                        title: 'Error',
+                        message: "서버 통신 중 에러가 발생했습니다.",
+                        onConfirm: closeAlert
+                    });
+                }
             }
-        } catch(error){
-            console.log("수정 요청 실패", error);
-        } 
+        });
     }
 
     return (
         <>
+            <Modal {...modal}/>
             <form className={styleStorage.updateForm} onSubmit={handelSubmit}>
                 <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
                     <h3 className={styleStorage.modifyHeading}>창고</h3>

@@ -46,11 +46,9 @@ function Ttik() {
     checkLoginStatus();
   }, []);
 
-  // 특정 권한만 접근 가능한 보호 라우트 컴포넌트
   const ProtectedRoute = ({ children, allowedRoles }) => {
     if (!isLoggedIn) return <Navigate to="/login" replace />;
     if (allowedRoles && !allowedRoles.includes(user?.tkcgStorage)) {
-      // 권한이 없으면 대시보드로 리다이렉트
       return <Navigate to="/ttik" replace />;
     }
     return children;
@@ -60,17 +58,18 @@ function Ttik() {
 
   return (
     <Routes>
-      {/* 1. 로그인이 필요 없는 경로 */}
-      <Route path="/login" element={<Login setUser={setUser} setIsLoggedIn={setIsLoggedIn} />} />
+      {/* 1. 로그인 페이지를 최상단에 배치하고 /* 경로와 분리 */}
+      <Route path="/login" element={
+        isLoggedIn ? <Navigate to="/ttik" replace /> : <Login setUser={setUser} setIsLoggedIn={setIsLoggedIn} />
+      } />
 
-      {/* 2. 로그인이 필요한 모든 경로 */}
-      <Route 
-        path="*" 
-        element={
-          isLoggedIn ? (
+      {/* 2. 로그인이 필요한 모든 경로는 Layout 내부에서 처리 */}
+      {isLoggedIn ? (
+        <Route 
+          path="/*" 
+          element={
             <Layout user={user} setUser={setUser} setIsLoggedIn={setIsLoggedIn}>
               <Routes>
-                {/* 공통 접근 권한 */}
                 <Route path="/ttik" element={<MainDashboard user={user} />} />
                 <Route path="/product/list" element={<ProductList />} /> 
                 <Route path="/brand" element={<Brand />} />
@@ -78,7 +77,6 @@ function Ttik() {
                 <Route path="/stock/plans" element={<Plans />} />
                 <Route path="/stock/plans/inbound/:productCd" element={<StockDetailInbound />} />
                 <Route path="/stock/plans/outbound/:productCd" element={<StockDetailOutbound />} />
-                {/* <Route path="/register" element={<ProductRegister />} /> */}
                 <Route path="/product/register" element={<ProductRegister />} />
                 <Route path="/register/admin" element={<RegisterAdmin />} />
                 <Route path="/product/productDetail/:gds_cd" element={<ProductDetail />} />
@@ -88,8 +86,6 @@ function Ttik() {
                 <Route path="/stock/history" element={<History />} />
                 <Route path="/storage" element={<Storage />} />
 
-
-                {/* 전체 관리자(ALL)만 접근 가능 */}
                 <Route 
                   path="/register-admin" 
                   element={
@@ -102,11 +98,12 @@ function Ttik() {
                 <Route path="*" element={<Error404Page />} />
               </Routes>
             </Layout>
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        } 
-      />
+          } 
+        />
+      ) : (
+        /* 로그인 안된 상태에서 /login 이외의 모든 경로는 로그인으로 강제 이동 */
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      )}
     </Routes>
   );
 }

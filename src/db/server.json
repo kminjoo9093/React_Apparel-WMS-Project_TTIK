@@ -1,6 +1,5 @@
 {
   "SERVER_URL": "https://localhost:3001",
-  "__SERVER_URL": "https://localhost:3001",
   "__comment": "원래 사용하던 로컬 주소는 아래와 같습니다",
   "SERVER_URL_LOCAL": "https://58.126.151.156:3001"
 }

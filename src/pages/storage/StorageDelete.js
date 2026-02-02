@@ -2,6 +2,7 @@ import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
+import Modal from "../../components/Modal";
 
 function StorageDelete ({storageList, onUpdate, setView}) {
 
@@ -15,6 +16,10 @@ function StorageDelete ({storageList, onUpdate, setView}) {
         deleteZone: false,  //구역 삭제
         deleteRack: false //선반 삭제
     })
+
+    //alert
+    const closeAlert = () => setModal({ ...modal, isOpen: false });
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
     
     const handleSelectStorage = (e) => {
         setSelectedStorage(Number(e.target.value));
@@ -63,54 +68,82 @@ function StorageDelete ({storageList, onUpdate, setView}) {
 
         e.preventDefault();
 
-        //삭제 체크가 하나도 없을 경우
+        // 삭제 체크가 하나도 없을 경우
         if(!isCheckedDelete.deleteStorage && !isCheckedDelete.deleteZone && !isCheckedDelete.deleteRack) {
-            alert("삭제 버튼을 눌러 체크 후 삭제를 진행하세요");
+            setModal({
+                isOpen: true,
+                title: '',
+                message: "삭제 버튼을 눌러 체크 후 삭제를 진행하세요",
+                onConfirm: closeAlert
+            });
             return;
         }
 
-        // 창고 삭제시 관련 관리자 삭제
+        // 창고 삭제시 관련 관리자 삭제를 위한 데이터 준비
         const currentStorageNm = storageList.find(s => s.storageSn === selectedStorage)?.storageNm;
 
-        //창고 정보 수정(삭제) 파라미터
+        // 창고 정보 수정(삭제) 파라미터
         const storageDeleteReq = {
             "storageSn" : selectedStorage,
             "zoneSn" : selectedZone,
             "rackSn" : selectedRack,
-            "storageNm" : isCheckedDelete.deleteStorage ? currentStorageNm : null // 창고 삭제 시에만 창고명 전달
+            "storageNm" : isCheckedDelete.deleteStorage ? currentStorageNm : null 
         }
 
-        if(!window.confirm("삭제를 진행하시겠습니까?")) return;
+        setModal({
+            isOpen: true,
+            title: 'DELETE',
+            message: "삭제를 진행하시겠습니까?",
+            onCancel: closeAlert,
+            onConfirm: async () => {
+                try {
+                    const res = await fetch(`${SERVER_URL}/ttik/storage/delete`, {
+                        method: 'DELETE',
+                        credentials: 'include', 
+                        headers: {'Content-type': 'application/json'},
+                        body: JSON.stringify(storageDeleteReq)
+                    });
+                    
+                    if(res.ok){
+                        const data = await res.json();
 
-        try{
-            const res = await fetch(`${SERVER_URL}/ttik/storage/delete`, {
-                method: 'DELETE',
-                credentials: 'include', 
-                headers: {'Content-type': 'application/json'},
-                body: JSON.stringify(storageDeleteReq)
-            });
-            if(res.ok){
-                const data = await res.json();
+                        // 어떤 구역, 선반을 삭제했는지 안내
+                        setModal({
+                            isOpen: true,
+                            title: 'Success',
+                            message: data.message,
+                            onConfirm: () => {
+                                closeAlert();
+                                if(onUpdate) onUpdate();
+                                resetForm();
+                                setView("list"); // 수정 후 창고 조회 리스트가 보이도록
+                            }
+                        });
 
-                //어떤 구역, 선반을 삭제했는지 안내
-                alert(data.message);
-
-                if(onUpdate) onUpdate();
-                resetForm();
-
-                setView("list"); //수정 후 창고 조회 리스트가 보이도록
-
-            } else {
-                const errorData = await res.json();
-                alert(errorData.message);
+                    } else {
+                        const errorData = await res.json();
+                        setModal({
+                            isOpen: true,
+                            title: 'DELETE',
+                            message: errorData.message,
+                            onConfirm: closeAlert
+                        });
+                    }
+                } catch(error){
+                    console.log("수정 요청 실패", error);
+                    setModal({
+                        isOpen: true,
+                        title: 'Error',
+                        message: "서버 통신 중 에러가 발생했습니다.",
+                        onConfirm: closeAlert
+                    });
+                } 
             }
-        } catch(error){
-            console.log("수정 요청 실패", error);
-        } 
-    }
-
+        });
+    };
     return (
         <>
+            <Modal {...modal}/>
             <form className={styleStorage.deleteForm} onSubmit={handelSubmit}>
                 <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
                     <h3 className={styleStorage.modifyHeading}>창고</h3>

@@ -3,6 +3,8 @@ import styleBrand from "../../css/Brand.module.css";
 import serverUrl from "../../db/server.json";
 
 function BrandRegister({ isOpen, onClose, onRegisterSuccess }) {
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const closeModal = () => setModal({ ...modal, isOpen: false });
     const [brNo, setBrNo] = useState("");
     const [brResult, setBrResult] = useState(null);
     const [brError, setBrError] = useState("");
@@ -60,13 +62,24 @@ function BrandRegister({ isOpen, onClose, onRegisterSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!brand) { alert("브랜드명을 입력해 주세요."); return; }
+        if (!brand) { 
+            setModal({
+                isOpen: true,
+                title: 'Brand',
+                message: '브랜드명을 입력해 주세요',
+                onConfirm: closeModal
+            });   return; }
         if (brResult?.status !== "인증되었습니다.") {
             setBrError("사업자 번호 인증이 필요합니다.");
             return;
         }
         if (telError || Tel.length < 9) {
-            alert("올바른 연락처를 입력해 주세요.");
+            setModal({
+                isOpen: true,
+                title: 'Tel',
+                message: '올바른 연락처를 입력해 주세요.',
+                onConfirm: closeModal
+            });
             return;
         }
 
@@ -83,7 +96,12 @@ function BrandRegister({ isOpen, onClose, onRegisterSuccess }) {
             });
 
             if (response.ok) {
-                alert("등록되었습니다!");
+                    setModal({
+                    isOpen: true,
+                    title: 'Register',
+                    message: '등록되었습니다!',
+                    onConfirm: closeModal
+                });
                 setBrand("");
                 setBrNo("");
                 setTel("");
