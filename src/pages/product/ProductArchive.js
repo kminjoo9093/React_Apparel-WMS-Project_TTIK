@@ -84,9 +84,6 @@ const ProductArchive = () => {
 
   return (
     <>
-    <Modal
-        {...modal} 
-    />
     <div className={style['archive-wrapper']}>
       <h2 className={style['archive-title']}>
         📦 관리 제외 품목 (Archive)
@@ -147,6 +144,7 @@ const ProductArchive = () => {
         </table>
       </div>
     </div>
+    <Modal {...modal} />
     </>
   );
 };
