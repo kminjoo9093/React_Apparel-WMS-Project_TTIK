@@ -153,8 +153,8 @@ const QRsave = () => {
     }, 200);
 
     try {
-        const selectedProduct = products.find(p => p.id === printConfig.productId);
-        const productNameRaw = selectedProduct ? selectedProduct.name : "상품라벨";
+        const selectedProduct = products.find(p => String(p.productCd) === String(printConfig.productId));
+        const productNameRaw = selectedProduct ? selectedProduct.productNm : "상품라벨";
         
         const labelDataList = generatedQrs.map(code => ({
             qrContent: code,

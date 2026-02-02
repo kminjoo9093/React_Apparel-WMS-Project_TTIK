@@ -73,6 +73,8 @@ function BrandList() {
             });
             return;
         }
+
+        // 1. 먼저 삭제 여부를 묻는 모달을 띄움
         setModal({
             isOpen: true,
             title: 'DELETE',
@@ -88,14 +90,18 @@ function BrandList() {
                     });
                     
                     if (response.ok) {
+                        // 2. 삭제 성공 시 성공 알림 모달을 띄움
                         setModal({
                             isOpen: true,
                             title: 'DELETE',
                             message: '삭제되었습니다',
-                            onConfirm: closeModal
+                            onConfirm: () => {
+                                // 3. 성공 모달의 '확인'을 눌렀을 때만 상태 업데이트 및 모달 닫기
+                                setBrands(prev => prev.filter(brand => !selectedIds.includes(brand.brandSn)));
+                                setSelectedIds([]);
+                                closeModal();
+                            }
                         });
-                        setBrands(prev => prev.filter(brand => !selectedIds.includes(brand.brandSn)));
-                        setSelectedIds([]);
                     } else {
                         setModal({
                             isOpen: true,

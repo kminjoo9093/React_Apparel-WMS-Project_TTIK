@@ -301,7 +301,10 @@ function ProductRegister(){
                 isOpen: true,
                 title: 'Success',
                 message: '상품 등록이 완료되었습니다.',
-                onConfirm: closeAlert
+                onConfirm: () => {
+                        closeAlert(); // 모달 닫기
+                        navigate("/product/list"); // 확인 후 이동
+                    }
                 });
                 setBrandCd("");
                 setProductNm("");
@@ -318,7 +321,7 @@ function ProductRegister(){
                 const data = await res.json();
                 console.log(data);
 
-                navigate("/product/list");
+                
             }
         } catch(error){
             setModal({
