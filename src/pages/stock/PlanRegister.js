@@ -163,12 +163,18 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
                 if (!lastNoRes.ok) throw new Error("박스 번호 조회 실패");
                 const { lastBoxNo } = await lastNoRes.json();
                 let startNo = Number(lastBoxNo || 0);
+                console.log(formData.boxQuantity,"확인");
+                console.log(startNo,"스타트넘버11");
 
                 // 3. [입고] 박스 및 아이템 코드 생성 규칙 적용
                 for (let i = 1; i <= Number(formData.boxQuantity); i++) {
                     const currentBoxNo = startNo + i;
                     const boxCode = `${formData.itemName}-B${formData.eaQuantity}-${currentBoxNo}`;
-                    
+                    console.log(startNo,"스타트넘버22");
+                    console.log(boxCode,"박스코드");
+                    console.log(formData.itemName,"아이템이름");
+                    console.log(formData.eaQuantity,"수량");
+                    console.log(currentBoxNo,"박스넘버");
                     const itemCodes = [];
                     for (let j = 1; j <= Number(formData.eaQuantity); j++) {
                         itemCodes.push(`${boxCode}-${j}`);

@@ -62,40 +62,26 @@ const ProductArchive = () => {
     });
   };
 
+
+  /* [운영 정책 변경] 데이터 이력 보존을 위해 영구 삭제(Hard Delete) 기능은 UI 및 로직에서 제외함
   // 영구 삭제 (DB에서 진짜 지우기)
   const handlePermanentDelete = async (gds_cd) => {
-    setModal({
-      isOpen: true,
-      title: 'DELETE',
-      message: '정말로 영구 삭제하시겠습니까?',
-      onCancel: closeModal,
-      onConfirm: async () => {
-        try {
-          await axios.delete(`${SERVER_URL}/ttik/product/productArchive/${gds_cd}`, {
-            withCredentials: true // 🔐 세션 유지를 위해 그대로 보존
-          });
-          
-          setModal({
-            isOpen: true,
-            title: 'Delete',
-            message: '영구 삭제되었습니다.',
-            onConfirm: () => {
-              closeModal();
-              navigate("/product/list");
-            }
-          });
-        } catch (error) {
-          console.error("삭제 실패:", error);
-          setModal({
-            isOpen: true,
-            title: 'Error',
-            message: '삭제 중 오류가 발생했습니다.',
-            onConfirm: closeModal
-          });
-        }
-      }
-    });
+    if (!window.confirm("정말로 영구 삭제하시겠습니까?")) return;
+
+    try {
+      await axios.delete(`${SERVER_URL}/ttik/product/productArchive/${gds_cd}`, {
+        withCredentials: true // 🔐 이 줄이 없어서 로그인 페이지로 튕기는 거야!
+      });
+      
+      alert("영구 삭제되었습니다.");
+      navigate('/product/list');
+    } catch (error) {
+      console.error("삭제 실패:", error);
+    }
   };
+  */
+
+
   return (
     <>
     <Modal
@@ -143,12 +129,15 @@ const ProductArchive = () => {
                       >
                         수정 후 복구
                       </button>
+
+                      {/* [운영 정책] 영구 삭제 버튼 주석 처리 (코드 보존용)
                       <button 
                         onClick={() => handlePermanentDelete(product.gds_cd)} 
                         className={style['delete-btn']}
                       >
                         영구 삭제
                       </button>
+                      */}
                     </div>
                   </td>
                 </tr>

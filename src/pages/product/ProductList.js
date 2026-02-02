@@ -506,6 +506,7 @@ function ProductList(){
                                                         {product.frstRegDt.split('T')[0]}
                                                     </div>
                                                 </div>
+
                                             </Link>
                                         </li>
                                     )
