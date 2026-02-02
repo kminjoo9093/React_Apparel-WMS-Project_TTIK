@@ -126,7 +126,8 @@
     align-items: center;
     gap: 10px;
     width: 40%;   /* 검색창 전체 너비 */
-    justify-content: center;
+    margin-left: 1rem;
+    /* justify-content: center; */
 }
 
 .searchInput input {
@@ -150,7 +151,7 @@
 .timelineContainer {
     position: relative;
     padding-left: 40px;
-    margin-left: 20px;
+    margin-left: 2.5rem;
     border-left: 2px solid #cbd5e1; /* 정의서의 수직선 */
 }
 
@@ -158,13 +159,14 @@
 .timelineItem {
     position: relative;
     margin-bottom: 1.5rem;
+    font-size: 2rem;
 }
 
 /* 수직선 위의 점 */
 .timelineDot {
     position: absolute;
     left: -47px; /* 선 위치에 맞게 조절 */
-    top: 10px;
+    top: 18px;
     width: 12px;
     height: 12px;
     background-color: #1e293b; /* 정의서의 검은 점 */
@@ -181,7 +183,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 0.95rem;
+    font-size: 1.5rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
@@ -194,7 +196,7 @@
 /* 검색창 둥글게 조절 */
 .searchInput input {
     border-radius: 30px;
-    padding: 10px 20px;
+    padding: 2rem 3rem;
     border: 2px solid #e2e8f0;
     width: 400px;
 }
