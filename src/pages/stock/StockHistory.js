@@ -96,7 +96,7 @@ function StockHistory() {
                                         </span>
                                     </div>
 
-                                    {item.remark.includes('입고') && (
+                                    {/* {item.remark.includes('입고') && (
                                         <span className={styleHistory.targetText}>
                                             거래처 {item.target_name}
                                         </span>
@@ -107,12 +107,13 @@ function StockHistory() {
                                         <span className={styleHistory.targetText}>
                                             거래처 {item.target_name}
                                         </span>
-                                    )}
+                                    )} */}
 
                                     <div className={styleHistory.contentBottom}>
                                         <span className={styleHistory.remarkText}>
                                             {/* 비고(remark)에 저장된 창고 위치나 상세 상태 출력 */}
                                             {item.remark || "상세 내역 없음"}
+                                            
                                         </span>
                                     </div>
                                 </div>
