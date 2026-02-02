@@ -94,9 +94,6 @@ function StockPlans() {
 
     return (
         <>
-        <Modal
-            {...modal} 
-        />
         <div>
             <h1 className={stylePlans.plansTitle}>Stock Plans</h1>
             <p className={stylePlans.plansSubTitle}>입·출고 예정을 확인하고 관리하세요.</p>
@@ -309,6 +306,9 @@ function StockPlans() {
                 />
             )}
         </div>
+        <Modal
+            {...modal} 
+        />
         </>
     );
 }
