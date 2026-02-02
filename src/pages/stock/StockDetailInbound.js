@@ -151,7 +151,7 @@ function StockDetailInbound() {
         }
 
         try {
-            // 2. DB에서 실제 박스/아이템 수량 조회
+            // DB에서 실제 박스/아이템 수량 조회
             const res = await fetch(`${SERVER_URL}/ttik/productdetail/scan-check/${fullBarcode}`, {
                 method: 'GET',
                 credentials: 'include', 
@@ -163,13 +163,17 @@ function StockDetailInbound() {
             const actualQty = await res.json();
 
             if (actualQty <= 0) {
-                alert("해당 박스에 입고 가능한 아이템이 없습니다.");
+                setModal({
+                    isOpen: true,
+                    title: 'Again',
+                    message: '해당 박스에 입고 가능한 아이템이 없습니다.',
+                    onConfirm: closeModal
+                });
                 return;
             }
 
-            // 3. 대소문자 구분 없이 박스 여부 및 상품코드 추출
+            // 대소문자 구분 없이 박스 여부 및 상품코드 추출
             const parts = fullBarcode.split('-');
-            //const isBoxScan = fullBarcode.toUpperCase().includes('-B');
             const boxMatch = fullBarcode.match(/^(.*)-B(\d+)-(\d+)(?:-(\d+))?$/i);
         
             let productId = "";
@@ -249,7 +253,12 @@ function StockDetailInbound() {
 
         } catch (error) {
             console.error("스캔 처리 오류:", error);
-            alert("정보 조회 중 오류가 발생했습니다.");
+            setModal({
+                isOpen: true,
+                title: 'Error',
+                message: '정보 조회 중 오류가 발생했습니다.',
+                onConfirm: closeModal
+            });
         }
     };
 
@@ -281,21 +290,18 @@ function StockDetailInbound() {
             try {
                 let successCount = 0;
 
-                // ⚠️ 주의: for문 내부에서 중복 호출되지 않도록 구조 정돈
                 for (const item of itemsToProcess) {
                     const payload = {
                         boxCd: item.barcode,
                         gdsCd: productCd,
-                        rackSn: Number(selections.rack), // 확실하게 숫자로 변환
+                        rackSn: Number(selections.rack), 
                         brandNm: product?.brandNm || '',
                         qty: item.increment 
                     };
 
-                    // 🔍 [디버깅 로그] 전송 직전 데이터 확인
                     console.log(`🚀 [${item.barcode}] 전송 시도...`);
                     console.log("📦 Payload:", payload);
 
-                    // URL 확인: /ttik/productdetail/inbound/process 가 맞는지 백엔드와 맞출 것
                     const response = await fetch(`${SERVER_URL}/ttik/productdetail/inbound/process`, {
                         method: 'POST',
                         credentials: 'include',
@@ -313,7 +319,12 @@ function StockDetailInbound() {
                     }
                 }
 
-                alert(`${successCount}건의 입고 및 적재 처리가 완료되었습니다.`);
+                setModal({
+                    isOpen: true,
+                    title: 'Success',
+                    message: `${successCount}건의 입고 및 적재 처리가 완료되었습니다.`,
+                    onConfirm: closeModal
+                });
 
                 // 성공 후 상태 업데이트
                 const remainingHistory = scanHistory.filter(h => !checkedItems.has(h.barcode));
@@ -327,7 +338,12 @@ function StockDetailInbound() {
 
             } catch (error) {
                 console.error("🏁 최종 등록 실패:", error);
-                alert("처리 중 오류가 발생했습니다. 콘솔창(F12)의 에러 메시지를 확인해주세요.");
+                setModal({
+                    isOpen: true,
+                    title: 'Error',
+                    message: "처리 중 오류가 발생했습니다. 콘솔창(F12)의 에러 메시지를 확인해주세요.",
+                    onConfirm: closeModal
+                });
             }
         }
     };

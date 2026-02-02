@@ -200,7 +200,12 @@ function StorageList({storageList:storageOptions=[]}){
                 // 리스트 새로고침
                 getStorageListData();
             } else {
-                alert("오류가 발생했습니다.");
+                setModal({
+                    isOpen: true,
+                    title: 'Error',
+                    message: '오류가 발생했습니다.',
+                    onConfirm: closeAlert
+                });
             }
         } catch(error){
             console.log(error);

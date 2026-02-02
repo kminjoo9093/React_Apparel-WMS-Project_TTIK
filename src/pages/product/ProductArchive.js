@@ -3,12 +3,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import style from '../../css/ProductArchive.module.css';
 import serverUrl from "../../db/server.json";
+import Modal from '../../components/Modal';
 
 const ProductArchive = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const SERVER_URL = serverUrl.SERVER_URL;
   
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+  const closeModal = () => setModal({ ...modal, isOpen: false });
   const [archiveList, setArchiveList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
@@ -62,14 +65,24 @@ const ProductArchive = () => {
       });
       
       // 성공 시 로직...
-      alert("영구 삭제되었습니다.");
-      navigate('/product/list');
+      setModal({
+          isOpen: true,
+          title: 'Delete',
+          message: '영구 삭제되었습니다.',
+          onConfirm: () => {
+            navigate("/product/list");
+          }
+        });
     } catch (error) {
       console.error("삭제 실패:", error);
     }
   };
 
   return (
+    <>
+    <Modal
+        {...modal} 
+    />
     <div className={style['archive-wrapper']}>
       <h2 className={style['archive-title']}>
         📦 관리 제외 품목 (Archive)
@@ -127,6 +140,7 @@ const ProductArchive = () => {
         </table>
       </div>
     </div>
+    </>
   );
 };
 

@@ -3,11 +3,14 @@ import stylePlans from "../../css/plarns.module.css";
 import PlanRegister from './PlanRegister';
 import serverUrl from "../../db/server.json";
 import { useLocation, useNavigate } from 'react-router-dom';
+import Modal from '../../components/Modal';
 
 function StockPlans() {
     const navigate = useNavigate();
     const location = useLocation(); 
     const [searchTerm, setSearchTerm] = useState(""); 
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const closeModal = () => setModal({ ...modal, isOpen: false });
 
     const [plansType, setPlansType] = useState(location.state?.activeTab || "InBound");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,6 +93,10 @@ function StockPlans() {
     };
 
     return (
+        <>
+        <Modal
+            {...modal} 
+        />
         <div>
             <h1 className={stylePlans.plansTitle}>Stock Plans</h1>
             <p className={stylePlans.plansSubTitle}>입·출고 예정을 확인하고 관리하세요.</p>
@@ -205,7 +212,12 @@ function StockPlans() {
                                                         productCode = item.BOX_CD.split('-').slice(0, 3).join('-');
                                                     }
                                                     if (!productCode || productCode === "undefined") {
-                                                        alert(`상품 코드를 인식할 수 없습니다.`);
+                                                        setModal({
+                                                            isOpen: true,
+                                                            title: 'Error',
+                                                            message: '상품 코드를 인식할 수 없습니다.',
+                                                            onConfirm: closeModal
+                                                        });
                                                         return;
                                                     }
                                                     if (plansType === "InBound") {
@@ -297,6 +309,7 @@ function StockPlans() {
                 />
             )}
         </div>
+        </>
     );
 }
 
