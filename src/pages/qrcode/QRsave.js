@@ -7,8 +7,10 @@ import Modal from '../../components/Modal';
 const QRsave = () => {
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
     const closeModal = () => setModal({ ...modal, isOpen: false });
-    const [products, setProducts] = useState([]);
     const [generatedQrs, setGeneratedQrs] = useState([]);
+    const [products, setProducts] = useState([]); 
+    const [brands, setBrands] = useState([]); 
+    const [selectedBrand, setSelectedBrand] = useState(''); 
     const [isDownloading, setIsDownloading] = useState(false);
     const [progress, setProgress] = useState(0);
 
@@ -34,31 +36,62 @@ const QRsave = () => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    const mappedData = data.map(p => ({
-                        id: p.productCd,
-                        name: p.productNm
-                    }));
-                    setProducts(mappedData);
+                    setProducts(data);
                     
-                    // 데이터가 있다면 첫 번째 상품을 기본값으로 설정
-                    if (mappedData.length > 0) {
-                        setPrintConfig(prev => ({ ...prev, productId: mappedData[0].id }));
-                    }
+                    // 브랜드 중복 제거하여 추출
+                    const uniqueBrands = [...new Set(data.map(p => p.brandNm))];
+                    setBrands(uniqueBrands);
                 }
             } catch (error) {
                 console.error("상품 목록 로딩 실패:", error);
             }
         };
-
         fetchProducts();
     }, []);
 
+    const handleProductChange = async (productId) => {
+        const selectedProduct = products.find(p => p.productCd === productId);
+        if (!selectedProduct) return;
+
+        // 1. 입수량(inboxQty) 자동 세팅
+        const newBoxQty = selectedProduct.inboxQty || 50;
+
+        try {
+            const res = await fetch(`${SERVER_URL}/ttik/product/sequence/${productId}`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            
+            let nextNum = 1;
+            if (res.ok) {
+                const data = await res.json();
+                nextNum = data.nextBoxNum || 1; // 서버에서 계산된 다음 번호
+            }
+
+            setPrintConfig(prev => ({
+                ...prev,
+                productId: productId,
+                boxQty: newBoxQty,
+                boxStart: nextNum,
+                boxEnd: nextNum
+            }));
+        } catch (error) {
+            console.error("시퀀스 조회 실패:", error);
+            setPrintConfig(prev => ({ ...prev, productId: productId, boxQty: newBoxQty }));
+        }
+    };
+
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setPrintConfig(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+        
+        if (name === 'productId') {
+            handleProductChange(value);
+        } else {
+            setPrintConfig(prev => ({
+                ...prev,
+                [name]: type === 'checkbox' ? checked : value
+            }));
+        }
     };
 
     const generateSequence = (e) => {
@@ -189,23 +222,40 @@ const QRsave = () => {
             {...modal} 
         />
         <div className={style.container}>
-            {/* 좌측: 설정창 */}
             <aside className={style.leftSection}>
                 <div className={style.card}>
                     <div className={style.header}>
                         <h2>🖨️ 라벨 발행 설정</h2>
                     </div>
                     <form className={style.form} onSubmit={generateSequence}>
+                        {/* 브랜드 선택 추가 */}
+                        <div className={style.inputGroup}>
+                            <label>브랜드</label>
+                            <select 
+                                value={selectedBrand} 
+                                onChange={(e) => {
+                                    setSelectedBrand(e.target.value);
+                                    setPrintConfig(prev => ({ ...prev, productId: '' })); // 브랜드 변경 시 상품 초기화
+                                }}
+                            >
+                                <option value="">브랜드를 선택하세요</option>
+                                {brands.map(brand => (
+                                    <option key={brand} value={brand}>{brand}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* 상품 선택 (브랜드에 따라 필터링) */}
                         <div className={style.inputGroup}>
                             <label>발행 대상 상품</label>
-                            <select name="productId" value={printConfig.productId} onChange={handleChange}>
-                                {products.length > 0 ? (
-                                    products.map(p => (
-                                        <option key={p.id} value={p.id}>{p.name} ({p.id})</option>
+                            <select name="productId" value={printConfig.productId} onChange={handleChange} disabled={!selectedBrand}>
+                                <option value="">상품을 선택하세요</option>
+                                {products
+                                    .filter(p => p.brandNm === selectedBrand)
+                                    .map(p => (
+                                        <option key={p.productCd} value={p.productCd}>{p.productNm} ({p.productCd})</option>
                                     ))
-                                ) : (
-                                    <option value="">상품 로딩 중...</option>
-                                )}
+                                }
                             </select>
                         </div>
 

@@ -2,6 +2,7 @@ import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
+import Modal from "../../components/Modal";
 
 function StorageDelete ({storageList, onUpdate, setView}) {
 
@@ -15,6 +16,10 @@ function StorageDelete ({storageList, onUpdate, setView}) {
         deleteZone: false,  //구역 삭제
         deleteRack: false //선반 삭제
     })
+
+    //alert
+    const closeAlert = () => setModal({ ...modal, isOpen: false });
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
     
     const handleSelectStorage = (e) => {
         setSelectedStorage(Number(e.target.value));
@@ -65,7 +70,12 @@ function StorageDelete ({storageList, onUpdate, setView}) {
 
         //삭제 체크가 하나도 없을 경우
         if(!isCheckedDelete.deleteStorage && !isCheckedDelete.deleteZone && !isCheckedDelete.deleteRack) {
-            alert("삭제 버튼을 눌러 체크 후 삭제를 진행하세요");
+            setModal({
+                isOpen: true,
+                title: '',
+                message: "삭제 버튼을 눌러 체크 후 삭제를 진행하세요",
+                onConfirm: closeAlert
+            });
             return;
         }
 
@@ -93,7 +103,12 @@ function StorageDelete ({storageList, onUpdate, setView}) {
                 const data = await res.json();
 
                 //어떤 구역, 선반을 삭제했는지 안내
-                alert(data.message);
+                 setModal({
+                    isOpen: true,
+                    title: '삭제 성공',
+                    message: data.message,
+                    onConfirm: closeAlert
+                });
 
                 if(onUpdate) onUpdate();
                 resetForm();
@@ -102,7 +117,12 @@ function StorageDelete ({storageList, onUpdate, setView}) {
 
             } else {
                 const errorData = await res.json();
-                alert(errorData.message);
+                setModal({
+                    isOpen: true,
+                    title: '삭제 실패',
+                    message: errorData.message,
+                    onConfirm: closeAlert
+                });
             }
         } catch(error){
             console.log("수정 요청 실패", error);
@@ -111,6 +131,7 @@ function StorageDelete ({storageList, onUpdate, setView}) {
 
     return (
         <>
+            <Modal {...modal}/>
             <form className={styleStorage.deleteForm} onSubmit={handelSubmit}>
                 <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
                     <h3 className={styleStorage.modifyHeading}>창고</h3>

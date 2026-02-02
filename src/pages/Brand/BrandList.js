@@ -82,11 +82,21 @@ function BrandList() {
                     body: JSON.stringify(selectedIds), 
                 });
                 if (response.ok) {
-                    alert("삭제되었습니다.");
+                    setModal({
+                        isOpen: true,
+                        title: 'DELETE',
+                        message: '삭제되었습니다',
+                        onConfirm: closeModal
+                    });
                     setBrands(prev => prev.filter(brand => !selectedIds.includes(brand.brandSn)));
                     setSelectedIds([]);
                 } else {
-                    alert("삭제 실패");
+                    setModal({
+                        isOpen: true,
+                        title: 'ERROR',
+                        message: '삭제 실패',
+                        onConfirm: closeModal
+                    });
                 }
             } catch (error) {
                 console.error("삭제 에러:", error);
