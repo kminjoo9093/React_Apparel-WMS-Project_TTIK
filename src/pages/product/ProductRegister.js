@@ -161,7 +161,7 @@ function ProductRegister(){
         } else {
             setModal({
                 isOpen: true,
-                title: '입력값 오류',
+                title: 'Error',
                 message: '입력 형식을 확인하세요.',
                 onConfirm: closeAlert
             });
@@ -219,7 +219,7 @@ function ProductRegister(){
         } catch(error){
             setModal({
             isOpen: true,
-            title: '생성 실패',
+            title: 'Error',
             message: '입력한 정보를 확인하세요.',
             onConfirm: closeAlert
             });
@@ -233,7 +233,7 @@ function ProductRegister(){
             console.log(brandCd, seasonCd, category, sizeCd);
             setModal({
             isOpen: true,
-            title: '입력값 확인',
+            title: 'Again',
             message: '브랜드, 품번, 시즌, 카테고리, 사이즈를 모두 입력해야 합니다.',
             onConfirm: closeAlert
             });
@@ -263,7 +263,7 @@ function ProductRegister(){
         if(!productCd){
             setModal({
             isOpen: true,
-            title: '상품코드 확인',
+            title: 'Again',
             message: '상품코드를 생성해야 등록이 가능합니다.',
             onConfirm: closeAlert
             });
@@ -273,7 +273,7 @@ function ProductRegister(){
         const hasError = Object.values(errors).some(val => val === true);
         if(hasError) setModal({
             isOpen: true,
-            title: '입력값 확인',
+            title: 'Again',
             message: '입력값을 확인하세요',
             onConfirm: closeAlert
             });
@@ -299,7 +299,7 @@ function ProductRegister(){
             if(res.ok){
                 setModal({
                 isOpen: true,
-                title: '등록 성공',
+                title: 'Success',
                 message: '상품 등록이 완료되었습니다.',
                 onConfirm: closeAlert
                 });
@@ -323,7 +323,7 @@ function ProductRegister(){
         } catch(error){
             setModal({
                 isOpen: true,
-                title: '등록 실패',
+                title: 'Again',
                 message: '입력한 정보를 확인하세요.',
                 onConfirm: closeAlert
             });

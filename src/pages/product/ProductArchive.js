@@ -3,12 +3,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import style from '../../css/ProductArchive.module.css';
 import serverUrl from "../../db/server.json";
+import Modal from '../../components/Modal';
 
 const ProductArchive = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const SERVER_URL = serverUrl.SERVER_URL;
   
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+  const closeModal = () => setModal({ ...modal, isOpen: false });
   const [archiveList, setArchiveList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
@@ -47,29 +50,57 @@ const ProductArchive = () => {
 
   // 수정 후 복구
   const handleEditAndRestore = (product) => {
-    if (window.confirm(`[${product.gds_nm}] 상품 정보를 수정하며 복구하시겠습니까?`)) {
-      navigate('/product/productModify', { state: { product, fromArchive: true } });
-    }
+    setModal({
+      isOpen: true,
+      title: 'Restoration',
+      message: `[${product.gds_nm}] 상품 정보를 수정하며 복구하시겠습니까?`,
+      onCancel: closeModal,
+      onConfirm: () => {
+        navigate('/product/productModify', { state: { product, fromArchive: true } });
+        closeModal();
+      }
+    });
   };
 
-  // 영구 삭제 (DB에서 진짜 지우기) ProductArchive.js 수정
+  // 영구 삭제 (DB에서 진짜 지우기)
   const handlePermanentDelete = async (gds_cd) => {
-    if (!window.confirm("정말로 영구 삭제하시겠습니까?")) return;
-
-    try {
-      await axios.delete(`${SERVER_URL}/ttik/product/productArchive/${gds_cd}`, {
-        withCredentials: true // 🔐 이 줄이 없어서 로그인 페이지로 튕기는 거야!
-      });
-      
-      // 성공 시 로직...
-      alert("영구 삭제되었습니다.");
-      navigate('/product/list');
-    } catch (error) {
-      console.error("삭제 실패:", error);
-    }
+    setModal({
+      isOpen: true,
+      title: 'DELETE',
+      message: '정말로 영구 삭제하시겠습니까?',
+      onCancel: closeModal,
+      onConfirm: async () => {
+        try {
+          await axios.delete(`${SERVER_URL}/ttik/product/productArchive/${gds_cd}`, {
+            withCredentials: true // 🔐 세션 유지를 위해 그대로 보존
+          });
+          
+          setModal({
+            isOpen: true,
+            title: 'Delete',
+            message: '영구 삭제되었습니다.',
+            onConfirm: () => {
+              closeModal();
+              navigate("/product/list");
+            }
+          });
+        } catch (error) {
+          console.error("삭제 실패:", error);
+          setModal({
+            isOpen: true,
+            title: 'Error',
+            message: '삭제 중 오류가 발생했습니다.',
+            onConfirm: closeModal
+          });
+        }
+      }
+    });
   };
-
   return (
+    <>
+    <Modal
+        {...modal} 
+    />
     <div className={style['archive-wrapper']}>
       <h2 className={style['archive-title']}>
         📦 관리 제외 품목 (Archive)
@@ -127,6 +158,7 @@ const ProductArchive = () => {
         </table>
       </div>
     </div>
+    </>
   );
 };
 

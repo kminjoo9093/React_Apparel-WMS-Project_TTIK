@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styleHistory from "../../css/History.module.css";
 import serverUrl from "../../db/server.json";
+import Modal from '../../components/Modal';
 
 function StockHistory() {
     // 날짜 상태는 유지하되, 이번 요구사항에 따라 검색 시에는 필수로 쓰지 않도록 처리
@@ -8,6 +9,8 @@ function StockHistory() {
     const [historyList, setHistoryList] = useState([]);
     const [loading, setLoading] = useState(false);
     const SERVER_URL = serverUrl.SERVER_URL;
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const closeModal = () => setModal({ ...modal, isOpen: false });
 
     // 검색 핸들러
     const handleSearch = async () => {
@@ -33,7 +36,12 @@ function StockHistory() {
             setHistoryList(data);
         } catch (error) {
             console.error("이력 로드 실패:", error);
-            alert("이력을 불러오는 중 오류가 발생했습니다. (백엔드 로그 확인 필요)");
+            setModal({
+                isOpen: true,
+                title: 'Error',
+                message: '이력을 불러오는 중 오류가 발생했습니다. (백엔드 로그 확인 필요)',
+                onConfirm: closeModal
+            });
         } finally {
             setLoading(false);
         }
@@ -45,6 +53,10 @@ function StockHistory() {
     }, []);
 
     return (
+        <>
+        <Modal
+            {...modal} 
+        />
         <div className={styleHistory.HistoryContainer}>
             <h1 className={styleHistory.HistoryTitle}>Stock History</h1>
             <p className={styleHistory.HistorySubTitle}>상품 이력을 확인하세요.</p>
@@ -114,6 +126,7 @@ function StockHistory() {
                 </div>
             </div>
         </div>
+        </>
     );
 }
 

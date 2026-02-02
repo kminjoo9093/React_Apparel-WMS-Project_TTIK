@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import stylePlans from "../../css/plarns.module.css";
 import serverUrlData from "../../db/server.json";
+import Modal from '../../components/Modal';
 
 const initialFormState = {
     date: '',
@@ -22,6 +23,8 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
         partners: [], brands: [], categories: [], Product: [] 
     });
     const [availableBoxes, setAvailableBoxes] = useState([]); // 출고 가능 박스 목록
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+    const closeModal = () => setModal({ ...modal, isOpen: false });
 
     const SERVER_URL = serverUrlData.SERVER_URL; 
 
@@ -127,9 +130,22 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
         
         // 1. 출고 시 수량 유효성 검사
         if (currentType === "OutBound") {
-            if (!formData.boxCode) { alert("출고할 박스를 선택해주세요."); return; }
+            if (!formData.boxCode) { 
+                setModal({
+                    isOpen: true,
+                    title: 'Select',
+                    message: '출고할 박스를 선택해주세요.',
+                    onConfirm: closeModal
+                });
+                return; 
+            }
             if (formData.eaQuantity > formData.currentStock) {
-                alert(`선택한 박스의 재고(${formData.currentStock}EA)를 초과할 수 없습니다.`);
+                setModal({
+                    isOpen: true,
+                    title: 'Warning',
+                    message: `선택한 박스의 재고(${formData.currentStock}EA)를 초과할 수 없습니다.`,
+                    onConfirm: closeModal
+                });
                 return;
             }
         }
@@ -184,20 +200,39 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
             });
 
             if (response.ok) {
-                alert(`${currentType === "InBound" ? "입고" : "출고"} 등록이 완료되었습니다.`);
+                setModal({
+                    isOpen: true,
+                    title: 'Register',
+                    message: `${currentType === "InBound" ? "입고" : "출고"} 등록이 완료되었습니다.`,
+                    onConfirm: closeModal
+                });
                 onRegisterSuccess(); 
                 onClose();
             } else {
                 const errorData = await response.text();
-                alert(`등록 실패: ${errorData}`);
+                setModal({
+                    isOpen: true,
+                    title: 'Error',
+                    message: `등록 실패: ${errorData}`,
+                    onConfirm: closeModal
+                });
             }
         } catch (error) { 
             console.error("등록 중 에러:", error);
-            alert('서버와 통신 중 오류가 발생했습니다.'); 
+            setModal({
+                    isOpen: true,
+                    title: 'Error',
+                    message: '서버와 통신 중 오류가 발생했습니다.',
+                    onConfirm: closeModal
+                });
         }
     };
 
     return (
+        <>
+        <Modal
+            {...modal} 
+        />
         <div className={stylePlans.modalOverlay}>
             <div className={stylePlans.modalContent} onClick={(e) => e.stopPropagation()}>
                 <button className={stylePlans.closeBtn} onClick={onClose}>&times;</button>
@@ -306,6 +341,7 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
                 </form>
             </div>
         </div>
+        </>
     );
 }
 
