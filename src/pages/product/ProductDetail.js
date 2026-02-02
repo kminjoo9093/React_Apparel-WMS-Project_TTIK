@@ -5,6 +5,7 @@ import axios from 'axios';
 import { BarChart, Bar, Cell, XAxis, YAxis, ResponsiveContainer, Tooltip, LabelList } from 'recharts';
 import style from '../../css/ProductDetail.module.css';
 import serverUrl from "../../db/server.json"
+import Modal from '../../components/Modal';
 
 const ProductDetail = () => {
   const { gds_cd } = useParams();
@@ -12,6 +13,8 @@ const ProductDetail = () => {
   const [cardList, setCardList] = useState([]);
   const [loading, setLoading] = useState(true);
   const SERVER_URL = serverUrl.SERVER_URL;
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
+  const closeModal = () => setModal({ ...modal, isOpen: false });
 
   const fetchProductData = async () => {
     try {
@@ -49,7 +52,12 @@ const ProductDetail = () => {
 const handleDelete = async (product) => {
   // 1. 데이터 누락 방어
   if (!product) {
-    alert("상품 정보를 불러올 수 없습니다.");
+    setModal({
+          isOpen: true,
+          title: 'Error',
+          message: '상품 정보를 불러올 수 없습니다.',
+          onConfirm: closeModal
+        });
     return;
   }
 
@@ -77,17 +85,32 @@ const handleDelete = async (product) => {
           }
         );
 
-        alert("관리 제외 품목으로 이동되었습니다.");
-        navigate('/product/productArchive');
-        
+        setModal({
+          isOpen: true,
+          title: 'Move',
+          message: "관리 제외 품목으로 이동되었습니다.",
+          onConfirm: () => {
+            navigate("/product/productArchive");
+          }
+        });
       } catch (error) {
         console.error("비활성화 처리 에러:", error);
-        alert("처리 중 오류가 발생했습니다. (서버 연결 확인 필요)");
+        setModal({
+          isOpen: true,
+          title: 'Error',
+          message: '처리 중 오류가 발생했습니다. (서버 연결 확인 필요)',
+          onConfirm: closeModal
+        });
       }
     }
   } else {
     // 4. 재고가 남았을 때 차단
-    alert(`현재 재고가 ${currentStock}개 남아있어 삭제할 수 없습니다. \n재고를 먼저 소진해주세요.`);
+    setModal({
+          isOpen: true,
+          title: 'Error',
+          message: `현재 재고가 ${currentStock}개 남아있어 삭제할 수 없습니다. \n재고를 먼저 소진해주세요.`,
+          onConfirm: closeModal
+        });
   }
 };
 
@@ -99,6 +122,11 @@ const handleDelete = async (product) => {
   if (cardList.length === 0) return <div style={{ textAlign: 'center', marginTop: '100px' }}>표시할 상품이 없습니다.</div>;
 
   return (
+    <>
+    <Modal
+        {...modal} 
+    />
+
     <div className={style['card-stack-wrapper']} onClick={handleCardClick} style={{ cursor: 'pointer', position: 'relative', minHeight: '100vh', background: '#f8f9fa', paddingBottom: '100px' }}>
           <AnimatePresence mode="popLayout">
             {cardList.slice(0, 3).map((product, index) => {
@@ -220,6 +248,7 @@ const handleDelete = async (product) => {
         })}
       </AnimatePresence>
     </div>
+    </>
   );
 };
 

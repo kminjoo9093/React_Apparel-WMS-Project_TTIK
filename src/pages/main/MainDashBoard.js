@@ -17,7 +17,7 @@ const MainDashboard = ({ user }) => {
 
   const [storageList, setStorageList] = useState([]);
   const [rackData, setRackData] = useState([]);
-  const [historyList, setHistoryList] = useState([]); // 이력 데이터 상태 추가
+  const [historyList, setHistoryList] = useState([]); 
   const [selectedStorage, setSelectedStorage] = useState(initialStorage);
   const [lastUpdated, setLastUpdated] = useState(new Date());
   
@@ -188,7 +188,12 @@ const groupedRacks = useMemo(() => {
 
       <div className={styleMainDashBoard.statsGrid}>
         <StatCard title="전체 등록 상품" value={stats.totalProducts} unit="건" trend={stats.totalTrend} />
-        <StatCard title="현재 재고 보유" value={stats.inStockProducts} unit="건" trend={stats.inStockTrend} />
+        <StatCard 
+          title={selectedStorage === 'ALL' ? "현재 재고 보유" : "전체 재고 보유"} 
+          value={stats.inStockProducts} 
+          unit="건" 
+          trend={stats.inStockTrend} 
+        />
         <StatCard title="재고 부족 품목" value={stats.lowStockProducts} unit="건" trend={stats.lowStockTrend} isWarning={true} />
       </div>
 
