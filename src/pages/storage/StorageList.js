@@ -221,23 +221,9 @@ function StorageList({storageList:storageOptions=[]}){
         });
     };
 
-    // 창고 필터
-    // useEffect(()=>{
-    //     if(!storageFilter && storageFilter === "") {
-    //         setFilteredList(storageList);
-    //         return;
-    //     }
-
-    //     const newList = storageList.filter(data => {
-    //         return data.storageSn === Number(storageFilter);
-    //     })
-    //     setFilteredList(newList);
-    // }, [storageFilter, storageList])
-
 
     return (
         <>
-            <Modal {...modal}/>
             <h2 className={styleStorage.contentTitle}>창고 조회</h2>
             <div className={styleStorage.listTopWrap}>
                 <span className={styleStorage.notice}>클릭 시 적재된 박스 정보 확인과 <br className={styleStorage.brMo}></br>위치 수정이 가능합니다.</span>
@@ -299,58 +285,61 @@ function StorageList({storageList:storageOptions=[]}){
 
             { isOpen && 
                 <div className={styleModal.modalOverlay}>
-                    <div className={`${styleProdModal.modal} ${styleStorage.storageModal}`} style={{height: "auto", maxWidth: "90rem"}}>
+                    <div className={`${styleProdModal.modal} ${styleStorage.storageModal}`}>
                         <div className={styleProdModal.modalInner} style={{alignItems: "stretch"}}>
                             <h3 className={styleStorage.rackHeading}>Rack : {detailRackNm}<span> (수량 : {boxCount}개) </span></h3>
-                            <table className={styleStorage.storageTable}>
-                                <thead>
-                                    <tr>
-                                        <th>NO</th>
-                                        <th>박스 QR</th>
-                                        <th>상품명</th>
-                                        <th>현재 위치</th>
-                                        <th>변경 위치</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                     {
-                                        rackDetailList?.boxes && rackDetailList.boxes.length > 0
-                                        ? 
-                                        rackDetailList?.boxes?.map((box, index) => {
-                                        return (
-                                             <tr key={box.boxQr}>
-                                                <td>{index + 1}</td>
-                                                <td>{box.boxQr}</td>
-                                                <td>{box.productNm}</td>
-                                                <td>{detailRackNm}</td>
-                                                <td>
-                                                    <select name="newLoc" value={box.nextRackSn || ""} onChange={(e)=>handleChangeRackInfo(e, box.boxQr, box.rackSn)}>
-                                                        <option value="">변경 안함</option>
-                                                        {
-                                                            rackDetailList.availableRacks?.map(rack=>(
-                                                                <option value={rack.availableRackSn}>{rack.availableRackNm}</option>
-                                                            ))
-                                                        }
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                        )})
-                                        :
-                                        (
-                                            <tr className={styleStorage.emptyRack}>
-                                                <td colSpan={5}>해당 선반에 적재된 상자가 없습니다.</td>
-                                            </tr>
-                                        )
-                                    }
-                                </tbody>
-                            </table>
+                            <div className={styleStorage.modalTableArea}>
+                                <table className={styleStorage.storageTable}>
+                                    <thead>
+                                        <tr>
+                                            <th>NO</th>
+                                            <th>박스 QR</th>
+                                            <th>상품명</th>
+                                            <th>현재 위치</th>
+                                            <th>변경 위치</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            rackDetailList?.boxes && rackDetailList.boxes.length > 0
+                                            ? 
+                                            rackDetailList?.boxes?.map((box, index) => {
+                                            return (
+                                                <tr key={box.boxQr}>
+                                                    <td>{index + 1}</td>
+                                                    <td>{box.boxQr}</td>
+                                                    <td>{box.productNm}</td>
+                                                    <td>{detailRackNm}</td>
+                                                    <td>
+                                                        <select name="newLoc" value={box.nextRackSn || ""} onChange={(e)=>handleChangeRackInfo(e, box.boxQr, box.rackSn)}>
+                                                            <option value="">변경 안함</option>
+                                                            {
+                                                                rackDetailList.availableRacks?.map(rack=>(
+                                                                    <option value={rack.availableRackSn}>{rack.availableRackNm}</option>
+                                                                ))
+                                                            }
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                            )})
+                                            :
+                                            (
+                                                <tr className={styleStorage.emptyRack}>
+                                                    <td colSpan={5}>해당 선반에 적재된 상자가 없습니다.</td>
+                                                </tr>
+                                            )
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            
                             <button type="submit" className="btnSubmit" onClick={confirmModifyRack}>확인</button>
                         </div>
                         <button className={styleProdModal.closeBtn} onClick={onCloseModal}></button>
                     </div>
                 </div>
             }        
-            {/* <StorageModal /> */}
+            <Modal {...modal}/>
         </>
     )
 }

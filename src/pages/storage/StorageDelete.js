@@ -143,7 +143,6 @@ function StorageDelete ({storageList, onUpdate, setView}) {
     };
     return (
         <>
-            <Modal {...modal}/>
             <form className={styleStorage.deleteForm} onSubmit={handelSubmit}>
                 <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
                     <h3 className={styleStorage.modifyHeading}>창고</h3>
@@ -232,6 +231,7 @@ function StorageDelete ({storageList, onUpdate, setView}) {
                     <button type="submit" className={`${styleStorage.btnModify} btnSubmit`}>수정</button>
                 </div>
             </form>
+            <Modal {...modal}/>
         </>
     )
 }
