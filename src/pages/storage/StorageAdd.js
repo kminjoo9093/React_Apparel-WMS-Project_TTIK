@@ -190,7 +190,7 @@ function StorageAdd ({storageList, onUpdate, setView}) {
                 console.log("수정 요청 응답-->", data);
                 setModal({
                     isOpen: true,
-                    title: '수정 성공',
+                    title: 'Success',
                     message: data.message,
                     onConfirm: closeAlert
                 });
@@ -205,7 +205,7 @@ function StorageAdd ({storageList, onUpdate, setView}) {
                 const errorData = await res.json();
                 setModal({
                     isOpen: true,
-                    title: '수정 실패',
+                    title: 'Again',
                     message: errorData.message,
                     onConfirm: closeAlert
                 });

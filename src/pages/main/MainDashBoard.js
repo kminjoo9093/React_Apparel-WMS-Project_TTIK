@@ -115,14 +115,27 @@ const groupedRacks = useMemo(() => {
   return groups;
 }, [rackData]);
 
-  // 최근 입고/출고 데이터 필터링 (최근 5개씩)
+  // 최근 입고/출고 데이터 필터링 (출고완료만 추출)
   const getGroupedHistory = (type) => {
     if (!Array.isArray(historyList)) return [];
 
     const grouped = historyList
-      .filter(item => Number(item.type) === type)
+      .filter(item => {
+        const isOutbound = Number(item.type) === 1; // SQL에서 '출고' 포함 시 1로 정의됨
+        const isRemarkComplete = item.remark && item.remark.includes('완료');
+        const isRemarkInbound = item.remark && item.remark.includes('입고');
+
+        if (type === 0) {
+            // 입고 현황: 입고이면서 완료인 것
+            return Number(item.type) === 0 && isRemarkInbound && isRemarkComplete;
+        }
+        if (type === 1) {
+            // 출고 현황: 출고이면서 완료인 것만 필터링
+            return isOutbound && isRemarkComplete;
+        }
+        return false;
+      })
       .reduce((acc, current) => {
-        // 그룹화 기준: 날짜 + 거래처 + 브랜드 + 상품명 (데이터의 정밀도 유지)
         const brand = current.brand_name || '';
         const key = `${current.date}-${current.target_name}-${brand}-${current.item_name}`;
         
@@ -133,11 +146,10 @@ const groupedRacks = useMemo(() => {
             display_brand: brand
           };
         }
-        acc[key].quantity += (current.quantity || 1); 
+        acc[key].quantity += 1; // 낱개출고 한 건당 1씩 가산
         return acc;
       }, {});
 
-    // 객체를 배열로 변환 후, 날짜와 시간순으로 정렬하여 최근 5건만 추출
     return Object.values(grouped)
       .sort((a, b) => {
         const dateTimeA = new Date(`${a.date.replace(/\./g, '-')} ${a.time}`);

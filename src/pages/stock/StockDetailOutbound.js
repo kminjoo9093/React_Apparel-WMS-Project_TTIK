@@ -182,48 +182,55 @@ const handleBarcodeScanned = async (fullBarcode) => {
             return;
         }
 
-        if (window.confirm(`선택한 ${itemsToProcess.length}건을 출고 등록 하시겠습니까?`)) {
-            try {
-                let successCount = 0;
-                for (const item of itemsToProcess) {
-                    const payload = {
-                        type: "OutBound", // 출고 고정
-                        boxCd: item.barcode,
-                        gdsCd: productCd,
-                        brandNm: product?.brandNm || '',
-                        partnerNm: product?.partnerNm || ''
-                    };
+        setModal({
+            isOpen: true,
+            title: 'Register',
+            message: `선택한 ${itemsToProcess.length}건을 출고 등록 하시겠습니까?`,
+            onCancel: closeModal,
+            onConfirm: async () => {
+                try {
+                    let successCount = 0;
+                    for (const item of itemsToProcess) {
+                        const payload = {
+                            type: "OutBound", // 출고 고정
+                            boxCd: item.barcode,
+                            gdsCd: productCd,
+                            brandNm: product?.brandNm || '',
+                            partnerNm: product?.partnerNm || ''
+                        };
 
-                    const response = await fetch(`${SERVER_URL}/ttik/productdetail/outbound/process`, {
-                        method: 'POST',
-                        credentials: 'include',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
+                        const response = await fetch(`${SERVER_URL}/ttik/productdetail/outbound/process`, {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
 
-                    if (response.ok) successCount++;
-                }
-
-                setModal({
-                    isOpen: true,
-                    title: 'Success',
-                    message: `${successCount}건의 출고 처리가 완료되었습니다.`,
-                    onConfirm: () => {
-                        navigate('/stock/plans', { state: { activeTab: "OutBound" } });
+                        if (response.ok) successCount++;
                     }
-                });     
 
-            } catch (error) {
-                setModal({
-                    isOpen: true,
-                    title: 'Error',
-                    message: '처리 중 오류가 발생했습니다.',
-                    onConfirm: closeModal
-                });
-                console.error("출고 등록 실패:", error);
+                    setModal({
+                        isOpen: true,
+                        title: 'Success',
+                        message: `${successCount}건의 출고 처리가 완료되었습니다.`,
+                        onConfirm: () => {
+                            closeModal();
+                            navigate('/stock/plans', { state: { activeTab: "OutBound" } });
+                        }
+                    });     
+
+                } catch (error) {
+                    console.error("출고 등록 실패:", error);
+                    setModal({
+                        isOpen: true,
+                        title: 'Error',
+                        message: '처리 중 오류가 발생했습니다.',
+                        onConfirm: closeModal
+                    });
+                }
             }
-        }
-    };
+        });
+    }
 
     // 스캐너 설정
     useEffect(() => {

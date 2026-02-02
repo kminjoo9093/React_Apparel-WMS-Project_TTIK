@@ -73,35 +73,48 @@ function BrandList() {
             });
             return;
         }
-        if (window.confirm(`선택한 ${selectedIds.length}개의 브랜드를 삭제하시겠습니까?`)) {
-            try {
-                const response = await fetch(`${SERVER_URL}/ttik/brand/delete`, {
-                    method: 'DELETE',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(selectedIds), 
-                });
-                if (response.ok) {
-                    setModal({
-                        isOpen: true,
-                        title: 'DELETE',
-                        message: '삭제되었습니다',
-                        onConfirm: closeModal
+        setModal({
+            isOpen: true,
+            title: 'DELETE',
+            message: `선택한 ${selectedIds.length}개의 브랜드를 삭제하시겠습니까?`,
+            onCancel: closeModal,
+            onConfirm: async () => {
+                try {
+                    const response = await fetch(`${SERVER_URL}/ttik/brand/delete`, {
+                        method: 'DELETE',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(selectedIds), 
                     });
-                    setBrands(prev => prev.filter(brand => !selectedIds.includes(brand.brandSn)));
-                    setSelectedIds([]);
-                } else {
+                    
+                    if (response.ok) {
+                        setModal({
+                            isOpen: true,
+                            title: 'DELETE',
+                            message: '삭제되었습니다',
+                            onConfirm: closeModal
+                        });
+                        setBrands(prev => prev.filter(brand => !selectedIds.includes(brand.brandSn)));
+                        setSelectedIds([]);
+                    } else {
+                        setModal({
+                            isOpen: true,
+                            title: 'ERROR',
+                            message: '삭제 실패',
+                            onConfirm: closeModal
+                        });
+                    }
+                } catch (error) {
+                    console.error("삭제 에러:", error);
                     setModal({
                         isOpen: true,
                         title: 'ERROR',
-                        message: '삭제 실패',
+                        message: '서버 통신 중 에러가 발생했습니다.',
                         onConfirm: closeModal
                     });
                 }
-            } catch (error) {
-                console.error("삭제 에러:", error);
             }
-        }
+        });
     };
 
     useEffect(() => {

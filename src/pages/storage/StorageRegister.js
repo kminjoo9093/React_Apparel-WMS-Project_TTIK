@@ -56,7 +56,7 @@ function StorageRegister({storageList, onUpdate}){
         if(!value) {
             setModal({
                 isOpen: true,
-                title: '등록 실패',
+                title: 'Again',
                 message: '창고명을 입력해주세요',
                 onConfirm: closeModal
             });    
@@ -72,8 +72,11 @@ function StorageRegister({storageList, onUpdate}){
         const adminCreate = () => {
             setModal({
             isOpen: true,
-            title: '등록이 완료되었습니다',
-            message: '관리자/모니터 등록을 진행해 주세요',
+            title: 'Success',
+            message: <>
+                        등록이 완료되었습니다.<br />
+                        관리자/모니터 등록을 진행해 주세요
+                    </>,
             onConfirm: () => {
                 navigate("/register/admin");
             }
@@ -87,7 +90,7 @@ function StorageRegister({storageList, onUpdate}){
         if(value.length > 1 || !isAlphabet(value)){
             setModal({
                 isOpen: true,
-                title: '등록 실패',
+                title: 'Again',
                 message: '창고명을 다시 입력해주세요',
                 onConfirm: closeModal
             });
@@ -102,7 +105,7 @@ function StorageRegister({storageList, onUpdate}){
         if(hasStorage) {
             setModal({
                 isOpen: true,
-                title: '등록 실패',
+                title: 'Again',
                 message: '이미 등록된 창고입니다.',
                 onConfirm:closeModal
             });
