@@ -191,7 +191,7 @@ const QRsave = () => {
             
             setModal({
                     isOpen: true,
-                    title: 'PDF 파일 생성 완료',
+                    title: 'Success',
                     message: (
                         <>
                             {fileName}

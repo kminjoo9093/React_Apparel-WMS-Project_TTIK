@@ -78,36 +78,51 @@ function PartnerList() {
             });  
             return;
         }
-        if (window.confirm(`선택한 ${selectedIds.length}개의 거래처를 삭제하시겠습니까?`)) {
-            try {
-                const response = await fetch(`${SERVER_URL}/ttik/partner/delete`, {
-                    method: 'DELETE',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(selectedIds), 
-                });
-                if (response.ok) {
-                    setModal({
-                        isOpen: true,
-                        title: 'DELETE',
-                        message: '삭제되었습니다.',
-                        onConfirm: closeModal
-                    }); 
-                    // 서버를 다시 호출하는 대신 로컬 상태에서 즉시 제거 (성능 최적화)
-                    setPartners(prev => prev.filter(p => !selectedIds.includes(p.partnerSn)));
-                    setSelectedIds([]);
-                } else {
+
+        // 📍 커스텀 모달 적용 (취소 버튼 포함)
+        setModal({
+            isOpen: true,
+            title: 'DELETE',
+            message: `선택한 ${selectedIds.length}개의 거래처를 삭제하시겠습니까?`,
+            onCancel: closeModal, 
+            onConfirm: async () => {
+                try {
+                    const response = await fetch(`${SERVER_URL}/ttik/partner/delete`, {
+                        method: 'DELETE',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(selectedIds), 
+                    });
+                    
+                    if (response.ok) {
+                        setModal({
+                            isOpen: true,
+                            title: 'DELETE',
+                            message: '삭제되었습니다.',
+                            onConfirm: closeModal
+                        }); 
+                        // 로컬 상태 즉시 반영
+                        setPartners(prev => prev.filter(p => !selectedIds.includes(p.partnerSn)));
+                        setSelectedIds([]);
+                    } else {
+                        setModal({
+                            isOpen: true,
+                            title: 'Error',
+                            message: '삭제 실패',
+                            onConfirm: closeModal
+                        }); 
+                    }
+                } catch (error) {
+                    console.error("삭제 에러:", error);
                     setModal({
                         isOpen: true,
                         title: 'Error',
-                        message: '삭제 실패',
+                        message: '서버 통신 중 에러가 발생했습니다.',
                         onConfirm: closeModal
-                    }); 
+                    });
                 }
-            } catch (error) {
-                console.error("삭제 에러:", error);
             }
-        }
+        });
     };
 
     const handleSearchChange = (e) => {

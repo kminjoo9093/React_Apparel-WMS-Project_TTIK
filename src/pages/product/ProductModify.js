@@ -45,48 +45,57 @@ useEffect(() => {
   };
   
   const handleSave = async () => {
-    if (!window.confirm("변경 내용을 DB에 최종 저장하시겠습니까?")) return;
-    const fromArchive = location.state?.fromArchive;
+    setModal({
+      isOpen: true,
+      title: 'Save',
+      message: "변경 내용을 DB에 최종 저장하시겠습니까?",
+      onCancel: closeModal,
+      onConfirm: async () => {
+        const fromArchive = location.state?.fromArchive;
 
-    const finalData = {
-      ...product,
-      gds_enabled: fromArchive ? 'Y' : (product.gds_enabled || 'Y'),
-      gds_cd: product.gds_cd,
-      gds_nm: product.gds_nm,
-      season_cd: product.season_cd,
-      brand_sn: product.brand_sn,
-      gds_cat_cd: product.gds_cat_cd,
-      size_cd: product.size_cd,
-      untprc: Number(product.untprc) || 0,
-      threshold: Number(product.threshold) || 0,
-      inbox_qty: Number(product.inbox_qty) || 0
-    };
+        const finalData = {
+          ...product,
+          gds_enabled: fromArchive ? 'Y' : (product.gds_enabled || 'Y'),
+          gds_cd: product.gds_cd,
+          gds_nm: product.gds_nm,
+          season_cd: product.season_cd,
+          brand_sn: product.brand_sn,
+          gds_cat_cd: product.gds_cat_cd,
+          size_cd: product.size_cd,
+          untprc: Number(product.untprc) || 0,
+          threshold: Number(product.threshold) || 0,
+          inbox_qty: Number(product.inbox_qty) || 0
+        };
 
-    try {
-      const response = await axios.post(`${SERVER_URL}/ttik/product/update`,
-                                         finalData,
-                                        {
-                                          withCredentials: true 
-                                        });
-      if (response.status === 200) {
-        
-        setModal({
-          isOpen: true,
-          title: 'Again',
-          message: fromArchive ? "복구 및 수정 완료!" : "수정 완료!",
-          onConfirm: () => {
-            navigate(`/product/productDetail/${finalData.gds_cd}`);
+        try {
+          const response = await axios.post(
+            `${SERVER_URL}/ttik/product/update`,
+            finalData,
+            { withCredentials: true }
+          );
+
+          if (response.status === 200) {
+            setModal({
+              isOpen: true,
+              title: 'Again',
+              message: fromArchive ? "복구 및 수정 완료!" : "수정 완료!",
+              onConfirm: () => {
+                closeModal();
+                navigate(`/product/productDetail/${finalData.gds_cd}`);
+              }
+            });
           }
-        });
+        } catch (error) {
+          console.error("저장 에러:", error);
+          setModal({
+            isOpen: true,
+            title: 'Again',
+            message: "서버 연동 실패!",
+            onConfirm: closeModal
+          });
+        }
       }
-    } catch (error) {
-      setModal({
-          isOpen: true,
-          title: 'Again',
-          message: "서버 연동 실패!",
-          onConfirm: closeModal
-        });
-    }
+    });
   };
 
   return (

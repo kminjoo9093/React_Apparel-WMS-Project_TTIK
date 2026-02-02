@@ -70,47 +70,54 @@ const handleDelete = async (product) => {
   // 3. 재고가 0일 때만 실행
   if (currentStock === 0) {
     const confirmMessage = `[${targetGdsNm}] \n재고가 0입니다. 관리 제외 품목(Archive)으로 이동시킬까요?`;
-    
-    if (window.confirm(confirmMessage)) {
-      try {
-        // 📍 axios 인자 구조: URL, 데이터, 설정 순서 엄수!
-        await axios.post(
-          `${SERVER_URL}/ttik/product/disable`, 
-          { 
-            gds_cd: targetGdsCd,
-            gds_enabled: 'N'
-          }, 
-          { 
-            withCredentials: true // 🔐 아까 해결했던 보안 설정 추가
-          }
-        );
 
-        setModal({
-          isOpen: true,
-          title: 'Move',
-          message: "관리 제외 품목으로 이동되었습니다.",
-          onConfirm: () => {
-            navigate("/product/productArchive");
-          }
-        });
-      } catch (error) {
-        console.error("비활성화 처리 에러:", error);
-        setModal({
-          isOpen: true,
-          title: 'Error',
-          message: '처리 중 오류가 발생했습니다. (서버 연결 확인 필요)',
-          onConfirm: closeModal
-        });
-      }
-    }
-  } else {
-    // 4. 재고가 남았을 때 차단
     setModal({
-          isOpen: true,
-          title: 'Error',
-          message: `현재 재고가 ${currentStock}개 남아있어 삭제할 수 없습니다. \n재고를 먼저 소진해주세요.`,
-          onConfirm: closeModal
-        });
+      isOpen: true,
+      title: 'Archive',
+      message: confirmMessage,
+      onCancel: closeModal,
+      onConfirm: async () => {
+        try {
+          // 📍 axios 인자 구조 및 보안 설정 완벽 계승
+          await axios.post(
+            `${SERVER_URL}/ttik/product/disable`, 
+            { 
+              gds_cd: targetGdsCd,
+              gds_enabled: 'N'
+            }, 
+            { 
+              withCredentials: true 
+            }
+          );
+          
+          setModal({
+            isOpen: true,
+            title: 'Move',
+            message: "관리 제외 품목으로 이동되었습니다.",
+            onConfirm: () => {
+              closeModal();
+              navigate("/product/productArchive");
+            }
+          });
+        } catch (error) {
+          console.error("비활성화 처리 에러:", error);
+          setModal({
+            isOpen: true,
+            title: 'Error',
+            message: '처리 중 오류가 발생했습니다. (서버 연결 확인 필요)',
+            onConfirm: closeModal
+          });
+        }
+      }
+    });
+  } else {
+    // 4. 재고가 남았을 때 차단 (기존 로직 유지)
+    setModal({
+      isOpen: true,
+      title: 'Error',
+      message: `현재 재고가 ${currentStock}개 남아있어 삭제할 수 없습니다. \n재고를 먼저 소진해주세요.`,
+      onConfirm: closeModal
+    });
   }
 };
 

@@ -25,7 +25,7 @@ function ProductSeason({onClose, setSeasonList}){
         if(!year || year.length !== 4 ){
             setModal({
                 isOpen: true,
-                title: '입력값 확인',
+                title: 'Again',
                 message: "연도 4자리 숫자를 정확히 입력하세요.",
                 onConfirm: closeAlert
             });
@@ -51,7 +51,7 @@ function ProductSeason({onClose, setSeasonList}){
                 const newSeason = season === "S" ? "S/S" : "FW";
                 setModal({
                     isOpen: true,
-                    title: '등록 성공',
+                    title: 'Success',
                     message: `${year} ${newSeason} 시즌이 정상 등록되었습니다.`,
                     onConfirm: closeAlert
                 });
@@ -63,7 +63,7 @@ function ProductSeason({onClose, setSeasonList}){
                 //이미 있는 시즌인 경우 처리
                 setModal({
                     isOpen: true,
-                    title: '등록 실패',
+                    title: 'Again',
                     message: "이미 등록된 시즌이거나 등록할 수 없는 정보입니다.",
                     onConfirm: closeAlert
                 });
@@ -73,7 +73,7 @@ function ProductSeason({onClose, setSeasonList}){
             console.error(error);
             setModal({
                 isOpen: true,
-                title: '등록 실패',
+                title: 'Error',
                 message: "네트워크 통신 중 오류가 발생했습니다.",
                 onConfirm: closeAlert
             });

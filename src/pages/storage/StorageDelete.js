@@ -68,7 +68,7 @@ function StorageDelete ({storageList, onUpdate, setView}) {
 
         e.preventDefault();
 
-        //삭제 체크가 하나도 없을 경우
+        // 삭제 체크가 하나도 없을 경우
         if(!isCheckedDelete.deleteStorage && !isCheckedDelete.deleteZone && !isCheckedDelete.deleteRack) {
             setModal({
                 isOpen: true,
@@ -79,56 +79,68 @@ function StorageDelete ({storageList, onUpdate, setView}) {
             return;
         }
 
-        // 창고 삭제시 관련 관리자 삭제
+        // 창고 삭제시 관련 관리자 삭제를 위한 데이터 준비
         const currentStorageNm = storageList.find(s => s.storageSn === selectedStorage)?.storageNm;
 
-        //창고 정보 수정(삭제) 파라미터
+        // 창고 정보 수정(삭제) 파라미터
         const storageDeleteReq = {
             "storageSn" : selectedStorage,
             "zoneSn" : selectedZone,
             "rackSn" : selectedRack,
-            "storageNm" : isCheckedDelete.deleteStorage ? currentStorageNm : null // 창고 삭제 시에만 창고명 전달
+            "storageNm" : isCheckedDelete.deleteStorage ? currentStorageNm : null 
         }
 
-        if(!window.confirm("삭제를 진행하시겠습니까?")) return;
+        setModal({
+            isOpen: true,
+            title: 'DELETE',
+            message: "삭제를 진행하시겠습니까?",
+            onCancel: closeAlert,
+            onConfirm: async () => {
+                try {
+                    const res = await fetch(`${SERVER_URL}/ttik/storage/delete`, {
+                        method: 'DELETE',
+                        credentials: 'include', 
+                        headers: {'Content-type': 'application/json'},
+                        body: JSON.stringify(storageDeleteReq)
+                    });
+                    
+                    if(res.ok){
+                        const data = await res.json();
 
-        try{
-            const res = await fetch(`${SERVER_URL}/ttik/storage/delete`, {
-                method: 'DELETE',
-                credentials: 'include', 
-                headers: {'Content-type': 'application/json'},
-                body: JSON.stringify(storageDeleteReq)
-            });
-            if(res.ok){
-                const data = await res.json();
+                        // 어떤 구역, 선반을 삭제했는지 안내
+                        setModal({
+                            isOpen: true,
+                            title: 'Success',
+                            message: data.message,
+                            onConfirm: () => {
+                                closeAlert();
+                                if(onUpdate) onUpdate();
+                                resetForm();
+                                setView("list"); // 수정 후 창고 조회 리스트가 보이도록
+                            }
+                        });
 
-                //어떤 구역, 선반을 삭제했는지 안내
-                 setModal({
-                    isOpen: true,
-                    title: '삭제 성공',
-                    message: data.message,
-                    onConfirm: closeAlert
-                });
-
-                if(onUpdate) onUpdate();
-                resetForm();
-
-                setView("list"); //수정 후 창고 조회 리스트가 보이도록
-
-            } else {
-                const errorData = await res.json();
-                setModal({
-                    isOpen: true,
-                    title: '삭제 실패',
-                    message: errorData.message,
-                    onConfirm: closeAlert
-                });
+                    } else {
+                        const errorData = await res.json();
+                        setModal({
+                            isOpen: true,
+                            title: 'DELETE',
+                            message: errorData.message,
+                            onConfirm: closeAlert
+                        });
+                    }
+                } catch(error){
+                    console.log("수정 요청 실패", error);
+                    setModal({
+                        isOpen: true,
+                        title: 'Error',
+                        message: "서버 통신 중 에러가 발생했습니다.",
+                        onConfirm: closeAlert
+                    });
+                } 
             }
-        } catch(error){
-            console.log("수정 요청 실패", error);
-        } 
-    }
-
+        });
+    };
     return (
         <>
             <Modal {...modal}/>
