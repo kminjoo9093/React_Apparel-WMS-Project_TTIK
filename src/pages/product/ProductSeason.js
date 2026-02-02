@@ -85,7 +85,6 @@ function ProductSeason({onClose, setSeasonList}){
 
     return (
         <div className={styleProdModal.modalInner}>
-            <Modal {...modal}/>
             <p>상품 등록에 사용할 시즌을 추가하세요.</p>
             <form onSubmit={registerSeason} className={styleProdModal.modalContents}>
                 <div className={styleProdModal.inputGroup}>
@@ -109,6 +108,7 @@ function ProductSeason({onClose, setSeasonList}){
                 </div>             
                 <button type="submit" className="btnSubmit">등록</button>
             </form>
+            <Modal {...modal}/>
         </div>
     )
 }

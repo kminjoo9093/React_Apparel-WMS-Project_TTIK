@@ -221,23 +221,9 @@ function StorageList({storageList:storageOptions=[]}){
         });
     };
 
-    // 창고 필터
-    // useEffect(()=>{
-    //     if(!storageFilter && storageFilter === "") {
-    //         setFilteredList(storageList);
-    //         return;
-    //     }
-
-    //     const newList = storageList.filter(data => {
-    //         return data.storageSn === Number(storageFilter);
-    //     })
-    //     setFilteredList(newList);
-    // }, [storageFilter, storageList])
-
 
     return (
         <>
-            <Modal {...modal}/>
             <h2 className={styleStorage.contentTitle}>창고 조회</h2>
             <div className={styleStorage.listTopWrap}>
                 <span className={styleStorage.notice}>클릭 시 적재된 박스 정보 확인과 <br className={styleStorage.brMo}></br>위치 수정이 가능합니다.</span>
@@ -350,7 +336,7 @@ function StorageList({storageList:storageOptions=[]}){
                     </div>
                 </div>
             }        
-            {/* <StorageModal /> */}
+            <Modal {...modal}/>
         </>
     )
 }
