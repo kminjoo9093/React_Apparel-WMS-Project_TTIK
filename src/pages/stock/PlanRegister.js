@@ -236,9 +236,6 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
 
     return (
         <>
-        <Modal
-            {...modal} 
-        />
         <div className={stylePlans.modalOverlay}>
             <div className={stylePlans.modalContent} onClick={(e) => e.stopPropagation()}>
                 <button className={stylePlans.closeBtn} onClick={onClose}>&times;</button>
@@ -347,6 +344,9 @@ function PlanRegister({ isOpen, onClose, onRegisterSuccess, currentType }) {
                 </form>
             </div>
         </div>
+        <Modal
+            {...modal} 
+        />
         </>
     );
 }
