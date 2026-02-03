@@ -46,6 +46,16 @@ jobs:
       #  with:
       #    name: frontend-build
       #    path: build/
+      
+      # 260203 [추가] 빌드 결과물이 실제로 존재하는지 검증!
+      - name: Verify Build
+        shell: cmd
+        run: |
+          if not exist "build\index.html" (
+            echo "❌ Error: React build failed! index.html not found."
+            exit 1
+          )
+          echo "✅ Build success: index.html exists."
 
   release:
     name: Prepare Release
