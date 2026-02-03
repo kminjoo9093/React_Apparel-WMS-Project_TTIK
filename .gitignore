@@ -28,3 +28,4 @@ package-lock.json
 # 인증서 및 개인키 제외
 cert/cert.pem
 cert/key.pem
+.env
