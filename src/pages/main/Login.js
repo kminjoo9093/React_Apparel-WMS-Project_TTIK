@@ -86,9 +86,6 @@ const Login = ({ setUser, setIsLoggedIn }) => {
 
   return (
     <>
-      <Modal
-        {...modal}
-      />
       <div className={styleLogin.modernLoginContainer}>
         <div className={styleLogin.loginGlassCard}>
           <div className={styleLogin.loginBrandSection}>
@@ -148,6 +145,7 @@ const Login = ({ setUser, setIsLoggedIn }) => {
           </div>
         </div>
       </div>
+      <Modal {...modal}/>
     </>
   );
 };
