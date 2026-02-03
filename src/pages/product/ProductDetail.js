@@ -133,7 +133,6 @@ const handleDelete = async (product) => {
     <Modal
         {...modal} 
     />
-
     <div className={style['card-stack-wrapper']} onClick={handleCardClick} style={{ cursor: 'pointer', position: 'relative', minHeight: '100vh', background: '#f8f9fa', paddingBottom: '100px' }}>
           <AnimatePresence mode="popLayout">
             {cardList.slice(0, 3).map((product, index) => {

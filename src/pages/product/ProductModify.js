@@ -77,7 +77,7 @@ useEffect(() => {
           if (response.status === 200) {
             setModal({
               isOpen: true,
-              title: 'Again',
+              title: 'Success',
               message: fromArchive ? "복구 및 수정 완료!" : "수정 완료!",
               onConfirm: () => {
                 closeModal();

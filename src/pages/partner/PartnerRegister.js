@@ -94,7 +94,6 @@ function PartnerRegister({ isOpen, onClose, onRegisterSuccess }) {
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    // 💥 중요: 엔티티 필드명과 똑같이 소문자 partnerNm으로 수정
                     partnerNm: Partner, 
                     brNo: brNo,
                     telNo: Tel
@@ -102,21 +101,28 @@ function PartnerRegister({ isOpen, onClose, onRegisterSuccess }) {
             });
 
             if (response.ok) {
+                // 성공 모달 설정
                 setModal({
                     isOpen: true,
                     title: 'Register',
                     message: '등록되었습니다!',
-                    onConfirm: closeModal
+                    onConfirm: () => {
+                        // 1. 알림 모달 닫기
+                        closeModal(); 
+                        
+                        // 2. 입력 폼 초기화
+                        setPartner("");
+                        setBrNo("");
+                        setTel("");
+                        setTelError("");
+                        setBrResult(null);
+                        setBrError("");
+
+                        // 3. 등록 창(부모 모달) 닫기 및 데이터 갱신
+                        onClose();
+                        if (onRegisterSuccess) onRegisterSuccess(); 
+                    }
                 });
-                // 초기화
-                setPartner("");
-                setBrNo("");
-                setTel("");
-                setTelError("");
-                setBrResult(null);
-                setBrError("");
-                onClose();
-                if (onRegisterSuccess) onRegisterSuccess(); 
             } else {
                 setModal({
                     isOpen: true,
