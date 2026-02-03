@@ -207,6 +207,46 @@
     background-color: #e2e8f0;
 }
 
+/* 체크박스 - 정중앙 정렬 최종 보정 */
+.brandTable input[type='checkbox'] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.7rem;
+    background-color: #ffffff;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    vertical-align: middle;
+}
+
+.brandTable input[type='checkbox']:checked {
+    background-color: var(--primary-color, #3b82f6);
+    border-color: var(--primary-color, #3b82f6);
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+}
+
+/* 체크 표시 - transform 중심점 기준 정렬 */
+.brandTable input[type='checkbox']:checked::after {
+    content: '';
+    position: absolute;
+    /* 고정 수치 대신 %와 translate로 중앙 정렬 */
+    top: 45%;
+    left: 50%;
+    width: 0.6rem;
+    height: 1.1rem;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    /* 정중앙 배치 후 45도 회전 */
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.brandTable input[type='checkbox']:hover:not(:disabled) {
+    border-color: var(--primary-color, #3b82f6);
+    transform: scale(1.05);
+}
 
 @media (max-width: 876px){
     .searchBox{
