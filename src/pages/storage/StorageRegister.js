@@ -162,7 +162,6 @@ function StorageRegister({storageList, onUpdate}){
     
     return (
         <>
-        
             <h2 className={styleStorage.contentTitle}>창고 등록</h2>
             <form onSubmit={handleSubmit}>
                 <div className={`${styleStorage.contentRow}`} style={{gap:"2rem", alignItems:"flex-start"}}>
@@ -233,9 +232,7 @@ function StorageRegister({storageList, onUpdate}){
                     <button type="submit" className={`${styleStorage.btnRegister} btnSubmit`} >등록</button> 
                 </div>
             </form>
-        <Modal 
-           {...modal}
-        />
+            <Modal {...modal}/>
         </>
     )
 }

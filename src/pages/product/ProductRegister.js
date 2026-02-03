@@ -335,7 +335,6 @@ function ProductRegister(){
 
     return (
         <div className={`${styleRegister.register} container`}>
-            <Modal {...modal}/>
             <div className={styleMainDashBoard.welcomeSection}>
                 <h1>Register</h1>
                 <p>상품을 등록하세요. </p>
@@ -474,6 +473,7 @@ function ProductRegister(){
                 >
                     {modalConfig.children} 
             </ModalFrame>
+            <Modal {...modal}/>
         </div>
     )
 }

@@ -162,10 +162,6 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
 
   return (
     <div className={styleLayout.appContainer}>
-      <Modal 
-            {...modal} 
-        />
-
       {hasSidebarPermission && (
         <>
           <div className={`${isSidebarOpen ? styleLayout.overlayActive : ''}`} onClick={closeSidebar}></div>
@@ -341,6 +337,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
           {children} 
         </main>
       </div>
+      <Modal {...modal}/>
     </div>
   );
 };
