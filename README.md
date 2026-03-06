@@ -3,28 +3,18 @@
 <img width="952" height="389" alt="image" src="https://github.com/user-attachments/assets/96e59366-b7de-4a9b-9122-3c91385ef03d" />
 
 <br>
-시스템 공정 처리 시연영상 : https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing
+프로세스 시연 영상 : https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing
+<br>
+시스템 기능 설명 영상 : 
+<br>
 ## 기여한 부분
 
----
-
 ### **상품 목록 페이지 개발**
-
-![상품 목록 - 필터링 기반 재고 상품 조회](attachment:b4ddab11-8537-4ae2-9cdf-d2a27f9813fb:image.png)
-
-상품 목록 - 필터링 기반 재고 상품 조회
-
-![상품 목록 모바일](attachment:624c02bd-9985-467a-ac1a-e229a05ecc9f:image.png)
-
-상품 목록 모바일
-
-![image.png](attachment:a1ba1405-463e-4c8d-ab3a-14bcc96cd92c:image.png)
-
-- API 연동으로 상품 조회 및 재고 상태 확인
-- 필터링 및 검색어 기반 상품 검색
-- 디바이스 환경 기반 **데이터 목록 조회 전략 분리** 
-PC: 페이지네이션 / Mobile: 무한스크롤
-- 컬러 활용한 상태 구분으로 정보의 직관성 높임 : 입고 대기, 부족, 정상
+- API 연동으로 상품 조회 및 재고 상태 확인<br>
+- 필터링 및 검색어 기반 상품 검색<br>
+- 디바이스 환경 기반 **데이터 목록 조회 전략 분리** <br>
+PC: 페이지네이션 / Mobile: 무한스크롤<Br>
+- 컬러 활용한 상태 구분으로 정보의 직관성 높임 : 입고 대기, 부족, 정상<Br>
 
 ### **상품 등록 페이지 개발**
 
