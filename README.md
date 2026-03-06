@@ -83,6 +83,8 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 
 ### **3. 상품 상태 값 세분화로 재고 부족 오 분류 문제 해결**
 
+[ 관련 코드 바로보기 ](./src/pages/product/ProductList.js#L42-L60)
+
 ![image.png](attachment:77d31eb0-e40f-49fe-ae67-7806eda09e54:image.png)
 
 - **문제**
