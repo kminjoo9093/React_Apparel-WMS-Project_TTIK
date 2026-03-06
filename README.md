@@ -9,7 +9,7 @@
 
 ## 기여한 부분
 
-### **상품 목록 페이지 개발**  [ 관련 코드 바로보기 ](./src/pages/product/ProductList.js)
+### **상품 목록 페이지 개발**  &emsp; [ 관련 코드 → ](./src/pages/product/ProductList.js)
 - API 연동으로 상품 조회 및 재고 상태 확인<br>
 - 필터링 및 검색어 기반 상품 검색<br>
 - 디바이스 환경 기반 **데이터 목록 조회 전략 분리**  <br>
@@ -18,7 +18,7 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 
 <br>
 
-### **상품 등록 페이지 개발** [ 관련 코드 바로보기 ](./src/pages/product/ProductRegister.js)
+### **상품 등록 페이지 개발** [ 관련 코드 ](./src/pages/product/ProductRegister.js)
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 부여**
 - children 기반 재사용 가능한 **공통 Modal 컴포넌트** 설계 [ 관련 코드 바로보기 ](./src/pages/product/ModalFrame.js)
     - 브랜드, 시즌, 상품코드 모달
