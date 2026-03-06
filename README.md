@@ -9,7 +9,7 @@
 
 ## 기여한 부분
 
-#### **상품 목록 페이지 개발**  &emsp; [ 관련 코드 보기 → ](./src/pages/product/ProductList.js)
+#### **상품 목록 페이지 개발**  &emsp; [ 코드 보기 → ](./src/pages/product/ProductList.js)
 - API 연동으로 상품 조회 및 재고 상태 확인<br>
 - 필터링 및 검색어 기반 상품 검색<br>
 - 디바이스 환경 기반 **데이터 목록 조회 전략 분리**  <br>
@@ -18,9 +18,9 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 
 <br>
 
-#### **상품 등록 페이지 개발** &emsp; [ 관련 코드 보기 → ](./src/pages/product/ProductRegister.js)
+#### **상품 등록 페이지 개발** &emsp; [ 코드 보기 → ](./src/pages/product/ProductRegister.js)
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 부여**
-- children 기반 재사용 가능한 **공통 Modal 컴포넌트** 설계 [ 관련 코드 바로보기 ](./src/pages/product/ModalFrame.js)
+- children 기반 재사용 가능한 **공통 Modal 컴포넌트** 설계 &emsp; [ 관련 코드 바로가기 → ](./src/pages/product/ModalFrame.js)
     - 브랜드, 시즌, 상품코드 모달
 - 입력값 유효성 검증
     - 숫자(음수), 자릿수, 알파벳
@@ -29,10 +29,10 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 
 <br>
 
-#### 창고 관리 페이지 개발 &emsp; [ 관련 코드 보기 → ](./src/pages/storage/)
+#### 창고 관리 페이지 개발 [ 코드 보기 → ](./src/pages/storage/)
 - 창고 등록, 창고 정보 수정, 창고 삭제 기능
 - 선반 정보 조회 및 재고 위치 변경 기능
-- **컨텍스트 인식형 입력 가이드** 구현
+- **컨텍스트 인식형 입력 가이드** 구현 &emsp; [ 관련 코드 바로가기 → ](./src/pages/storage/StorageAdd.js#L38-L51)
     - 창고 관리의 구역/선반 추가 시 **현재 최댓값 및 상태 정보 실시간 조회하여 정보 제공**으로 오류 차단
 - 현장 상황과 데이터의 일치를 고려한 **예외 처리**
     - 적재 상품 존재 시 창고/구역/선반 삭제 불가
@@ -84,7 +84,7 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
         
         실제 품절 상품과 함께 **'재고 부족'으로 오 분류되는 데이터 정합성 오류**를 확인
         
-- **해결** &emsp; [ 관련 코드 바로보기 → ](./src/pages/product/ProductList.js#L112-L130)
+- **해결** &emsp; [ 관련 코드 바로가기 → ](./src/pages/product/ProductList.js#L112-L130)
     - **입고 대기 상태(W)를 신규 정의**하여 상품 등록 시 기본값으로 설정하고, 실제 입고 처리 전까지
         
         재고 부족 판단 대상에서 제외되도록 비즈니스 로직을 설계하여 데이터 혼선을 방지
