@@ -9,7 +9,7 @@
 
 ## 기여한 부분
 
-### **상품 목록 페이지 개발**  &emsp; [ 관련 코드 → ](./src/pages/product/ProductList.js)
+#### **상품 목록 페이지 개발**  &emsp; [ 관련 코드 보기 → ](./src/pages/product/ProductList.js)
 - API 연동으로 상품 조회 및 재고 상태 확인<br>
 - 필터링 및 검색어 기반 상품 검색<br>
 - 디바이스 환경 기반 **데이터 목록 조회 전략 분리**  <br>
