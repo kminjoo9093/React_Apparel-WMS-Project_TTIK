@@ -38,7 +38,7 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 
 <br>
 
-#### 창고 관리 페이지 개발 [ 코드 보기 → ](./src/pages/storage/)
+#### 창고 관리 페이지 개발   &emsp; [ 코드 보기 → ](./src/pages/storage/)
 - 창고 등록, 창고 정보 수정, 창고 삭제 기능
 - 선반 정보 조회 및 재고 위치 변경 기능
 - **컨텍스트 인식형 입력 가이드** 구현 &emsp; [ 관련 코드 바로가기 → ](./src/pages/storage/StorageAdd.js#L38-L51)
