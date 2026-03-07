@@ -60,7 +60,7 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 - RESTful API 설계 및 CRUD 로직 구현
 <br>
 
----
+<br>
 
 ## 문제 해결 및 성과
 
