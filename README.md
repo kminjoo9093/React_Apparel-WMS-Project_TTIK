@@ -1,5 +1,5 @@
 # 의류 재고 관리 시스템 TTIK - Frontend
-
+B2B 대량 출고와 B2C 개별 출고를 통합 관리하는 QR 기반 패션 물류 재고 관리 시스템
 <br>
 프로세스 시연 영상 : https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing
 <br>
@@ -8,11 +8,8 @@
 <br>
 
 
-## **프로젝트 개요**
-- B2B 대량 출고와 B2C 개별 출고를 통합 관리하는 QR 기반 패션 물류 재고 관리 시스템
-- 팀장 | 4인 팀프로젝트
-- 반응형(PC, 태블릿, 모바일)
-- 사용 스킬 : HTML, CSS, JavaScript, React, Spring Boot, Java, JPA, MyBatis, Oracle, SQL
+### Teck Skill
+`HTML`, `CSS`, JavaScript, React, Spring Boot, Java, JPA, MyBatis, Oracle, SQL
 
 <br><br>
 
