@@ -1,4 +1,4 @@
-# 의류 재고 관리 시스템 TTIK
+# 의류 재고 관리 시스템 TTIK Frontend
 
 <br>
 프로세스 시연 영상 : https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing
