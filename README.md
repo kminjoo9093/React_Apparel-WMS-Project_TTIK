@@ -1,7 +1,9 @@
 # 의류 재고 관리 시스템 TTIK - Frontend
 B2B 대량 출고와 B2C 개별 출고를 통합 관리하는 QR 기반 패션 물류 재고 관리 시스템
 
----프로세스 시연 영상 : https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing
+---
+
+프로세스 시연 영상 : https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing
 <br>
 시스템 기능 설명 영상 : https://drive.google.com/file/d/16UDGscPzfVxy5I_0mqD-jndgrWXfUIAl/view?usp=sharing
 <br>
