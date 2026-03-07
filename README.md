@@ -61,7 +61,8 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
         속성값이 모두 동일할 경우 데이터 **고유성 확보가 불가함**을 확인
         
 - **해결**
-    - **품번(성별 식별자+3자리 숫자) 도입**으로 상품 코드 구조 재설계  →  (브랜드 코드 + 시즌 코드) - (카테고리 코드 + 사이즈 코드) - 품번
+    - **품번(성별 식별자+3자리 숫자) 도입**으로 상품 코드 구조 재설계 &emsp; [ 관련 코드 바로가기 → ](https://github.com/kminjoo9093/SpringBoot_Apparel-WMS-Project_TTIK/blob/master/src/main/java/com/ttik/serviceImpl/ProductCodeServiceImpl.java) <br>
+      →  (브랜드 코드 + 시즌 코드) - (카테고리 코드 + 사이즈 코드) - 품번
     - 표준화가 어려운 컬러 정보를 품번 내에 반영하도록 설계하여 관리 유연성 확보
     - 데이터 적재 전 **상품 코드 중복 여부 체크**로 검증 로직 강화 &emsp; [ 관련 코드 바로가기 → ](./src/pages/product/ProductCode.js#L17-L48)
     
