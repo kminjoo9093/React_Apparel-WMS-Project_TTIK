@@ -53,14 +53,7 @@ function ProductList(){
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    //화면에 보여줄 리스트 개수
-    // const currentProducts = isMobile 
-    //                         ? productList //Mobile
-    //                         : filteredProductList.slice(indexOfFirst, indexOfLast); //PC
-
-    
-
-    //추가 -- 레이아웃에서 상품명(코드) 검색시 이동할때 받는 함수 
+    //추가(김윤중) -- 레이아웃에서 상품명(코드) 검색시 이동할때 받는 함수 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const urlSearch = params.get('search') || "";
@@ -144,7 +137,7 @@ function ProductList(){
                 if(isMobile){
                     fetchUrl = `${URL}/list/mobile?size=${visibleCount}${filterQuery}`;
                     
-                    // 모바일에서 필터가 바뀌면 '더보기' 상태도 초기화해줘야 함
+                    // 모바일에서 필터가 바뀌면 '더보기' 상태 초기화
                     setHasMore(true);
                 } else {
                     fetchUrl = `${URL}/list/pc?page=${currentPage - 1}&size=${postsPerPagePC}${filterQuery}`; //PC
@@ -194,12 +187,6 @@ function ProductList(){
         // 즉시 한 번 실행
         getProductList();
 
-        // 1분마다 반복 실행
-        // const timer = setInterval(getProductList, 60000);
-
-        // 컴포넌트가 사라질 때 타이머 해제
-        // return () => clearInterval(timer);
-
     }, [currentPage, isMobile, searchFilters])
 
     //상품 목록 - 모바일
@@ -223,7 +210,7 @@ function ProductList(){
                     }
                 }
             }
-        }, { threshold: 0.5 } // 대상이 100% 다 보였을 때 실행
+        }, { threshold: 0.5 } 
         );
 
 
@@ -275,7 +262,7 @@ function ProductList(){
             console.log("데이터 요청 실패 : ", error);
             return [];
         } finally {
-            setIsLoading(false); // 로딩 종료를 반드시 해줘야 다시 Observer가 작동함
+            setIsLoading(false); // 다시 Observer 작동시키지 위해 로딩 종료
         }
     }
 
@@ -333,27 +320,7 @@ function ProductList(){
 
     const isScrollingToTop = useRef(false);
     const scrollContainerRef = useRef(null);
-    // const listRef = useRef(null);
     const [showBtn, setShowBtn] = useState(false);
-
-
-    // useEffect(() => {
-    //     const scrollContainer = document.querySelector('.scrollArea'); // 상위 scroll div
-    //     if (!scrollContainer) {
-    //         console.warn('scrollArea not found, fallback to window');
-    //     }
-    //     scrollContainerRef.current = scrollContainer || document.scrollingElement;
-
-    //     const handleScroll = () => {
-    //         if (!scrollContainerRef.current) return;
-    //         setShowBtn(scrollContainerRef.current.scrollTop > 300);
-    //     };
-
-    //     const el = scrollContainerRef.current;
-    //     el.addEventListener('scroll', handleScroll);
-
-    //     return () => el.removeEventListener('scroll', handleScroll);
-    // }, []);
 
     useEffect(()=>{
 
