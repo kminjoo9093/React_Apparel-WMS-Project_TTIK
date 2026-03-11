@@ -3,6 +3,7 @@ import styleProdModal from "../../css/ProductModal.module.css";
 import styleRegister from "../../css/ProductRegister.module.css";
 import serverUrl from "../../db/server.json";
 import Modal from "../../components/Modal";
+import { CommonButton } from "../../components/CommonButton";
 
 function ProductCode({onClose, productCd, setProductCd}){
 
@@ -17,7 +18,6 @@ function ProductCode({onClose, productCd, setProductCd}){
     async function checkDuplicate(e){
         e.preventDefault();
 
-        //fetch
         try{
             const res = await fetch(`${SERVER_URL}/ttik/product/exist/${productCd}`, {
                 method: 'GET',
@@ -91,7 +91,7 @@ function ProductCode({onClose, productCd, setProductCd}){
                     </div>
                 </div>
                 
-                <button className={`btnSubmit ${styleProdModal.registerBtn}`} disabled={!isChecked}>등록</button>
+                <CommonButton variant="primary" disabled={!isChecked}>등록</CommonButton>
             </form>
         </div>
         </>

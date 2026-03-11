@@ -1,0 +1,33 @@
+.primaryButton{
+    display: inline-block;
+    padding-inline: 2rem;
+    height: 4.5rem;
+    line-height: 4.5rem;
+    border-radius: 1rem;
+    margin-inline: 1rem;
+    text-wrap: nowrap;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: var(--secondary-color);
+    transition: all 0.3s;
+}
+
+.primaryButton:hover{
+    background: #2563eb;
+    box-shadow: 0 2rem 4rem rgba(37, 99, 235, 0.3);
+}
+
+.secondaryButton{
+    background-color: var(--gray-f1);
+    border: none;
+    padding: 0.8rem 1.6rem;
+    border-radius: 1rem;
+    color: var(--gray-47);
+    font-weight: 600;
+    margin-left: 1rem;
+    text-wrap: nowrap;
+}
+.secondaryButton:hover{
+    background-color: var(--gray-e2);
+}

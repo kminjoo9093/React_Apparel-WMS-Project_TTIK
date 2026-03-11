@@ -13,6 +13,25 @@ function Storage(){
     const [view, setView] = useState("list");
     const [storageList, setStorageList] = useState([]);
 
+    const storageMenuConfig = [
+        {
+            id : "list",
+            text : "창고 조회",
+            className : styleStorage.menuViewList
+        },
+        {
+            id : "register",
+            text : "창고 등록",
+            className : styleStorage.menuRegister
+        },
+        {
+            id : "modify",
+            text : "창고 정보 수정",
+            className : styleStorage.menuModify
+        }
+    ]                          
+
+
     //현재 존재하는 창고 리스트
     const getStorageData = async () => {
         try{
@@ -46,27 +65,25 @@ function Storage(){
             </div>
             <div className={styleStorage.contentArea}>
                 <div className={styleStorage.contentWidth}>
-                    <div className={styleStorage.menuArea}>
-                        <div className={`${styleStorage.menuBox} ${styleList.filterCard}`}>
+                    <aside className={styleStorage.menuArea}>
+                        <nav className={`${styleStorage.menuBox} ${styleList.filterCard}`}>
                             <ul className={styleStorage.menuList}>
-                                <li onClick={()=>setView("list")} 
-                                    className={`${view === "list" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuViewList}`}
-                                >창고 조회</li>
-                                <li onClick={()=>setView("register")} 
-                                    className={`${view === "register" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuRegister}`}
-                                >창고 등록</li>
-                                <li onClick={()=>setView("modify")} 
-                                    className={`${view === "modify" ? styleStorage.selected : ""} ${styleStorage.menu} ${styleStorage.menuModify}`}
-                                >창고 정보 수정</li>
+                                {
+                                    storageMenuConfig.map((item)=>{
+                                        return <li key={item.id} onClick={()=>setView(item.id)} 
+                                                    className={`${view === item.id ? styleStorage.selected : ""} ${styleStorage.menu} ${item.className}`}
+                                                >{item.text}</li>
+                                    })
+                                }
                             </ul>
-                        </div>
-                    </div>
+                        </nav>
+                    </aside>
 
-                    <div className={styleStorage.mainContentWrap}>
+                    <section className={styleStorage.mainContentWrap}>
                         {view === "register" && <StorageRegister storageList={storageList} onUpdate={getStorageData} setView={setView}/>}
                         {view === "modify" && <StorageModify storageList={storageList} onUpdate={getStorageData} setView={setView}/>}
                         {view === "list" && <StorageList storageList={storageList} onUpdate={getStorageData} setView={setView}/>}
-                    </div>
+                    </section>
                 </div>
                 
             </div>

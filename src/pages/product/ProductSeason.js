@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 import styleProdModal from "../../css/ProductModal.module.css";
-import styleRegister from "../../css/ProductRegister.module.css";
 import serverUrl from "../../db/server.json";
 import Modal from "../../components/Modal";
+import { CommonButton } from "../../components/CommonButton";
 
 function ProductSeason({onClose, setSeasonList}){
 
@@ -55,7 +55,6 @@ function ProductSeason({onClose, setSeasonList}){
                     message: `${year} ${newSeason} 시즌이 정상 등록되었습니다.`,
                     onConfirm: closeAlert
                 });
-                // alert(`${year} ${newSeason} 시즌이 정상 등록되었습니다.`);
 
                 //모달창 닫기
                 onClose();
@@ -67,7 +66,6 @@ function ProductSeason({onClose, setSeasonList}){
                     message: "이미 등록된 시즌이거나 등록할 수 없는 정보입니다.",
                     onConfirm: closeAlert
                 });
-                // alert("이미 등록된 시즌이거나 등록할 수 없는 정보입니다.");
             }
         } catch(error){
             console.error(error);
@@ -77,7 +75,6 @@ function ProductSeason({onClose, setSeasonList}){
                 message: "네트워크 통신 중 오류가 발생했습니다.",
                 onConfirm: closeAlert
             });
-            // alert("네트워크 통신 중 오류가 발생했습니다.");
         }
 
     }
@@ -106,7 +103,7 @@ function ProductSeason({onClose, setSeasonList}){
                         <option value="F">F/W</option>
                     </select>
                 </div>             
-                <button type="submit" className="btnSubmit">등록</button>
+                <CommonButton variant="primary" type="submit">등록</CommonButton>
             </form>
             <Modal {...modal}/>
         </div>

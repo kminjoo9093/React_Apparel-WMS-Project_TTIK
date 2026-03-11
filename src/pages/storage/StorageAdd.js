@@ -92,7 +92,6 @@ function StorageAdd ({storageList, onUpdate, setView}) {
 
     const validateNumber = (e) => {        
         const { value, name } = e.target; //객체 구조분해
-        // const isInvalid = Number(value) <= 0; //음수면 true
 
          switch (name){
             case "addRack" : setAddRackCount(value);
@@ -101,6 +100,7 @@ function StorageAdd ({storageList, onUpdate, setView}) {
                 break;
             case "rackCountForNewZone" : setRackCountForNewZone(value);
                 break;
+            default: break;
         }
 
         const num = Number(value);
@@ -166,7 +166,6 @@ function StorageAdd ({storageList, onUpdate, setView}) {
                 message: "이미 등록된 구역입니다.",
                 onConfirm: closeAlert
             });
-            // alert("이미 등록된 구역입니다.");
             return;
         }
 
@@ -176,7 +175,6 @@ function StorageAdd ({storageList, onUpdate, setView}) {
             message: "수정을 진행하시겠습니까?",
             onConfirm: closeAlert
         });
-        // alert("수정을 진행하시겠습니까?");
 
         try{
             const res = await fetch(`${SERVER_URL}/ttik/storage/add`, {
@@ -209,7 +207,6 @@ function StorageAdd ({storageList, onUpdate, setView}) {
                     message: errorData.message,
                     onConfirm: closeAlert
                 });
-                // alert(errorData.message);
             }
         } catch(error){
             console.log("수정 요청 실패", error);
@@ -328,10 +325,6 @@ function StorageAdd ({storageList, onUpdate, setView}) {
                                 >{errorMsg.rackCountForNewZone}</p>
                             </div>
                         </div>
-                </div>
-                    
-                <div className={styleStorage.btnSubmitWrap}>
-                    <button type="submit" className={`${styleStorage.btnModify} btnSubmit`}>수정</button>
                 </div>
             </form>
             <Modal {...modal}/>

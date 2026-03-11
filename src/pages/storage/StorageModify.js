@@ -1,9 +1,10 @@
 import styleStorage from "../../css/Storage.module.css";
 import { useEffect, useState } from "react";
 import serverUrl from "../../db/server.json";
-import StorageUpdate from "./StorageUpdate";
+import StorageUpdateState from "./StorageUpdateState";
 import StorageAdd from "./StorageAdd";
 import StorageDelete from "./StorageDelete";
+import { CommonButton } from "../../components/CommonButton";
 
 function StorageModify({storageList, onUpdate, setView}){
 
@@ -28,10 +29,13 @@ function StorageModify({storageList, onUpdate, setView}){
                         }
                     </div>
 
-                    {modifyType === "update" && <StorageUpdate storageList={storageList} onUpdate={onUpdate} setView={setView}/>}
+                    {modifyType === "update" && <StorageUpdateState storageList={storageList} onUpdate={onUpdate} setView={setView}/>}
                     {modifyType === "add" && <StorageAdd storageList={storageList} onUpdate={onUpdate} setView={setView}/>}
                     {modifyType === "delete" && <StorageDelete storageList={storageList} onUpdate={onUpdate} setView={setView}/>}
 
+                    <div className={styleStorage.btnSubmitWrap}>
+                        <CommonButton variant="primary" type="submit">수정</CommonButton>
+                    </div> 
                 </div>
             </div>
         </>

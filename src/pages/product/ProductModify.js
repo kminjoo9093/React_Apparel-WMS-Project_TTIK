@@ -19,7 +19,7 @@ const ProductModify = () => {
 useEffect(() => {
   if (location.state && location.state.product) {
     const p = location.state.product;
-    // 📍 백엔드에서 대문자로 줄 경우를 대비해 소문자로 표준화해서 state에 저장
+    // 백엔드에서 대문자로 줄 경우를 대비해 소문자로 표준화해서 state에 저장
     const normalizedProduct = {
       ...p,
       gds_cd: p.GDS_CD || p.gds_cd || "",

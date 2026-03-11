@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styleRegister from "../../css/ProductRegister.module.css";
 import styleMainDashBoard from '../../css/MainDashboard.module.css';
-import ModalFrame from "./ModalFrame";
+import RegistModalFrame from "../../components/RegistModalFrame";
 import ProductSeason from "./ProductSeason";
 import ProductCode from "./ProductCode";
 import ModalBrandSearch from "./ModalBrandSearch";
 import serverUrl from "../../db/server.json";
 import Modal from "../../components/Modal";
+import { CommonButton } from "../../components/CommonButton";
 
 function ProductRegister(){
 
@@ -56,8 +57,6 @@ function ProductRegister(){
     const [categoryList, setCategoryList] = useState([]);
     const [seasonList, setSeasonList] = useState([]);
     const [sizeMap, setSizeMap] = useState({});
-    // const [sizeList, setSizeList] = useState([]);
-    // const [brandNm, setBrandNm] = useState("");
 
     async function getData(url){
         try{
@@ -114,6 +113,8 @@ function ProductRegister(){
                 case "price" : setPrice(value);
                     break;
                 case "threshold" : setThreshold(value);
+                    break;
+                default:
                     break;
             }
         }
@@ -195,7 +196,6 @@ function ProductRegister(){
 
 
     // 상품 코드 생성 & 모달 오픈
-    // 상품 코드
     async function generateProductCd(){
         try{
             const res = await fetch(`${SERVER_URL}/ttik/productCode`, {
@@ -249,8 +249,6 @@ function ProductRegister(){
 
     // 인풋 값 변경 시 상품 코드 초기화
     useEffect(()=>{
-        // if(!productCd || !boxCd) return;
-
         setProductCd("");
     }, [brandCd, seasonCd, category, sizeCd, styleNo])
 
@@ -316,7 +314,6 @@ function ProductRegister(){
                 setThreshold("");
                 setProductCd("");
                 setStyleNo("");
-                // setBoxCd("");
 
                 const data = await res.json();
                 console.log(data);
@@ -353,7 +350,13 @@ function ProductRegister(){
                                         ))
                                     }
                                 </select>
-                                <button type="button" onClick={()=>{openModal("브랜드 검색", <ModalBrandSearch onClose={closeModal} setBrandCd={setBrandCd}/>)}}>검색</button>
+                                <CommonButton 
+                                    variant="secondary"
+                                    type="button"
+                                    onClick={()=>{openModal("브랜드 검색", <ModalBrandSearch onClose={closeModal} setBrandCd={setBrandCd}/>)}}
+                                >
+                                    검색
+                                </CommonButton>
                             </div>
                             <div className={`${styleRegister.col} ${styleRegister.right}`}>
                                 <label htmlFor="style" className={styleRegister.label}>품번</label>
@@ -384,7 +387,13 @@ function ProductRegister(){
                                         ))
                                     }
                                 </select>
-                                <button type="button" onClick={()=>{openModal("시즌 등록", <ProductSeason onClose={closeModal} setSeasonList={setSeasonList}/>)}}>등록</button>
+                                <CommonButton 
+                                    variant="secondary"
+                                    type="button"
+                                    onClick={()=>{openModal("시즌 등록", <ProductSeason onClose={closeModal} setSeasonList={setSeasonList}/>)}}
+                                >
+                                    등록
+                                </CommonButton>
                             </div>
                             <div className={`${styleRegister.col} ${styleRegister.right}`}>
                                 <label htmlFor="category" className={styleRegister.label}>카테고리</label>
@@ -455,24 +464,32 @@ function ProductRegister(){
                             <div className={styleRegister.col}>
                                 <label className={`${styleRegister.required} ${styleRegister.label}`}>상품 코드</label>
                                 <input type="text" placeholder="생성 버튼을 누르세요" readOnly value={productCd}></input>
-                                <button type="button" onClick={handleProductCd}>생성</button>
+                                <CommonButton 
+                                    variant="secondary"
+                                    type="button"
+                                    onClick={handleProductCd}
+                                >
+                                    생성
+                                </CommonButton>
                             </div>
                         </div>
                     </fieldset>
                     <div className={styleRegister.formBtnWrap}>
-                        <button type="submit" className={`${styleRegister.registerBtn} btnSubmit`}>등록</button>
+                        <CommonButton variant="primary" type="submit">
+                            등록
+                        </CommonButton>
                     </div>
                 </form>
             </div>
     
             {/* 공통 모달 하나만 배치 */}
-            <ModalFrame 
+            <RegistModalFrame 
                 isOpen={modalConfig.isOpen} 
                 onClose={closeModal} 
                 title={modalConfig.title}
                 >
                     {modalConfig.children} 
-            </ModalFrame>
+            </RegistModalFrame>
             <Modal {...modal}/>
         </div>
     )

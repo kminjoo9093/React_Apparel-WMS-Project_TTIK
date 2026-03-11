@@ -6,6 +6,7 @@ import serverUrl from "../../db/server.json";
 import Pagination from '../Pagination';
 import { useLocation } from "react-router-dom";
 import Modal from "../../components/Modal";
+import { CommonButton } from "../../components/CommonButton";
 
 function StorageList({storageList:storageOptions=[]}){
 
@@ -41,14 +42,14 @@ function StorageList({storageList:storageOptions=[]}){
     const closeAlert = () => setModal({ ...modal, isOpen: false });
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '' });
 
-    //메인 대시보드에서 창고 적재현황 클릭시 넘어오는 페이지
+    //메인 대시보드에서 창고 적재현황 클릭시 넘어오는 페이지 - 김윤중
     useEffect(() => {
         if (location.state?.autoOpenRackSn) {
             setSelectedRack(location.state.autoOpenRackSn);
             openDetailModal(location.state.autoOpenRackSn);
             setIsOpen(true);
             
-            // 2. 창고 필터 자동 선택 로직  -- 추가(김윤중)
+            // 창고 필터 자동 선택 로직 
              if (location.state.autoOpenStorageNm && storageOptions.length > 0) {
                 const targetStorage = storageOptions.find(
                     (s) => s.storageNm === location.state.autoOpenStorageNm
@@ -62,6 +63,7 @@ function StorageList({storageList:storageOptions=[]}){
         }
     }, [location.state, storageOptions]);
 
+    
     const handleRackClick = (rackSn)=>{
         setSelectedRack(rackSn);
         openDetailModal(rackSn);
@@ -70,7 +72,6 @@ function StorageList({storageList:storageOptions=[]}){
 
     const openDetailModal = async (rackSn) => {
         console.log("정보 확인");
-        // setIsOpen(true);
 
         //rackSn으로 상세 정보 요청
         try{
@@ -332,8 +333,7 @@ function StorageList({storageList:storageOptions=[]}){
                                     </tbody>
                                 </table>
                             </div>
-                            
-                            <button type="submit" className="btnSubmit" onClick={confirmModifyRack}>확인</button>
+                            <CommonButton variant="primary" type="submit" onClick={confirmModifyRack}>확인</CommonButton>
                         </div>
                         <button className={styleProdModal.closeBtn} onClick={onCloseModal}></button>
                     </div>

@@ -4,7 +4,7 @@ import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
 import Modal from "../../components/Modal";
 
-function StorageUpdate ({storageList, onUpdate, setView}) {
+function StorageUpdateState ({storageList, onUpdate, setView}) {
 
     const SERVER_URL = serverUrl.SERVER_URL;
     const [selectedStorage, setSelectedStorage] = useState(1); //창고 일련번호
@@ -81,10 +81,8 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
         setSelectedRack("");
         
         // 2. 입력 필드 초기화
-        // isDisabledRack("");
         setRackCapacity("");
         setRackEnabled("");
-        // setIsDisabledZone(false);
 
         setDisableValues({
             disabledZone: false,
@@ -139,7 +137,7 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
             confirmMsg = "해당 구역과 하위 모든 선반을 비활성화하시겠습니까?";
         }
 
-        // 📍 커스텀 모달 적용
+        // 커스텀 모달 적용
         setModal({
             isOpen: true,
             title: 'Modify',
@@ -286,14 +284,10 @@ function StorageUpdate ({storageList, onUpdate, setView}) {
                         </div>
                     </div>
                 </div>
-                    
-                <div className={styleStorage.btnSubmitWrap}>
-                    <button type="submit" className={`${styleStorage.btnModify} btnSubmit`}>수정</button>
-                </div>
             </form>
             <Modal {...modal}/>
         </>
     )
 }
 
-export default StorageUpdate;
+export default StorageUpdateState;

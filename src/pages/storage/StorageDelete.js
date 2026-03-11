@@ -226,10 +226,6 @@ function StorageDelete ({storageList, onUpdate, setView}) {
                             </div>
                         </div>
                     </div>
-                    
-                <div className={styleStorage.btnSubmitWrap}>
-                    <button type="submit" className={`${styleStorage.btnModify} btnSubmit`}>수정</button>
-                </div>
             </form>
             <Modal {...modal}/>
         </>

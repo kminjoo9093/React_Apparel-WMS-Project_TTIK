@@ -43,7 +43,6 @@
     justify-content: flex-end;
 }
 .registerForm input, .registerForm select{
-    /* padding: 0; */
     height: 4.5rem;
 }
 
@@ -57,7 +56,6 @@
 
 .registerForm input, .registerForm select{
     width: 60%;
-    /* flex: 1; */
     max-width: 25rem;
 }
 
@@ -71,25 +69,10 @@
     padding: 1rem;
 }
 
-.productInfo button, .codeInfo button{
-    background-color: var(--gray-f1);
-    border: none;
-    padding: 0.8rem 1.6rem;
-    border-radius: 1rem;
-    color: var(--gray-47);
-    font-weight: 600;
-    margin-left: 1rem;
-    text-wrap: nowrap;
-}
-.productInfo button:hover, .codeInfo button:hover{
-    background-color: var(--gray-e2);
-}
-
 .unit{
     display: inline-block;
     width: 100%;
     font-size: 1.3rem;
-    /* text-align: center; */
 }
 
 .formBtnWrap{

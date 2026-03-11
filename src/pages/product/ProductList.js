@@ -2,9 +2,10 @@ import { useEffect, useState, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom'; // URL 파라미터 감지용
 import styleMainDashBoard from '../../css/MainDashboard.module.css';
 import styleList from "../../css/ProductList.module.css";
-import styleRegister from "../../css/ProductRegister.module.css";
+
 import serverUrl from "../../db/server.json";
 import Pagination from '../Pagination';
+import { CommonButton } from '../../components/CommonButton';
 
 function ProductList(){
     const SERVER_URL = serverUrl.SERVER_URL;
@@ -59,14 +60,14 @@ function ProductList(){
         const urlSearch = params.get('search') || "";
         const urlStatus = params.get('status') || "";
 
-        // 1. 필터 상태 업데이트
+        // 필터 상태 업데이트
         setSearchFilters(prev => ({
             ...prev,
             keyword: urlSearch,
             stkStatus: urlStatus
         }));
 
-        // 2. 입력창 상태 업데이트 (이 부분이 추가되어야 검색창에 글자가 남습니다)
+        // 입력창 상태 업데이트 (이 부분이 추가되어야 검색창에 글자가 남습니다)
         setKeywordInput(urlSearch);
 
         setCurrentPage(1); // 검색 시 1페이지로
@@ -221,10 +222,9 @@ function ProductList(){
 
         // 5. 언마운트 시 관찰 중단
         return () => {
-            // if (observerTarget.current) observer.unobserve(observerTarget.current);
             if (observerTarget.current) observer.disconnect();
         };
-    }, [isMobile, hasMore, productList]) //isLoading productList
+    }, [isMobile, hasMore, productList]) 
 
     //모바일 두번째 이후 데이터 요청
     const getNextData = async (lastItemDate, lastItemProCd) => {
@@ -367,7 +367,9 @@ function ProductList(){
                 <p>상품 목록을 확인하세요. </p>
             </div>
             <div className={styleList.actionArea}>
-                <Link to="/product/register" className={`${styleRegister.registerBtn} btnSubmit`}>상품 등록</Link>
+                <CommonButton as={Link} to="/product/register" variant="primary">
+                    상품 등록
+                </CommonButton>
             </div>
             <div className={styleList.productListBox}>
                 <div className={styleList.listTopWrap}>
@@ -381,11 +383,13 @@ function ProductList(){
                                 onKeyDown={(e) => e.key === 'Enter' && handleSearchClick()} // 엔터키 지원
                                 type="text" placeholder="상품명 또는 코드 검색"
                         ></input>
-                        <button onClick={handleSearchClick}>검색</button>
+                        <CommonButton variant="secondary" onClick={handleSearchClick}>
+                            검색
+                        </CommonButton>
                     </div>
                 </div>
                 <div className={styleList.contentWrap}>
-                    <div className={styleList.filterArea}>
+                    <aside className={styleList.filterArea}>
                         <div className={styleList.filterCard}>
                             <div className={styleList.filterHeading}>
                                 <h3>검색 필터 설정</h3>
@@ -418,8 +422,8 @@ function ProductList(){
                                 </select>
                             </div>
                         </div>
-                    </div>
-                    <div className={styleList.listArea}>
+                    </aside>
+                    <section className={styleList.listArea}>
                         <div className={styleList.totalCount}>
                             [ 총 {totalElements}개 상품 ]
                         </div>
@@ -481,7 +485,7 @@ function ProductList(){
                                 })
                             }
                         </ul>
-                    </div>
+                    </section>
                 </div>
 
                 {
