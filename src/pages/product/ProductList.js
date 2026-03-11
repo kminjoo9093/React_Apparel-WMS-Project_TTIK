@@ -29,6 +29,33 @@ function ProductList(){
         keyword: new URLSearchParams(location.search).get('search') || "" 
     });
     
+    const fetchProductList = async (searchFilters, currentPage, isMobile) => {
+        let fetchUrl = "";
+        // 모바일: 필터 조건을 쿼리 스트링으로 변환하여 5개만 요청
+        const { brandCd, categoryCd, seasonCd, stkStatus, keyword } = searchFilters;
+        const filterQuery = `&brandCd=${brandCd}&catCd=${categoryCd}&seasonCd=${seasonCd}&stkStatus=${stkStatus}&keyword=${encodeURIComponent(keyword)}`;
+
+        if(isMobile){
+            fetchUrl = `${URL}/list/mobile?size=${visibleCount}${filterQuery}`;
+            setHasMore(true); // 모바일에서 필터가 바뀌면 '더보기' 상태 초기화
+        } else {
+            fetchUrl = `${URL}/list/pc?page=${currentPage - 1}&size=${postsPerPagePC}${filterQuery}`; //PC
+        }
+
+        const res = await fetch(fetchUrl, {
+            method: 'GET',
+            credentials: 'include', // 세션 쿠키 전송 (필수)
+            headers: {
+                'Accept': 'application/json', // JSON 응답 선호 명시
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log("응답 상태:", res.status);
+
+        if(!res.ok) throw new Error("네트워크 응답 실패");
+        return await res.json();
+    }
+
     const stkStatusConfig = [
         {value: "대기", status: "입고 대기"},
         {value: "정상", status: "정상"},
@@ -117,51 +144,25 @@ function ProductList(){
             setIsLoading(true); // 로딩 시작
 
             try{
-                let fetchUrl = "";
+                const data = await fetchProductList(searchFilters, currentPage, isMobile);
+                const products = data.content || [];
+                const total = data.totalPages || 0;
                 
-                // 모바일: 필터 조건을 쿼리 스트링으로 변환하여 5개만 요청
-                const { brandCd, categoryCd, seasonCd, stkStatus, keyword } = searchFilters;
-                const filterQuery = `&brandCd=${brandCd}&catCd=${categoryCd}&seasonCd=${seasonCd}&stkStatus=${stkStatus}&keyword=${encodeURIComponent(keyword)}`;
-                if(isMobile){
-                    fetchUrl = `${URL}/list/mobile?size=${visibleCount}${filterQuery}`;
-                    
-                    // 모바일에서 필터가 바뀌면 '더보기' 상태 초기화
-                    setHasMore(true);
-                } else {
-                    fetchUrl = `${URL}/list/pc?page=${currentPage - 1}&size=${postsPerPagePC}${filterQuery}`; //PC
-                }
-
-                const res = await fetch(fetchUrl, {
-                    method: 'GET',
-                    credentials: 'include', // 세션 쿠키 전송 (필수)
-                    headers: {
-                        'Accept': 'application/json', // JSON 응답 선호 명시
-                        'Content-Type': 'application/json'
+                if(isMobile) {
+                    setProductList(products);
+                    setTotalElements(total);
+                    if(products.length > 0){
+                        if (products.length < visibleCount){
+                            setHasMore(false); // 가져온 데이터가 요청한 size(5개)보다 적으면 더 가져올 게 없다고 판단
+                            return;
+                        } 
+                    } else {
+                        setHasMore(false);
                     }
-                });
-                console.log("응답 상태:", res.status);
-                if(res.ok){
-                    const data = await res.json();
-
-                    const products = data.content || [];
-                    const total = data.totalPages || 0;
-                    
-                    if(isMobile) {
-                        setProductList(products);
-                        setTotalElements(total);
-                        if(products.length > 0){
-                            if (products.length < visibleCount){
-                                setHasMore(false); // 가져온 데이터가 요청한 size(5개)보다 적으면 더 가져올 게 없다고 판단
-                                return;
-                            } 
-                        } else {
-                            setHasMore(false);
-                        }
-                    } else { //pc
-                        setTotalElements(data.totalElements);
-                        setProductList(products); 
-                        setTotalPages(total);
-                    }
+                } else { //pc
+                    setTotalElements(data.totalElements);
+                    setProductList(products); 
+                    setTotalPages(total);
                 }
             } catch (error){
                 console.log("데이터 요청 실패 - ", error);
@@ -200,7 +201,6 @@ function ProductList(){
             }
         }, { threshold: 0.5 } 
         );
-
 
         // 4. 관찰 시작
         if (observerTarget.current) {
