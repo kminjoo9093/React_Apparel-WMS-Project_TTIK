@@ -84,7 +84,6 @@ function ProductRegister(){
             setBrandList(brandData);
             setCategoryList(categoryData);
             setSeasonList(seasonData);
-            console.log("여기" + seasonData);
         };
 
         fetchData();
