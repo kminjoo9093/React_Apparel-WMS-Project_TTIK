@@ -40,7 +40,7 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 
 #### **상품 등록 페이지 개발** &emsp; [ 코드 보기 → ](./src/pages/product/ProductRegister.js)
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 부여**
-- children 기반 재사용 가능한 **공통 Modal 컴포넌트** 설계 &emsp; [ 관련 코드 바로가기 → ](./src/pages/product/ModalFrame.js)
+- children 기반 재사용 가능한 **공통 Modal 컴포넌트** 설계 &emsp; [ 관련 코드 바로가기 → ](./src/components/RegistModalFrame.js)
     - 브랜드, 시즌, 상품코드 모달
 - 입력값 유효성 검증
     - 숫자(음수), 자릿수, 알파벳
