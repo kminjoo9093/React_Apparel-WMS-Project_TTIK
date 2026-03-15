@@ -31,11 +31,14 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 ## 기여한 부분
 
 #### **상품 목록 페이지 개발**  &emsp; [ 코드 보기 → ](./src/pages/product/ProductList.js)
+<img width="800" height="276" alt="Image" src="https://github.com/user-attachments/assets/854170a7-953c-4292-b92e-6b98c1bd773d" />
 - API 연동으로 상품 조회 및 재고 상태 확인<br>
 - 필터링 및 검색어 기반 상품 검색<br>
 - 디바이스 환경 기반 **데이터 목록 조회 전략 분리**  <br>
 PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 - 컬러 활용한 상태 구분으로 정보의 직관성 높임 : 입고 대기, 부족, 정상<Br>
+
+
 
 <br>
 
