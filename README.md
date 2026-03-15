@@ -32,7 +32,7 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 #### **상품 목록 페이지 개발**  &emsp; [ 코드 보기 → ](./src/pages/product/ProductList.js)
 <img width="400" alt="Image" src="https://github.com/user-attachments/assets/411eaf70-e179-4c04-b6ba-133d5e5956cf" />
-<img width="250" alt="Image" src="https://github.com/user-attachments/assets/c7cbf128-21dc-4e2c-8b7f-d731c0214c3b" />
+<img height="250" alt="Image" src="https://github.com/user-attachments/assets/c7cbf128-21dc-4e2c-8b7f-d731c0214c3b" />
 
 <br>
 - API 연동으로 상품 조회 및 재고 상태 확인<br>
