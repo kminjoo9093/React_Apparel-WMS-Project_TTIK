@@ -33,6 +33,7 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 #### **상품 목록 페이지 개발**  &emsp; [ 코드 보기 → ](./src/pages/product/ProductList.js)
 <img width="400" alt="Image" src="https://github.com/user-attachments/assets/411eaf70-e179-4c04-b6ba-133d5e5956cf" />
 <img height="250" alt="Image" src="https://github.com/user-attachments/assets/c7cbf128-21dc-4e2c-8b7f-d731c0214c3b" />
+<img height="250" alt="Image" src="https://github.com/user-attachments/assets/51eff88c-4997-465e-b74f-eff97bfd0d47" />
 
 <br>
 - API 연동으로 상품 조회 및 재고 상태 확인<br>
@@ -46,6 +47,10 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 <br>
 
 #### **상품 등록 페이지 개발** &emsp; [ 코드 보기 → ](./src/pages/product/ProductRegister.js)
+<img width="400" alt="Image" src="https://github.com/user-attachments/assets/313fa5be-e6db-434a-80fd-d64fee3c65a5" />
+<img width="300" alt="Image" src="https://github.com/user-attachments/assets/d2b8c75b-2391-43ca-a812-bb475df21de8" />
+<img width="300" alt="Image" src="https://github.com/user-attachments/assets/35dd3e8b-111c-4c21-9f57-30779d69fc69" />
+<br>
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 부여**
 - children 기반 재사용 가능한 **공통 Modal 컴포넌트** 설계 &emsp; [ 관련 코드 바로가기 → ](./src/components/RegistModalFrame.js)
     - 브랜드, 시즌, 상품코드 모달
@@ -57,6 +62,10 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 <br>
 
 #### 창고 관리 페이지 개발   &emsp; [ 코드 보기 → ](./src/pages/storage/)
+<img width="350" alt="Image" src="https://github.com/user-attachments/assets/e5a0a8a4-48e5-426a-898a-a6eff3aa39f4" />
+<img width="350" alt="Image" src="https://github.com/user-attachments/assets/68f72ecb-672f-42d9-8177-9acdecd3b3f6" />
+<img width="300" height="286" alt="Image" src="https://github.com/user-attachments/assets/24b87c9a-48aa-41c0-a6ab-28fe0d45f418" />
+<br>
 - 창고 등록, 창고 정보 수정, 창고 삭제 기능
 - 선반 정보 조회 및 재고 위치 변경 기능
 - **컨텍스트 인식형 입력 가이드** 구현 &emsp; [ 관련 코드 바로가기 → ](./src/pages/storage/StorageAdd.js#L38-L51)
@@ -72,13 +81,15 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 ## 문제 해결 및 성과
 
 ### **1. 상품 코드 체계 재설계로 데이터 고유성 & 연결성 확보 및 시스템 확장에 기여** 
-
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/0fca1b92-f094-4e52-af05-cdd5c9f19269" />
+<br>
 - **문제**
     - 초기 설계한 상품 코드 (브랜드 코드 + 시즌 코드) - (카테고리 코드 + 사이즈 코드) 구조 하에
         
         속성값이 모두 동일할 경우 데이터 **고유성 확보가 불가함**을 확인
         
 - **해결**
+  <img width="600" alt="Image" src="https://github.com/user-attachments/assets/6acb8436-21d0-498f-800c-249027876905" /> <br>
     - **품번(성별 식별자+3자리 숫자) 도입**으로 상품 코드 구조 재설계 &emsp; <br>
       →  (브랜드 코드 + 시즌 코드) - (카테고리 코드 + 사이즈 코드) - 품번
     - 표준화가 어려운 컬러 정보를 품번 내에 반영하도록 설계하여 관리 유연성 확보
@@ -91,11 +102,12 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 <br>
 
 ### **2. 서버 사이드 페이지네이션 적용으로 대용량 데이터 조회 시 렌더링 지연 문제 개선**
-
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/996c8e7c-ced3-489d-b7f4-362c56edf79b" /> <br>
 - **문제**
     - 상품 데이터 증가 시 전체 데이터를 브라우저로 전송하여 발생하는 **렌더링 속도 지연 문제 발생**
     
 - **해결**
+  <img width="600" alt="Image" src="https://github.com/user-attachments/assets/41322dd7-56e5-4298-b471-e15dd1a1c1b2" /><br>
     - Spring Data JPA **Pageable 기반 서버 사이드 페이지네이션 적용**
     - DB 엔진 레벨에서 **현재 페이지에 필요한 데이터만 추출**하는 부분 조회하는 방식으로 전환
     - LEFT JOIN 및 동적 쿼리를 활용하여 **필터링을 DB 단계에서 처리**
@@ -106,7 +118,7 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 <br>
 
 ### **3. 상품 상태 값 세분화로 재고 부족 오 분류 문제 해결**  
-
+<img width="500" alt="Image" src="https://github.com/user-attachments/assets/415d2f3b-0448-4910-9cbe-90c672629cf2" /> <br>
 - **문제**
     - 상품 상태를 활성,비활성으로만 관리하여 상품 등록 후 입고 전인 수량 0의 상품이
         
