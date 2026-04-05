@@ -14,6 +14,8 @@ import {
   registerProduct,
 } from "../../api/product";
 import PageInfo from "../../components/PageInfo";
+import { checkNumber } from "../../utils/validation/numbers";
+import { checkStyleNo } from "../../utils/validation/styleNo";
 
 function ProductRegister() {
   const navigate = useNavigate();
@@ -71,23 +73,22 @@ function ProductRegister() {
   });
 
   const validateNumber = (e) => {
-    const { value, name } = e.target; //객체 구조분해
-    const isInvalid = Number(value) < 0; //음수면 true
+    const { value, name } = e.target;
+    const { isInvalid, message } = checkNumber(value);
 
     if (!isInvalid) {
-      switch (name) {
-        case "qty":
-          setFormData({ ...formData, inboxQty: value });
-          break;
-        case "price":
-          setFormData({ ...formData, price: value });
-          break;
-        case "threshold":
-          setFormData({ ...formData, threshold: value });
-          break;
-        default:
-          break;
-      }
+      setFormData((prev) => {
+        switch (name) {
+          case "qty":
+            return { ...prev, inboxQty: value };
+          case "price":
+            return { ...prev, price: value };
+          case "threshold":
+            return { ...prev, threshold: value };
+          default:
+            return prev;
+        }
+      });
     }
 
     setErrors((prev) => ({
@@ -97,38 +98,28 @@ function ProductRegister() {
 
     setErrorMsg((prev) => ({
       ...prev,
-      [name]: isInvalid ? "0 이상의 숫자를 입력하세요." : "",
+      [name]: message,
     }));
   };
 
   // 카테고리 선택
   function changedCategory(e) {
     const cat = e.target.value;
-    setFormData({ ...formData, category: cat });
-    setFormData({ ...formData, sizeCd: "" });
+    setFormData((prev) => ({ ...prev, category: cat, sizeCd: "" }));
   }
 
   //스타일 넘버 -> 품번
   function handleStyleNo(e) {
-    setFormData({ ...formData, sizeCd: "" });
+    setFormData((prev) => ({ ...prev, sizeCd: "" }));
 
-    //유효성 검사(W/M/U/K)
-    const value = e.target.value.toUpperCase();
+    const result = checkStyleNo(e.target.value);
 
-    if (!value) return;
+    if (result.ok === false && result.empty) return;
 
-    const startAlphas = ["W", "M", "U", "K"];
-    const isValid = startAlphas.some((alpha) => value.startsWith(alpha));
-
-    //첫 글자 뒤 3자리가 숫자인지 확인
-    const num = Number(value.substring(1));
-    const isNumber = Number.isInteger(num) && num >= 0 && num < 1000;
-
-    if (value.length === 4 && isValid && isNumber) {
-      setFormData({ ...formData, styleNo: value });
-
-      const target = value.substring(0, 1);
-      setTarget(target);
+    if (result.ok) {
+      setFormData((prev) => ({ ...prev, styleNo: result.styleNo }));
+      setTarget(result.target);
+      return;
     } else {
       setModal({
         isOpen: true,
