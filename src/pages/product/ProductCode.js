@@ -27,7 +27,7 @@ function ProductCode({onClose, productCd, setProductCd}){
                 }
             });
             if(!res.ok){
-                throw new Error(`Error : ${res.status}`);
+                throw new Error("서버와의 통신이 원활하지 않습니다. 잠시 후 다시 시도해주세요.");
             }
             const data = await res.json();
             console.log(data);
@@ -42,7 +42,7 @@ function ProductCode({onClose, productCd, setProductCd}){
             }
             return;
         } catch(error){
-            console.log(error);
+            alert(error.message);
             return;
         }
     }
@@ -66,7 +66,6 @@ function ProductCode({onClose, productCd, setProductCd}){
 
         //바코드 이미지 생성 로직 성공하면 모달 닫기
         if(!isDuplicate && productCd){
-            console.log("상품코드 생성 성공 : ", productCd);
             //모달창 닫기
             setIsDuplicate(null);
             onClose();
