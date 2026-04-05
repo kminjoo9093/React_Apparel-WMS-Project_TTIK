@@ -1,15 +1,18 @@
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import styleProdModal from "../../css/ProductModal.module.css";
 import serverUrl from "../../db/server.json";
 import Modal from "../../components/Modal";
 import { CommonButton } from "../../components/CommonButton";
+import { SeasonDispatchContext } from "./ProductDataProvider";
 
-function ProductSeason({onClose, setSeasonList}){
+function ProductSeason({onClose}){
 
     const SERVER_URL = serverUrl.SERVER_URL;
 
     const yearRef = useRef();
     const seasonRef = useRef();
+
+    const dispatch = useContext(SeasonDispatchContext);
 
     //alert
     const closeAlert = () => setModal({ ...modal, isOpen: false });
@@ -47,7 +50,7 @@ function ProductSeason({onClose, setSeasonList}){
             if(res.ok){
                 console.log(year, season);
                 const updatedList = await res.json();
-                setSeasonList(updatedList);
+                dispatch(updatedList);
                 const newSeason = season === "S" ? "S/S" : "FW";
                 setModal({
                     isOpen: true,

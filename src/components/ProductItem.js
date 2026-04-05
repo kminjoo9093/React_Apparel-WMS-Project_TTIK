@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import styleList from "../../css/ProductList.module.css";
+import styleList from "../css/ProductList.module.css";
 
 function ProductItem({product, index, isMobile, currentPage, postsPerPagePC}){
 

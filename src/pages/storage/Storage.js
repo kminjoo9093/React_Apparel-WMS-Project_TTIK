@@ -1,4 +1,3 @@
-import styleMainDashBoard from '../../css/MainDashboard.module.css';
 import styleStorage from "../../css/Storage.module.css";
 import { useState, useEffect } from 'react';
 import StorageModify from './StorageModify';
@@ -6,6 +5,7 @@ import StorageList from './StorageList';
 import StorageRegister from './StorageRegister';
 import styleList from "../../css/ProductList.module.css";
 import serverUrl from "../../db/server.json";
+import PageInfo from '../../components/PageInfo';
 
 function Storage(){
 
@@ -59,10 +59,7 @@ function Storage(){
 
     return (
         <div className={styleStorage.storage}>
-             <div className={styleMainDashBoard.welcomeSection}>
-                <h1>Storage</h1>
-                <p>창고 정보를 조회하고 관리하세요.</p>
-            </div>
+            <PageInfo title={"Storage"} description={"창고 정보를 조회하고 관리하세요."}/>
             <div className={styleStorage.contentArea}>
                 <div className={styleStorage.contentWidth}>
                     <aside className={styleStorage.menuArea}>

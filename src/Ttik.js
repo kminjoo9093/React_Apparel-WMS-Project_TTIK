@@ -19,6 +19,9 @@ import History from "../src/pages/stock/StockHistory";
 import StockDetailInbound from "./pages/stock/StockDetailInbound";
 import StockDetailOutbound from "./pages/stock/StockDetailOutbound";
 import Storage from "./pages/storage/Storage";
+import ProductDataProvider, {
+  ProductContext,
+} from "./pages/product/ProductDataProvider";
 
 function Ttik() {
   const [user, setUser] = useState(null);
@@ -78,7 +81,6 @@ function Ttik() {
             <Layout user={user} setUser={setUser} setIsLoggedIn={setIsLoggedIn}>
               <Routes>
                 <Route path="/ttik" element={<MainDashboard user={user} />} />
-                <Route path="/product/list" element={<ProductList />} />
                 <Route path="/brand" element={<Brand />} />
                 <Route path="/partner" element={<Partner />} />
                 <Route path="/stock/plans" element={<Plans />} />
@@ -90,7 +92,10 @@ function Ttik() {
                   path="/stock/plans/outbound/:productCd"
                   element={<StockDetailOutbound />}
                 />
-                <Route path="/product/register" element={<ProductRegister />} />
+                <Route path="/product" element={<ProductDataProvider />}>
+                  <Route path="list" element={<ProductList />} />
+                  <Route path="register" element={<ProductRegister />} />
+                </Route>
                 <Route path="/register/admin" element={<RegisterAdmin />} />
                 <Route
                   path="/product/productDetail/:gds_cd"
