@@ -1,6 +1,6 @@
 import style from '../css/Modal.module.css';
 
-const Modal = ({ isOpen, title, message, type, onConfirm, onCancel, onClose }) => {
+const Alert = ({ isOpen, title, message, type, onConfirm, onCancel, onClose }) => {
   if (!isOpen) return null;
 
   const handleOverlayClick = (e) => {
@@ -31,4 +31,4 @@ const Modal = ({ isOpen, title, message, type, onConfirm, onCancel, onClose }) =
   );
 };
 
-export default Modal;
+export default Alert;
