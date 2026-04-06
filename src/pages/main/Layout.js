@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import styleLayout from "../../css/Layout.module.css";
-import Alert from "../../components/Alert";
+import { useOpenAlert } from "../../store/alert";
 import serverUrl from "../../db/server.json";
 
 const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
@@ -15,14 +15,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
   const [notifications, setNotifications] = useState([]);
   const notiRef = useRef(null);
 
-  const [alert, setAlert] = useState({
-    isOpen: false,
-    title: "",
-    message: "",
-    onConfirm: null,
-  });
-
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
+  const openAlert = useOpenAlert();
 
   // 사이드바 노출 권한 정의: ALL(전체관리자), U(창고이용자)
   const hasSidebarPermission = ["ALL", "U"].includes(user?.tkcgStorage);
@@ -119,8 +112,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
   };
 
   const handleLogout = () => {
-    setAlert({
-      isOpen: true,
+    openAlert({
       title: "Logout",
       message: "정말 로그아웃 하시겠습니까?",
       onConfirm: async () => {
@@ -130,7 +122,6 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
             credentials: "include",
           });
           if (response.ok) {
-            closeAlert();
             setIsLoggedIn(false);
             setUser(null);
             window.location.href = "/login";
@@ -139,7 +130,6 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
           console.error("로그아웃 실패:", error);
         }
       },
-      onCancel: closeAlert,
     });
   };
   const allMenus = [
@@ -309,11 +299,6 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
                     <div className={styleLayout.notiHeader}>
                       <span>최근 알림</span>
                       <button
-                        // onClick={() => {
-                        //   localStorage.removeItem('readNotifications');
-                        //   window.location.reload();
-                        // }}
-                        // style={{ fontSize: '10px', color: '#ef4444', cursor: 'pointer', border: 'none', background: 'none' }}
                         onClick={handleAllRead} // 분리한 함수 연결
                         style={{
                           fontSize: "12px",
@@ -418,7 +403,6 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
 
         <main className={styleLayout.scrollArea}>{children}</main>
       </div>
-      <Alert {...alert} />
     </div>
   );
 };

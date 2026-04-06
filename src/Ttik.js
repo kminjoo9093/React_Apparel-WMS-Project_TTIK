@@ -19,14 +19,16 @@ import History from "../src/pages/stock/StockHistory";
 import StockDetailInbound from "./pages/stock/StockDetailInbound";
 import StockDetailOutbound from "./pages/stock/StockDetailOutbound";
 import Storage from "./pages/storage/Storage";
-import ProductDataProvider, {
-  ProductContext,
-} from "./pages/product/ProductDataProvider";
+import ProductDataProvider from "./pages/product/ProductDataProvider";
+import Alert from "./components/Alert";
+import { useAlertStore } from "./store/alert";
 
 function Ttik() {
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+
+  const { alert, closeAlert } = useAlertStore();
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -60,78 +62,91 @@ function Ttik() {
   if (!isInitialized) return <div>로딩 중...</div>;
 
   return (
-    <Routes>
-      {/* 1. 로그인 페이지를 최상단에 배치하고 /* 경로와 분리 */}
-      <Route
-        path="/login"
-        element={
-          isLoggedIn ? (
-            <Navigate to="/ttik" replace />
-          ) : (
-            <Login setUser={setUser} setIsLoggedIn={setIsLoggedIn} />
-          )
-        }
-      />
-
-      {/* 2. 로그인이 필요한 모든 경로는 Layout 내부에서 처리 */}
-      {isLoggedIn ? (
+    <>
+      <Routes>
+        {/* 1. 로그인 페이지를 최상단에 배치하고 /* 경로와 분리 */}
         <Route
-          path="/*"
+          path="/login"
           element={
-            <Layout user={user} setUser={setUser} setIsLoggedIn={setIsLoggedIn}>
-              <Routes>
-                <Route path="/ttik" element={<MainDashboard user={user} />} />
-                <Route path="/brand" element={<Brand />} />
-                <Route path="/partner" element={<Partner />} />
-                <Route path="/stock/plans" element={<Plans />} />
-                <Route
-                  path="/stock/plans/inbound/:productCd"
-                  element={<StockDetailInbound />}
-                />
-                <Route
-                  path="/stock/plans/outbound/:productCd"
-                  element={<StockDetailOutbound />}
-                />
-                <Route path="/product" element={<ProductDataProvider />}>
-                  <Route path="list" element={<ProductList />} />
-                  <Route path="register" element={<ProductRegister />} />
-                </Route>
-                <Route path="/register/admin" element={<RegisterAdmin />} />
-                <Route
-                  path="/product/productDetail/:gds_cd"
-                  element={<ProductDetail />}
-                />
-                <Route
-                  path="/product/productModify"
-                  element={<ProductModify />}
-                />
-                <Route
-                  path="/product/productArchive"
-                  element={<ProductArchive />}
-                />
-                <Route path="/stock/plans/qr/print" element={<QRsave />} />
-                <Route path="/stock/history" element={<History />} />
-                <Route path="/storage" element={<Storage />} />
-
-                <Route
-                  path="/register-admin"
-                  element={
-                    <ProtectedRoute allowedRoles={["ALL", "A", "B"]}>
-                      <RegisterAdmin />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="/" element={<Navigate to="/ttik" replace />} />
-                <Route path="*" element={<Error404Page />} />
-              </Routes>
-            </Layout>
+            isLoggedIn ? (
+              <Navigate to="/ttik" replace />
+            ) : (
+              <Login setUser={setUser} setIsLoggedIn={setIsLoggedIn} />
+            )
           }
         />
-      ) : (
-        /* 로그인 안된 상태에서 /login 이외의 모든 경로는 로그인으로 강제 이동 */
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      )}
-    </Routes>
+
+        {/* 2. 로그인이 필요한 모든 경로는 Layout 내부에서 처리 */}
+        {isLoggedIn ? (
+          <Route
+            path="/*"
+            element={
+              <Layout
+                user={user}
+                setUser={setUser}
+                setIsLoggedIn={setIsLoggedIn}
+              >
+                <Routes>
+                  <Route path="/ttik" element={<MainDashboard user={user} />} />
+                  <Route path="/brand" element={<Brand />} />
+                  <Route path="/partner" element={<Partner />} />
+                  <Route path="/stock/plans" element={<Plans />} />
+                  <Route
+                    path="/stock/plans/inbound/:productCd"
+                    element={<StockDetailInbound />}
+                  />
+                  <Route
+                    path="/stock/plans/outbound/:productCd"
+                    element={<StockDetailOutbound />}
+                  />
+                  <Route path="/product" element={<ProductDataProvider />}>
+                    <Route path="list" element={<ProductList />} />
+                    <Route path="register" element={<ProductRegister />} />
+                  </Route>
+                  <Route path="/register/admin" element={<RegisterAdmin />} />
+                  <Route
+                    path="/product/productDetail/:gds_cd"
+                    element={<ProductDetail />}
+                  />
+                  <Route
+                    path="/product/productModify"
+                    element={<ProductModify />}
+                  />
+                  <Route
+                    path="/product/productArchive"
+                    element={<ProductArchive />}
+                  />
+                  <Route path="/stock/plans/qr/print" element={<QRsave />} />
+                  <Route path="/stock/history" element={<History />} />
+                  <Route path="/storage" element={<Storage />} />
+
+                  <Route
+                    path="/register-admin"
+                    element={
+                      <ProtectedRoute allowedRoles={["ALL", "A", "B"]}>
+                        <RegisterAdmin />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="/" element={<Navigate to="/ttik" replace />} />
+                  <Route path="*" element={<Error404Page />} />
+                </Routes>
+              </Layout>
+            }
+          />
+        ) : (
+          /* 로그인 안된 상태에서 /login 이외의 모든 경로는 로그인으로 강제 이동 */
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        )}
+      </Routes>
+
+      {/* alert */}
+      <Alert
+        {...alert}
+        onConfirm={alert.onConfirm}
+        onCancel={alert.onCancel || closeAlert}
+      />
+    </>
   );
 }
 

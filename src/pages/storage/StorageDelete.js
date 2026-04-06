@@ -2,7 +2,7 @@ import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
-import Alert from "../../components/Alert";
+import { useOpenAlert } from "../../store/alert";
 
 function StorageDelete({ storageList, onUpdate, setView }) {
   const SERVER_URL = serverUrl.SERVER_URL;
@@ -16,9 +16,7 @@ function StorageDelete({ storageList, onUpdate, setView }) {
     deleteRack: false, //선반 삭제
   });
 
-  //alert
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
+  const openAlert = useOpenAlert();
 
   const handleSelectStorage = (e) => {
     setSelectedStorage(Number(e.target.value));
@@ -75,11 +73,9 @@ function StorageDelete({ storageList, onUpdate, setView }) {
       !isCheckedDelete.deleteZone &&
       !isCheckedDelete.deleteRack
     ) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "",
         message: "삭제 버튼을 눌러 체크 후 삭제를 진행하세요",
-        onConfirm: closeAlert,
       });
       return;
     }
@@ -97,11 +93,9 @@ function StorageDelete({ storageList, onUpdate, setView }) {
       storageNm: isCheckedDelete.deleteStorage ? currentStorageNm : null,
     };
 
-    setAlert({
-      isOpen: true,
+    openAlert({
       title: "DELETE",
       message: "삭제를 진행하시겠습니까?",
-      onCancel: closeAlert,
       onConfirm: async () => {
         try {
           const res = await fetch(`${SERVER_URL}/ttik/storage/delete`, {
@@ -115,12 +109,10 @@ function StorageDelete({ storageList, onUpdate, setView }) {
             const data = await res.json();
 
             // 어떤 구역, 선반을 삭제했는지 안내
-            setAlert({
-              isOpen: true,
+            openAlert({
               title: "Success",
               message: data.message,
               onConfirm: () => {
-                closeAlert();
                 if (onUpdate) onUpdate();
                 resetForm();
                 setView("list"); // 수정 후 창고 조회 리스트가 보이도록
@@ -128,20 +120,16 @@ function StorageDelete({ storageList, onUpdate, setView }) {
             });
           } else {
             const errorData = await res.json();
-            setAlert({
-              isOpen: true,
+            openAlert({
               title: "DELETE",
               message: errorData.message,
-              onConfirm: closeAlert,
             });
           }
         } catch (error) {
           console.log("수정 요청 실패", error);
-          setAlert({
-            isOpen: true,
+          openAlert({
             title: "Error",
             message: "서버 통신 중 에러가 발생했습니다.",
-            onConfirm: closeAlert,
           });
         }
       },
@@ -252,7 +240,6 @@ function StorageDelete({ storageList, onUpdate, setView }) {
           </div>
         </div>
       </form>
-      <Alert {...alert} />
     </>
   );
 }

@@ -1,5 +1,5 @@
 import styleStorage from "../../css/Storage.module.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import serverUrl from "../../db/server.json";
 import StorageUpdateState from "./StorageUpdateState";
 import StorageAdd from "./StorageAdd";

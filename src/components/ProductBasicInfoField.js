@@ -6,6 +6,7 @@ import { CommonButton } from "./CommonButton";
 import { useOpenModal } from "../store/productModal";
 import { checkStyleNo } from "../utils/validation/styleNo";
 import { fetchSizeMap } from "../api/product";
+import { useOpenAlert } from "../store/alert";
 
 export default function ProductBasicInfo() {
   //브랜드, 시즌, 카테고리 공통 데이터
@@ -13,16 +14,12 @@ export default function ProductBasicInfo() {
 
   const formData = useFormData();
   const setFormData = useSetFormData();
-
+  const openAlert = useOpenAlert();
   const openModal = useOpenModal();
 
   const [inputValue, setInputValue] = useState(""); //임시 인풋값
   const [target, setTarget] = useState("");
   const [sizeMap, setSizeMap] = useState({});
-
-  //alert
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
 
   //스타일 넘버 -> 품번
   function handleStyleNo(e) {
@@ -37,11 +34,9 @@ export default function ProductBasicInfo() {
       setTarget(result.target);
       return;
     } else {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Error",
         message: "입력 형식을 확인하세요.",
-        onConfirm: closeAlert,
       });
       setInputValue("");
     }

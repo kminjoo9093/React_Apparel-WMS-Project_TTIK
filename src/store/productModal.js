@@ -7,7 +7,7 @@ export const useProductModal = create((set) => ({
     props: null,
   },
 
-  //액션
+  //action
   openModal: (type, props = {}) =>
     set({
       modalConfig: { isOpen: true, type, props },

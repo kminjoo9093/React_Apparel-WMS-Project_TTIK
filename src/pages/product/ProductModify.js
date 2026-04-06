@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import style from "../../css/ProductModify.module.css";
 import serverUrl from "../../db/server.json";
-import Alert from "../../components/Alert";
+import { useOpenAlert } from "../../store/alert";
 
 const ProductModify = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const SERVER_URL = serverUrl.SERVER_URL;
 
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
+  const openAlert = useOpenAlert();
   const [product, setProduct] = useState({});
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [tempCode, setTempCode] = useState("");
 
   useEffect(() => {
@@ -46,11 +43,9 @@ const ProductModify = () => {
   };
 
   const handleSave = async () => {
-    setAlert({
-      isOpen: true,
+    openAlert({
       title: "Save",
       message: "변경 내용을 DB에 최종 저장하시겠습니까?",
-      onCancel: closeModal,
       onConfirm: async () => {
         const fromArchive = location.state?.fromArchive;
 
@@ -76,23 +71,19 @@ const ProductModify = () => {
           );
 
           if (response.status === 200) {
-            setAlert({
-              isOpen: true,
+            openAlert({
               title: "Success",
               message: fromArchive ? "복구 및 수정 완료!" : "수정 완료!",
               onConfirm: () => {
-                closeModal();
                 navigate(`/product/productDetail/${finalData.gds_cd}`);
               },
             });
           }
         } catch (error) {
           console.error("저장 에러:", error);
-          setAlert({
-            isOpen: true,
+          openAlert({
             title: "Again",
             message: "서버 연동 실패!",
-            onConfirm: closeModal,
           });
         }
       },
@@ -101,8 +92,6 @@ const ProductModify = () => {
 
   return (
     <>
-      <Alert {...alert} />
-      {/* 📍 기존의 넓은 패딩과 중앙 정렬 디자인 그대로 유지 */}
       <div
         style={{
           padding: "5% 40px",
@@ -129,14 +118,6 @@ const ProductModify = () => {
               CODE: {product.gds_cd}
             </span>
 
-            {/* 📍 코드 변경 버튼 - 삭제 안 하고 주석 처리만 함 */}
-            {/* <button 
-            onClick={() => { setTempCode(product.gds_cd); setIsPopupOpen(true); }}
-            style={{ padding: '4px 12px', fontSize: '13px', cursor: 'pointer', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f8fafc' }}
-          >
-            코드 변경
-          </button> 
-          */}
           </div>
 
           <input
@@ -252,30 +233,6 @@ const ProductModify = () => {
             수 정 완 료
           </button>
         </div>
-
-        {/* 📍 팝업 영역 - 주석 처리만 함 */}
-        {/* {isPopupOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
-          <div style={{ background: '#fff', padding: '40px', borderRadius: '24px', width: '450px', textAlign: 'center' }}>
-            <h4 style={{ fontSize: '24px', marginBottom: '15px' }}>상품 코드 변경</h4>
-            <input 
-              style={{ width: '100%', padding: '15px', borderRadius: '10px', border: '1px solid #cbd5e1', marginBottom: '25px', textAlign: 'center' }}
-              value={tempCode}
-              onChange={(e) => setTempCode(e.target.value)}
-            />
-            <div style={{ display: 'flex', gap: '15px' }}>
-              <button onClick={() => setIsPopupOpen(false)} style={{ flex: 1, padding: '15px', borderRadius: '12px', border: '1px solid #cbd5e1', background: '#fff' }}>취소</button>
-              <button 
-                onClick={() => { setProduct({...product, gds_cd: tempCode}); setIsPopupOpen(false); }}
-                style={{ flex: 1, padding: '15px', borderRadius: '12px', border: 'none', background: '#000', color: '#fff' }}
-              >
-                변경 적용
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      */}
       </div>
     </>
   );

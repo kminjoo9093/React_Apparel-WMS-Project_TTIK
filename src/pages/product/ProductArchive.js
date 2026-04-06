@@ -3,15 +3,14 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import style from "../../css/ProductArchive.module.css";
 import serverUrl from "../../db/server.json";
-import Alert from "../../components/Alert";
+import { useOpenAlert } from "../../store/alert";
 
 const ProductArchive = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const SERVER_URL = serverUrl.SERVER_URL;
 
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
+  const openAlert = useOpenAlert();
   const [archiveList, setArchiveList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
@@ -56,37 +55,16 @@ const ProductArchive = () => {
 
   // 수정 후 복구
   const handleEditAndRestore = (product) => {
-    setAlert({
-      isOpen: true,
+    openAlert({
       title: "Restoration",
       message: `[${product.gds_nm}] 상품 정보를 수정하며 복구하시겠습니까?`,
-      onCancel: closeAlert,
       onConfirm: () => {
         navigate("/product/productModify", {
           state: { product, fromArchive: true },
         });
-        closeAlert();
       },
     });
   };
-
-  /* [운영 정책 변경] 데이터 이력 보존을 위해 영구 삭제(Hard Delete) 기능은 UI 및 로직에서 제외함
-  // 영구 삭제 (DB에서 진짜 지우기)
-  const handlePermanentDelete = async (gds_cd) => {
-    if (!window.confirm("정말로 영구 삭제하시겠습니까?")) return;
-
-    try {
-      await axios.delete(`${SERVER_URL}/ttik/product/productArchive/${gds_cd}`, {
-        withCredentials: true // 🔐 이 줄이 없어서 로그인 페이지로 튕기는 거야!
-      });
-      
-      alert("영구 삭제되었습니다.");
-      navigate('/product/list');
-    } catch (error) {
-      console.error("삭제 실패:", error);
-    }
-  };
-  */
 
   return (
     <>
@@ -150,14 +128,6 @@ const ProductArchive = () => {
                           수정 후 복구
                         </button>
 
-                        {/* [운영 정책] 영구 삭제 버튼 주석 처리 (코드 보존용)
-                      <button 
-                        onClick={() => handlePermanentDelete(product.gds_cd)} 
-                        className={style['delete-btn']}
-                      >
-                        영구 삭제
-                      </button>
-                      */}
                       </div>
                     </td>
                   </tr>
@@ -167,7 +137,6 @@ const ProductArchive = () => {
           </table>
         </div>
       </div>
-      <Alert {...alert} />
     </>
   );
 };

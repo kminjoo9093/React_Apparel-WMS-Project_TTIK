@@ -2,17 +2,16 @@ import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import styleRegister from "../../css/ProductRegister.module.css";
 import { useNavigate } from "react-router-dom";
-import Alert from "../../components/Alert";
 import serverUrl from "../../db/server.json";
 import { checkNumber } from "../../utils/validation/numbers";
+import { useOpenAlert } from "../../store/alert";
 
 function StorageRegister({ storageList, onUpdate }) {
   const navigate = useNavigate();
   const SERVER_URL = serverUrl.SERVER_URL;
   const [storageNm, setStorageNm] = useState("");
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
   const [zoneList, setZoneList] = useState([{ zone: 1, rack: "" }]);
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
+  const openAlert = useOpenAlert();
 
   const handleAddBtn = () => {
     setZoneList((prev) => {
@@ -53,11 +52,9 @@ function StorageRegister({ storageList, onUpdate }) {
     console.log(value);
     //창고명 입력하지 않은 경우
     if (!value) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Again",
         message: "창고명을 입력해주세요",
-        onConfirm: closeAlert,
       });
       return;
     }
@@ -69,8 +66,7 @@ function StorageRegister({ storageList, onUpdate }) {
     }
 
     const adminCreate = () => {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Success",
         message: (
           <>
@@ -89,11 +85,9 @@ function StorageRegister({ storageList, onUpdate }) {
     const isAlphabet = (value) => value >= "A" && value <= "Z";
 
     if (value.length > 1 || !isAlphabet(value)) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Again",
         message: "창고명을 다시 입력해주세요",
-        onConfirm: closeAlert,
       });
       return;
     }
@@ -104,11 +98,9 @@ function StorageRegister({ storageList, onUpdate }) {
     );
 
     if (hasStorage) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Again",
         message: "이미 등록된 창고입니다.",
-        onConfirm: closeAlert,
       });
       return;
     }
@@ -147,11 +139,9 @@ function StorageRegister({ storageList, onUpdate }) {
         //const data = await res.json(); post일땐 빈 객체 (200ok)를 보내서 데이터가 비어있음 -> 파싱오류
       } else {
         const errText = await res.text(); // 실패 원인 파악용
-        setAlert({
-          isOpen: true,
+        openAlert({
           title: "Error",
           message: "등록에 실패했습니다.",
-          onConfirm: closeAlert,
         });
       }
     } catch (error) {
@@ -245,7 +235,6 @@ function StorageRegister({ storageList, onUpdate }) {
           </button>
         </div>
       </form>
-      <Alert {...alert} />
     </>
   );
 }

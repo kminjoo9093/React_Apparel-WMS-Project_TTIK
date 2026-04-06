@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
-import Alert from "../../components/Alert";
+import { useOpenAlert } from "../../store/alert";
 
 function StorageAdd({ storageList, onUpdate, setView }) {
   const SERVER_URL = serverUrl.SERVER_URL;
@@ -23,9 +23,7 @@ function StorageAdd({ storageList, onUpdate, setView }) {
   const [currentZoneCount, setCurrentZoneCount] = useState(null);
   const [currentZoneNm, setCurrentZoneNm] = useState(null);
 
-  //alert
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
+  const openAlert = useOpenAlert();
 
   const handleSelectStorage = (e) => {
     setSelectedStorage(Number(e.target.value));
@@ -164,20 +162,16 @@ function StorageAdd({ storageList, onUpdate, setView }) {
     );
 
     if (hasZone) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "",
         message: "이미 등록된 구역입니다.",
-        onConfirm: closeAlert,
       });
       return;
     }
 
-    setAlert({
-      isOpen: true,
+    openAlert({
       title: "",
       message: "수정을 진행하시겠습니까?",
-      onConfirm: closeAlert,
     });
 
     try {
@@ -189,27 +183,21 @@ function StorageAdd({ storageList, onUpdate, setView }) {
       });
       if (res.ok) {
         const data = await res.json();
-        console.log("수정 요청 응답-->", data);
-        setAlert({
-          isOpen: true,
+        openAlert({
           title: "Success",
           message: data.message,
-          onConfirm: closeAlert,
         });
-        // alert(data.message);
 
         resetForm();
         if (onUpdate) onUpdate();
 
         setView("list"); //수정 후 창고 조회 리스트가 보이도록
+
       } else {
-        console.log("수정 요청 실패-->", res.status);
         const errorData = await res.json();
-        setAlert({
-          isOpen: true,
+        openAlert({
           title: "Again",
           message: errorData.message,
-          onConfirm: closeAlert,
         });
       }
     } catch (error) {
@@ -365,7 +353,6 @@ function StorageAdd({ storageList, onUpdate, setView }) {
           </div>
         </div>
       </form>
-      <Alert {...alert} />
     </>
   );
 }
