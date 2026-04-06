@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import styleProdModal from "../../css/ProductModal.module.css";
 import styleModal from "../../css/Modal.module.css";
@@ -7,6 +7,7 @@ import Pagination from "../Pagination";
 import { useLocation } from "react-router-dom";
 import Alert from "../../components/Alert";
 import { CommonButton } from "../../components/CommonButton";
+import { useOpenAlert } from "../../store/alert";
 
 function StorageList({ storageList: storageOptions = [] }) {
   const location = useLocation();
@@ -15,19 +16,12 @@ function StorageList({ storageList: storageOptions = [] }) {
   const [storageList, setStorageList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [storageFilter, setStorageFilter] = useState("");
-  const [filteredList, setFilteredList] = useState([]);
 
   //조회리스트에서 선택한 선반 정보
   const [selectedRack, setSelectedRack] = useState("");
   const [rackDetailList, setRackDetailList] = useState([]);
   const [detailRackNm, setDetailRackNm] = useState("");
   const [boxCount, setBoxCount] = useState(null);
-
-  //선반 이동 관련 상태값
-  const [boxQr, setBoxQr] = useState("");
-  const [oldRackSn, setOldRackSn] = useState("");
-  const [newRackSn, setNewRackSn] = useState("");
-  const [newRackNm, setNewRackNm] = useState("");
 
   // 페이지네이션
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,9 +31,7 @@ function StorageList({ storageList: storageOptions = [] }) {
   const indexOfLast = currentPage * postsPerPage;
   const indexOfFirst = indexOfLast - postsPerPage;
 
-  //alert
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
+  const openAlert = useOpenAlert();
 
   //메인 대시보드에서 창고 적재현황 클릭시 넘어오는 페이지 - 김윤중
   useEffect(() => {
@@ -171,11 +163,9 @@ function StorageList({ storageList: storageOptions = [] }) {
       return;
     }
 
-    setAlert({
-      isOpen: true,
+    openAlert({
       title: "Confirm",
       message: `${modifiedBoxes.length}개의 박스를 이동시키겠습니까?`,
-      onCancel: closeAlert,
       onConfirm: async () => {
         try {
           const moveRequests = modifiedBoxes.map((box) =>
@@ -194,31 +184,25 @@ function StorageList({ storageList: storageOptions = [] }) {
           const response = await Promise.all(moveRequests);
 
           if (response.every((res) => res.ok)) {
-            setAlert({
-              isOpen: true,
+            openAlert({
               title: "Success",
               message: "모든 박스의 위치 변경 및 이력 등록이 완료되었습니다.",
               onConfirm: () => {
-                closeAlert();
                 onCloseModal(); // 위치 수정 모달 닫기
                 getStorageListData(); // 리스트 새로고침
               },
             });
           } else {
-            setAlert({
-              isOpen: true,
+            openAlert({
               title: "Error",
               message: "일부 처리 중 오류가 발생했습니다.",
-              onConfirm: closeAlert,
             });
           }
         } catch (error) {
-          console.error("수정 요청 실패:", error);
-          setAlert({
+          openAlert({
             isOpen: true,
             title: "Error",
             message: "서버 통신 중 에러가 발생했습니다.",
-            onConfirm: closeAlert,
           });
         }
       },

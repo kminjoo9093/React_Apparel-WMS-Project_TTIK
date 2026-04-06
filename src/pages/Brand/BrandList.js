@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import BrandRegister from "./BrandRegister";
 import styleBrand from "../../css/Brand.module.css";
 import serverUrl from "../../db/server.json";
-import Alert from "../../components/Alert";
+import { useOpenAlert } from "../../store/alert";
 
 function BrandList() {
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
+  const openAlert = useOpenAlert();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [brands, setBrands] = useState([]);
@@ -66,21 +65,17 @@ function BrandList() {
 
   const handleDelete = async () => {
     if (selectedIds.length === 0) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Again",
         message: "삭제할 브랜드를 선택해 주세요.",
-        onConfirm: closeModal,
       });
       return;
     }
 
     // 1. 먼저 삭제 여부를 묻는 모달을 띄움
-    setAlert({
-      isOpen: true,
+    openAlert({
       title: "DELETE",
       message: `선택한 ${selectedIds.length}개의 브랜드를 삭제하시겠습니까?`,
-      onCancel: closeModal,
       onConfirm: async () => {
         try {
           const response = await fetch(`${SERVER_URL}/ttik/brand/delete`, {
@@ -92,8 +87,7 @@ function BrandList() {
 
           if (response.ok) {
             // 2. 삭제 성공 시 성공 알림 모달을 띄움
-            setAlert({
-              isOpen: true,
+            openAlert({
               title: "DELETE",
               message: "삭제되었습니다",
               onConfirm: () => {
@@ -102,24 +96,19 @@ function BrandList() {
                   prev.filter((brand) => !selectedIds.includes(brand.brandSn)),
                 );
                 setSelectedIds([]);
-                closeModal();
               },
             });
           } else {
-            setAlert({
-              isOpen: true,
+            openAlert({
               title: "ERROR",
               message: "삭제 실패",
-              onConfirm: closeModal,
             });
           }
         } catch (error) {
           console.error("삭제 에러:", error);
-          setAlert({
-            isOpen: true,
+          openAlert({
             title: "ERROR",
             message: "서버 통신 중 에러가 발생했습니다.",
-            onConfirm: closeModal,
           });
         }
       },
@@ -138,7 +127,6 @@ function BrandList() {
 
   return (
     <>
-      <Alert {...alert} />
       <div>
         <h1 className={styleBrand.brandTitle}>Brand</h1>
         <p className={styleBrand.brandSubTitle}>브랜드를 관리 하세요.</p>

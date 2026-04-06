@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styleLogin from "../../css/Login.module.css";
-import Alert from "../../components/Alert";
 import serverUrl from "../../db/server.json";
+import {useOpenAlert} from "../../store/alert";
 
 const Login = ({ setUser, setIsLoggedIn }) => {
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
+  const openAlert = useOpenAlert();
   const [formData, setFormData] = useState({ id: "", password: "" });
   const [isAltSlogan, setIsAltSlogan] = useState(false);
   const navigate = useNavigate();
@@ -47,8 +46,7 @@ const Login = ({ setUser, setIsLoggedIn }) => {
         if (meResponse.ok) {
           const userData = await meResponse.json();
 
-          setAlert({
-            isOpen: true,
+          openAlert({
             title: "Welcome",
             message: `${userData.nickname}님, 환영합니다.`,
             onConfirm: () => {
@@ -59,27 +57,21 @@ const Login = ({ setUser, setIsLoggedIn }) => {
           });
         }
       } else if (response.status === 401) {
-        setAlert({
-          isOpen: true,
+        openAlert({
           title: "Again",
           message: "아이디 또는 비밀번호가 일치하지 않습니다.",
-          onConfirm: closeAlert,
         });
       } else {
-        setAlert({
-          isOpen: true,
+        openAlert({
           title: "Error",
           message: "로그인 중 서버 오류가 발생했습니다.",
-          onConfirm: closeAlert,
         });
       }
     } catch (error) {
       console.error("네트워크 에러:", error);
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Network Error",
         message: "서버와 연결할 수 없습니다. 네트워크 상태를 확인해주세요.",
-        onConfirm: closeAlert,
       });
     }
   };
@@ -155,7 +147,6 @@ const Login = ({ setUser, setIsLoggedIn }) => {
           </div>
         </div>
       </div>
-      <Alert {...alert} />
     </>
   );
 };

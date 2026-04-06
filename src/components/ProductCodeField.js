@@ -1,20 +1,17 @@
 import styleRegister from "../css/ProductRegister.module.css";
-import { useState } from "react";
 import { CommonButton } from "./CommonButton";
 import { useFormData, useProductCd, useSetProductCd } from "../store/product";
 import { useOpenModal } from "../store/productModal";
 import { createProductCd } from "../api/product";
 import Alert from "./Alert";
+import { useOpenAlert } from "../store/alert";
 
 export default function ProductCodeField() {
   const formData = useFormData();
   const openModal = useOpenModal();
   const productCd = useProductCd();
   const setProductCd = useSetProductCd();
-
-  //alert
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
+  const openAlert = useOpenAlert();
 
   // 상품 코드 생성 & 모달 오픈
   async function generateProductCd() {
@@ -29,11 +26,9 @@ export default function ProductCodeField() {
       setProductCd(code);
       return code;
     } catch (error) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Error",
         message: "입력한 정보를 확인하세요.",
-        onConfirm: closeAlert,
       });
       return null;
     }
@@ -46,11 +41,9 @@ export default function ProductCodeField() {
       !formData.category ||
       !formData.sizeCd
     ) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Again",
         message: "브랜드, 품번, 시즌, 카테고리, 사이즈를 모두 입력해야 합니다.",
-        onConfirm: closeAlert,
       });
       return;
     }

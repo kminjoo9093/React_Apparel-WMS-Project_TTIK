@@ -2,7 +2,7 @@ import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
-import Alert from "../../components/Alert";
+import { useOpenAlert } from "../../store/alert";
 
 function StorageUpdateState({ storageList, onUpdate, setView }) {
   const SERVER_URL = serverUrl.SERVER_URL;
@@ -17,9 +17,7 @@ function StorageUpdateState({ storageList, onUpdate, setView }) {
     disabledRack: false,
   });
 
-  //alert
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
+  const openAlert = useOpenAlert();
 
   const handleSelectStorage = (e) => {
     setSelectedStorage(Number(e.target.value));
@@ -36,21 +34,17 @@ function StorageUpdateState({ storageList, onUpdate, setView }) {
     const { name, checked } = e.target;
 
     if (name === "disabledZone" && !selectedZone) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Again",
         message: "구역을 먼저 선택해주세요.",
-        onConfirm: closeAlert,
       });
       return;
     }
 
     if (name === "disabledRack" && !selectedRack) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Again",
         message: "선반을 먼저 선택해주세요.",
-        onConfirm: closeAlert,
       });
       return;
     }
@@ -97,11 +91,9 @@ function StorageUpdateState({ storageList, onUpdate, setView }) {
     // 선반 선택을 하고, 비활성화가 아닌경우 적재 상태를 선택해야하도록
     if (selectedRack !== "" && !disableValues.disabledRack) {
       if (rackCapacity === "") {
-        setAlert({
-          isOpen: true,
+        openAlert({
           title: "Again",
           message: "선반 적재 상태를 선택하세요.",
-          onConfirm: closeAlert,
         });
         return;
       }
@@ -135,11 +127,9 @@ function StorageUpdateState({ storageList, onUpdate, setView }) {
     }
 
     // 커스텀 모달 적용
-    setAlert({
-      isOpen: true,
+    openAlert({
       title: "Modify",
       message: confirmMsg,
-      onCancel: closeAlert,
       onConfirm: async () => {
         try {
           const res = await fetch(`${SERVER_URL}/ttik/storage/modify`, {
@@ -151,12 +141,10 @@ function StorageUpdateState({ storageList, onUpdate, setView }) {
 
           if (res.ok) {
             const data = await res.json();
-            setAlert({
-              isOpen: true,
+            openAlert({
               title: "Success",
               message: data.message,
               onConfirm: () => {
-                closeAlert();
                 resetForm();
                 if (onUpdate) onUpdate();
                 setView("list"); // 수정 후 리스트 보기
@@ -165,20 +153,15 @@ function StorageUpdateState({ storageList, onUpdate, setView }) {
           } else {
             console.log("수정 요청 실패-->", res.status);
             const errorData = await res.json();
-            setAlert({
-              isOpen: true,
+            openAlert({
               title: "Again",
               message: errorData.message,
-              onConfirm: closeAlert,
             });
           }
         } catch (error) {
-          console.log("수정 요청 실패", error);
-          setAlert({
-            isOpen: true,
+          openAlert({
             title: "Error",
             message: "서버 통신 중 에러가 발생했습니다.",
-            onConfirm: closeAlert,
           });
         }
       },
@@ -304,7 +287,6 @@ function StorageUpdateState({ storageList, onUpdate, setView }) {
           </div>
         </div>
       </form>
-      <Alert {...alert} />
     </>
   );
 }

@@ -5,7 +5,6 @@ import RegistModalFrame from "../../components/RegistModalFrame";
 import ProductSeason from "./ProductSeason";
 import ProductCode from "./ProductCode";
 import ModalBrandSearch from "./ModalBrandSearch";
-import Alert from "../../components/Alert";
 import { CommonButton } from "../../components/CommonButton";
 import { registerProduct } from "../../api/product";
 import PageInfo from "../../components/PageInfo";
@@ -17,9 +16,10 @@ import {
   useSetProductCd,
 } from "../../store/product";
 import { useCloseModal, useModalConfig } from "../../store/productModal";
-import ProductBasicInfo from "../../components/ProductBasicInfo";
-import ProductStockInfo from "../../components/ProductStockInfo";
+import ProductBasicInfoField from "../../components/ProductBasicInfoField";
+import ProductStockInfoField from "../../components/ProductStockInfoField";
 import ProductCodeField from "../../components/ProductCodeField";
+import { useOpenAlert } from "../../store/alert";
 
 function ProductRegister() {
   const navigate = useNavigate();
@@ -31,10 +31,7 @@ function ProductRegister() {
   const setProductCd = useSetProductCd();
   const modalConfig = useModalConfig();
   const closeModal = useCloseModal();
-
-  //alert
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
+  const openAlert = useOpenAlert();
 
   // 모달
   const getModalTitle = (type) => {
@@ -90,23 +87,21 @@ function ProductRegister() {
     e.preventDefault();
 
     if (!productCd) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Again",
         message: "상품코드를 생성해야 등록이 가능합니다.",
-        onConfirm: closeAlert,
       });
       return;
     }
 
     const hasError = Object.values(errors).some((val) => val === true);
-    if (hasError)
-      setAlert({
-        isOpen: true,
+    if (hasError) {
+      openAlert({
         title: "Again",
         message: "입력값을 확인하세요",
-        onConfirm: closeAlert,
       });
+      return;
+    }
 
     try {
       const res = await registerProduct({
@@ -122,13 +117,11 @@ function ProductRegister() {
         threshold: Number(formData.threshold), //임계치
       });
 
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Success",
         message: "상품 등록이 완료되었습니다.",
         onConfirm: () => {
-          closeAlert(); // 모달 닫기
-          navigate("/product/list"); // 확인 후 이동
+          navigate("/product/list"); 
         },
       });
       setFormData({
@@ -145,11 +138,9 @@ function ProductRegister() {
 
       setProductCd("");
     } catch (error) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Again",
         message: "입력한 정보를 확인하세요.",
-        onConfirm: closeAlert,
       });
     }
   }
@@ -159,8 +150,8 @@ function ProductRegister() {
       <PageInfo title={"Register"} description={"상품을 등록하세요."} />
       <div className={`${styleRegister.content} contentBox`}>
         <form onSubmit={handleSubmit} className={styleRegister.registerForm}>
-          <ProductBasicInfo />
-          <ProductStockInfo />
+          <ProductBasicInfoField />
+          <ProductStockInfoField />
           <ProductCodeField />
           <div className={styleRegister.formBtnWrap}>
             <CommonButton variant="primary" type="submit">
@@ -177,8 +168,6 @@ function ProductRegister() {
       >
         {renderModalContent()}
       </RegistModalFrame>
-
-      <Alert {...alert} />
     </div>
   );
 }

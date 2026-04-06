@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import styleBrand from "../../css/Brand.module.css";
 import serverUrl from "../../db/server.json";
-import Alert from "../../components/Alert"; // Modal 컴포넌트 임포트 확인
+import { useOpenAlert } from "../../store/alert";
 
 function BrandRegister({ isOpen, onClose, onRegisterSuccess }) {
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
+  const openAlert = useOpenAlert();
 
   const [brNo, setBrNo] = useState("");
   const [brResult, setBrResult] = useState(null);
@@ -65,11 +64,9 @@ function BrandRegister({ isOpen, onClose, onRegisterSuccess }) {
     e.preventDefault();
 
     if (!brand) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Brand",
         message: "브랜드명을 입력해 주세요",
-        onConfirm: closeAlert,
       });
       return;
     }
@@ -78,11 +75,9 @@ function BrandRegister({ isOpen, onClose, onRegisterSuccess }) {
       return;
     }
     if (telError || Tel.length < 9) {
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Tel",
         message: "올바른 연락처를 입력해 주세요.",
-        onConfirm: closeAlert,
       });
       return;
     }
@@ -101,12 +96,10 @@ function BrandRegister({ isOpen, onClose, onRegisterSuccess }) {
 
       if (response.ok) {
         // 성공 모달 설정
-        setAlert({
-          isOpen: true,
+        openAlert({
           title: "Register",
           message: "등록되었습니다!",
           onConfirm: () => {
-            closeAlert(); // 알림창 닫기
 
             // 값 초기화
             setBrand("");
@@ -116,7 +109,6 @@ function BrandRegister({ isOpen, onClose, onRegisterSuccess }) {
             setBrResult(null);
             setBrError("");
 
-            onClose(); // 부모 모달(등록창) 닫기
             if (onRegisterSuccess) onRegisterSuccess();
           },
         });
@@ -128,9 +120,6 @@ function BrandRegister({ isOpen, onClose, onRegisterSuccess }) {
 
   return (
     <>
-      {/* 알림용 모달 추가 */}
-      <Alert {...alert} />
-
       <div className={styleBrand.modalOverlay}>
         <div
           className={styleBrand.modalContent}

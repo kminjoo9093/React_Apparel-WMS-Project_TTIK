@@ -1,15 +1,13 @@
 import { useState } from "react";
 import styleProdModal from "../../css/ProductModal.module.css";
-import styleRegister from "../../css/ProductRegister.module.css";
 import serverUrl from "../../db/server.json";
-import Alert from "../../components/Alert";
 import { CommonButton } from "../../components/CommonButton";
+import { useOpenAlert } from "../../store/alert";
 
 function ProductCode({ onClose, productCd, setProductCd }) {
   const SERVER_URL = serverUrl.SERVER_URL;
 
-  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
-  const closeAlert = () => setAlert({ ...alert, isOpen: false });
+  const openAlert = useOpenAlert();
   const [isChecked, setIsChecked] = useState(false); //중복체크 여부
   const [isDuplicate, setIsDuplicate] = useState(null); //QR 코드 중복체크
 
@@ -56,11 +54,9 @@ function ProductCode({ onClose, productCd, setProductCd }) {
     if (isDuplicate) {
       setProductCd("");
       setIsDuplicate(null);
-      setAlert({
-        isOpen: true,
+      openAlert({
         title: "Again",
         message: "상품 등록 정보를 확인해주세요.",
-        onConfirm: closeModal,
       });
       onClose();
     }
@@ -75,8 +71,6 @@ function ProductCode({ onClose, productCd, setProductCd }) {
 
   return (
     <>
-      <Alert {...alert} />
-
       <div className={styleProdModal.modalInner}>
         <p>사용 가능한 상품 코드를 자동 생성합니다.</p>
         <form
