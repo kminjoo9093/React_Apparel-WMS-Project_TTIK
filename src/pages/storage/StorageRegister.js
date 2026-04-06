@@ -2,17 +2,17 @@ import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import styleRegister from "../../css/ProductRegister.module.css";
 import { useNavigate } from "react-router-dom";
-import Modal from "../../components/Modal";
+import Alert from "../../components/Alert";
 import serverUrl from "../../db/server.json";
 import { checkNumber } from "../../utils/validation/numbers";
 
 function StorageRegister({ storageList, onUpdate }) {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const SERVER_URL = serverUrl.SERVER_URL;
   const [storageNm, setStorageNm] = useState("");
-  const closeModal = () => setModal({ ...modal, isOpen: false });
+  const closeAlert = () => setAlert({ ...alert, isOpen: false });
   const [zoneList, setZoneList] = useState([{ zone: 1, rack: "" }]);
-  const [modal, setModal] = useState({ isOpen: false, title: "", message: "" });
+  const [alert, setAlert] = useState({ isOpen: false, title: "", message: "" });
 
   const handleAddBtn = () => {
     setZoneList((prev) => {
@@ -27,9 +27,9 @@ function StorageRegister({ storageList, onUpdate }) {
     );
   };
 
-    // 숫자 입력 유효성 검사 - 선반 층수
-    const [error, setError] = useState(false); //선반 층수
-    const [errorMsg, setErrorMsg] = useState("");
+  // 숫자 입력 유효성 검사 - 선반 층수
+  const [error, setError] = useState(false); //선반 층수
+  const [errorMsg, setErrorMsg] = useState("");
 
   const validateNumber = (e, rackNo) => {
     const value = e.target.value;
@@ -37,15 +37,13 @@ function StorageRegister({ storageList, onUpdate }) {
 
     if (!isInvalid) {
       setZoneList((prev) =>
-        prev.map((obj, i) =>
-          i === rackNo ? { ...obj, rack: value } : obj
-        )
+        prev.map((obj, i) => (i === rackNo ? { ...obj, rack: value } : obj)),
       );
     }
 
-        setError(isInvalid);
-        setErrorMsg(message);
-    }
+    setError(isInvalid);
+    setErrorMsg(message);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,11 +53,11 @@ function StorageRegister({ storageList, onUpdate }) {
     console.log(value);
     //창고명 입력하지 않은 경우
     if (!value) {
-      setModal({
+      setAlert({
         isOpen: true,
         title: "Again",
         message: "창고명을 입력해주세요",
-        onConfirm: closeModal,
+        onConfirm: closeAlert,
       });
       return;
     }
@@ -71,7 +69,7 @@ function StorageRegister({ storageList, onUpdate }) {
     }
 
     const adminCreate = () => {
-      setModal({
+      setAlert({
         isOpen: true,
         title: "Success",
         message: (
@@ -91,11 +89,11 @@ function StorageRegister({ storageList, onUpdate }) {
     const isAlphabet = (value) => value >= "A" && value <= "Z";
 
     if (value.length > 1 || !isAlphabet(value)) {
-      setModal({
+      setAlert({
         isOpen: true,
         title: "Again",
         message: "창고명을 다시 입력해주세요",
-        onConfirm: closeModal,
+        onConfirm: closeAlert,
       });
       return;
     }
@@ -106,11 +104,11 @@ function StorageRegister({ storageList, onUpdate }) {
     );
 
     if (hasStorage) {
-      setModal({
+      setAlert({
         isOpen: true,
         title: "Again",
         message: "이미 등록된 창고입니다.",
-        onConfirm: closeModal,
+        onConfirm: closeAlert,
       });
       return;
     }
@@ -149,11 +147,11 @@ function StorageRegister({ storageList, onUpdate }) {
         //const data = await res.json(); post일땐 빈 객체 (200ok)를 보내서 데이터가 비어있음 -> 파싱오류
       } else {
         const errText = await res.text(); // 실패 원인 파악용
-        setModal({
+        setAlert({
           isOpen: true,
           title: "Error",
           message: "등록에 실패했습니다.",
-          onConfirm: closeModal,
+          onConfirm: closeAlert,
         });
       }
     } catch (error) {
@@ -196,7 +194,7 @@ function StorageRegister({ storageList, onUpdate }) {
           className={`${styleStorage.registerRow} ${styleStorage.contentRow}`}
         >
           {zoneList.map((item, index) => (
-                            <div key={index} className={styleStorage.zoneRackBox}>
+            <div key={index} className={styleStorage.zoneRackBox}>
               <div>
                 <h3 className={styleStorage.modifyHeading}>구역</h3>
                 <input type="text" value={item.zone} readOnly required></input>
@@ -209,16 +207,16 @@ function StorageRegister({ storageList, onUpdate }) {
                     name="rack"
                     value={item.rack}
                     required
-                                                onChange={(e) => {
-                                                    
-                                                    validateNumber(e, index);
-                                                }}
+                    onChange={(e) => {
+                      validateNumber(e, index);
+                    }}
                     placeholder="선반 층수 입력"
                   ></input>
                   <p
                     className={`${styleRegister.errorMsg} ${styleStorage.errorMsg}`}
-                                            style={{ visibility: error ? "visible" : "hidden"}}
-                                            >{errorMsg}
+                    style={{ visibility: error ? "visible" : "hidden" }}
+                  >
+                    {errorMsg}
                   </p>
                 </div>
               </div>
@@ -247,7 +245,7 @@ function StorageRegister({ storageList, onUpdate }) {
           </button>
         </div>
       </form>
-      <Modal {...modal} />
+      <Alert {...alert} />
     </>
   );
 }
