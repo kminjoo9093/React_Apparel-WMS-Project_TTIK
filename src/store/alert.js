@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export const useAlertStore = create((set) => ({
+export const useAlertStore = create((set, get) => ({
   alert: {
     isOpen: false,
     title: "",
@@ -9,7 +9,7 @@ export const useAlertStore = create((set) => ({
     onCancel: null,
   },
 
-  openAlert: ({ title = "", message = "", onConfirm=()=>{}, onCancel=()=>{} }) => {
+  openAlert: ({ title = "", message = "", onConfirm, onCancel }) => {
     set((state) => ({
       alert: {
         isOpen: true,
@@ -17,11 +17,11 @@ export const useAlertStore = create((set) => ({
         message,
         onConfirm: () => {
           if (onConfirm) onConfirm();
-          state.closeAlert();
+          get().closeAlert();
         },
         onCancel: () => {
           if (onCancel) onCancel();
-          state.closeAlert();
+          get().closeAlert();
         },
       },
     }));
@@ -29,7 +29,7 @@ export const useAlertStore = create((set) => ({
 
   closeAlert: () => {
     set((state) => ({
-      alert: { isOpen: false, ...state.alert },
+      alert: { ...state.alert, isOpen: false },
     }));
   },
 }));

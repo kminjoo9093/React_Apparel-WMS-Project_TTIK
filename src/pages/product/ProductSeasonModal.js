@@ -1,14 +1,11 @@
 import { useContext, useRef } from "react";
 import styleProdModal from "../../css/ProductModal.module.css";
-import serverUrl from "../../db/server.json";
-import Alert from "../../components/Alert";
 import { CommonButton } from "../../components/CommonButton";
 import { SeasonDispatchContext } from "./ProductDataProvider";
 import { useOpenAlert } from "../../store/alert";
+import { registerSeasonData } from "../../api/season";
 
-function ProductSeason({ onClose }) {
-  const SERVER_URL = serverUrl.SERVER_URL;
-
+function ProductSeasonModal({ onClose }) {
   const yearRef = useRef();
   const seasonRef = useRef();
   const dispatch = useContext(SeasonDispatchContext);
@@ -30,40 +27,32 @@ function ProductSeason({ onClose }) {
     }
 
     try {
-      const res = await fetch(`${SERVER_URL}/ttik/product/seasonRegister`, {
-        method: "POST",
-        headers: { "Content-type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          year: year,
-          season: season,
-        }),
+      const updatedList = await registerSeasonData({
+        year: year,
+        season: season,
       });
 
-      if (res.ok) {
-        console.log(year, season);
-        const updatedList = await res.json();
-        dispatch(updatedList);
-        const newSeason = season === "S" ? "S/S" : "FW";
-        openAlert({
-          title: "Success",
-          message: `${year} ${newSeason} 시즌이 정상 등록되었습니다.`,
-        });
+      dispatch(updatedList);
+      const newSeason = season === "S" ? "S/S" : "FW";
+      openAlert({
+        title: "Success",
+        message: `${year} ${newSeason} 시즌이 정상 등록되었습니다.`,
+      });
 
-        //모달창 닫기
-        onClose();
+      //모달창 닫기
+      onClose();
+    } catch (error) {
+      if (error.status === 404) {
+        openAlert({
+          title: "Error",
+          message: "네트워크 통신 중 오류가 발생했습니다.",
+        });
       } else {
-        //이미 있는 시즌인 경우 처리
         openAlert({
           title: "Again",
           message: "이미 등록된 시즌이거나 등록할 수 없는 정보입니다.",
         });
       }
-    } catch (error) {
-      openAlert({
-        title: "Error",
-        message: "네트워크 통신 중 오류가 발생했습니다.",
-      });
     }
   }
 
@@ -97,9 +86,8 @@ function ProductSeason({ onClose }) {
           등록
         </CommonButton>
       </form>
-      <Alert {...alert} />
     </div>
   );
 }
 
-export default ProductSeason;
+export default ProductSeasonModal;

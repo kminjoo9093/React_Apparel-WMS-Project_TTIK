@@ -1,37 +1,21 @@
 import { useState } from "react";
 import styleProdModal from "../../css/ProductModal.module.css";
-import serverUrl from "../../db/server.json";
 import { CommonButton } from "../../components/CommonButton";
 import { useOpenAlert } from "../../store/alert";
+import { checkProductCdExists } from "../../api/product";
 
-function ProductCode({ onClose, productCd, setProductCd }) {
-  const SERVER_URL = serverUrl.SERVER_URL;
-
+function ProductCodeModal({ onClose, productCd, setProductCd }) {
   const openAlert = useOpenAlert();
   const [isChecked, setIsChecked] = useState(false); //중복체크 여부
   const [isDuplicate, setIsDuplicate] = useState(null); //QR 코드 중복체크
 
   // 코드 중복체크
-  async function checkDuplicate(e) {
+  async function validateProductCd(e) {
     e.preventDefault();
 
+    const isExist = await checkProductCdExists(productCd);
     try {
-      const res = await fetch(`${SERVER_URL}/ttik/product/exist/${productCd}`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-        },
-      });
-      if (!res.ok) {
-        throw new Error(
-          "서버와의 통신이 원활하지 않습니다. 잠시 후 다시 시도해주세요.",
-        );
-      }
-      const data = await res.json();
-      console.log(data);
-
-      if (data === true) {
+      if (isExist === true) {
         //코드 중복
         setIsDuplicate(true);
       } else {
@@ -41,7 +25,10 @@ function ProductCode({ onClose, productCd, setProductCd }) {
       }
       return;
     } catch (error) {
-      alert(error.message);
+      openAlert({
+        title: "Error",
+        message: "서버와의 통신이 원활하지 않습니다. 잠시 후 다시 시도해주세요",
+      });
       return;
     }
   }
@@ -86,7 +73,7 @@ function ProductCode({ onClose, productCd, setProductCd }) {
             ></input>
             <button
               className={styleProdModal.checkBtn}
-              onClick={checkDuplicate}
+              onClick={validateProductCd}
             >
               중복 체크
             </button>
@@ -119,4 +106,4 @@ function ProductCode({ onClose, productCd, setProductCd }) {
   );
 }
 
-export default ProductCode;
+export default ProductCodeModal;
