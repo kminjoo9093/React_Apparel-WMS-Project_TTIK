@@ -2,7 +2,7 @@ import styleRegister from "../css/ProductRegister.module.css";
 import { CommonButton } from "./CommonButton";
 import { useFormData, useProductCd, useSetProductCd } from "../store/product";
 import { useOpenModal } from "../store/productModal";
-import { createProductCd } from "../api/product";
+import { createProductCd } from "../api/product/productRegister";
 import Alert from "./Alert";
 import { useOpenAlert } from "../store/alert";
 

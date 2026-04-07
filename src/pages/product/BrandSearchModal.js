@@ -1,12 +1,9 @@
 import styleProdModal from "../../css/ProductModal.module.css";
 import { useState } from "react";
-import serverUrl from "../../db/server.json";
 import { CommonButton } from "../../components/CommonButton";
+import { searchBrandData } from "../../api/brand";
 
-function ModalBrandSearch({onClose, setBrandCd}){
-
-    const SERVER_URL = serverUrl.SERVER_URL;
-
+function BrandSearchModal({onClose, setBrandCd}){
     const [inputVal, setInputVal] = useState("");
     const [resultList, setResultList] = useState([]);
     const [selectedBrand, setSelectedBrand] = useState(null);
@@ -26,18 +23,8 @@ function ModalBrandSearch({onClose, setBrandCd}){
         if(inputVal.length === 0) return;
 
         try{
-            const res = await fetch(`${SERVER_URL}/ttik/brand/search?keyword=${inputVal}`, {
-                method: 'GET',
-                credentials: 'include', 
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-            if(res.ok){
-                const data = await res.json();
-                console.log("브랜드 검색 결과 : ", data)
-                setResultList(data);
-            }
+            const data = await searchBrandData(inputVal);
+            setResultList(data);
         } catch(error){
             console.log("브랜드 검색 실패 : ", error);
         }
@@ -46,7 +33,6 @@ function ModalBrandSearch({onClose, setBrandCd}){
     const selectBrand = (brand) => {
         setInputVal(brand.brandNm);
         setSelectedBrand(brand);
-        
     }
 
     return (
@@ -78,4 +64,4 @@ function ModalBrandSearch({onClose, setBrandCd}){
     )
 }
 
-export default ModalBrandSearch;
+export default BrandSearchModal;

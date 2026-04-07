@@ -1,20 +1,26 @@
 import { useEffect, useState, useRef, useContext } from "react";
 import { useLocation, Link } from "react-router-dom"; // URL 파라미터 감지용
 import styleList from "../../css/ProductList.module.css";
-import serverUrl from "../../db/server.json";
 import Pagination from "../Pagination";
 import { CommonButton } from "../../components/CommonButton";
 import { CommonSelect } from "../../components/CommonSelect";
 import ProductItem from "../../components/ProductItem";
 import { ProductContext } from "./ProductDataProvider";
 import PageInfo from "../../components/PageInfo";
+import { useOpenAlert } from "../../store/alert";
+import { useProductList } from "../../hooks/product/useProductList";
 
 function ProductList() {
-  const SERVER_URL = serverUrl.SERVER_URL;
-  const URL = `${SERVER_URL}/ttik/product`;
+  const openAlert = useOpenAlert();
   const location = useLocation(); // 추가: 대시보드에서 넘어온 쿼리 스트링 읽기
+  const visibleCount = 5; // 한 번에 5개씩 (모바일)
+  const postsPerPagePC = 10; // 한페이지에 10개씩 (Pc)
 
-  const [productList, setProductList] = useState([]);
+  const {productList, isLoading, hasMore, totalElements, totalPages, fetchProductList, fetchNextProductList} = useProductList();
+
+  // const [productList, setProductList] = useState([]);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [hasMore, setHasMore] = useState(true); //더 가져올 데이터가 있는지
   const [keywordInput, setKeywordInput] = useState("");
 
   //브랜드, 시즌, 카테고리 공통 데이터
@@ -29,33 +35,6 @@ function ProductList() {
     keyword: new URLSearchParams(location.search).get("search") || "",
   });
 
-  const fetchProductList = async (searchFilters, currentPage, isMobile) => {
-    let fetchUrl = "";
-    // 모바일: 필터 조건을 쿼리 스트링으로 변환하여 5개만 요청
-    const { brandCd, categoryCd, seasonCd, stkStatus, keyword } = searchFilters;
-    const filterQuery = `&brandCd=${brandCd}&catCd=${categoryCd}&seasonCd=${seasonCd}&stkStatus=${stkStatus}&keyword=${encodeURIComponent(keyword)}`;
-
-    if (isMobile) {
-      fetchUrl = `${URL}/list/mobile?size=${visibleCount}${filterQuery}`;
-      setHasMore(true); // 모바일에서 필터가 바뀌면 '더보기' 상태 초기화
-    } else {
-      fetchUrl = `${URL}/list/pc?page=${currentPage - 1}&size=${postsPerPagePC}${filterQuery}`; //PC
-    }
-
-    const res = await fetch(fetchUrl, {
-      method: "GET",
-      credentials: "include", // 세션 쿠키 전송 (필수)
-      headers: {
-        Accept: "application/json", // JSON 응답 선호 명시
-        "Content-Type": "application/json",
-      },
-    });
-    console.log("응답 상태:", res.status);
-
-    if (!res.ok) throw new Error("네트워크 응답 실패");
-    return await res.json();
-  };
-
   const stkStatusConfig = [
     { value: "대기", status: "입고 대기" },
     { value: "정상", status: "정상" },
@@ -64,16 +43,12 @@ function ProductList() {
 
   // 페이지네이션 관련 로직
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPagePC = 10; // 한페이지에 10개씩 (Pc)
-  const [totalPages, setTotalPages] = useState(null);
-  const [totalElements, setTotalElements] = useState(null); //전체 상품 수
+  // const [totalPages, setTotalPages] = useState(null);
+  // const [totalElements, setTotalElements] = useState(null); //전체 상품 수
   const indexOfLast = currentPage * postsPerPagePC;
   const indexOfFirst = indexOfLast - postsPerPagePC;
 
   const scrollRef = useRef(null);
-  const visibleCount = 5; // 한 번에 5개씩 (모바일)
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true); //더 가져올 데이터가 있는지
 
   // 1. 관찰할 대상을 가리킬 Ref 생성
   const observerTarget = useRef(null);
@@ -107,69 +82,18 @@ function ProductList() {
     setCurrentPage(1); // 검색 시 1페이지로
   }, [location.search]);
 
-  // 공통 데이터 요청 함수
-  async function getData(url) {
-    try {
-      const res = await fetch(url, {
-        method: "GET",
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error(`Error : ${res.status}`);
-      const data = await res.json();
-      return data || [];
-    } catch (error) {
-      console.log(error);
-      return [];
-    }
-  }
-
   // 상품 전체 목록 불러오기
   useEffect(() => {
-    const getProductList = async () => {
-      setIsLoading(true); // 로딩 시작
-
-      try {
-        const data = await fetchProductList(
-          searchFilters,
-          currentPage,
-          isMobile,
-        );
-        const products = data.content || [];
-        const total = data.totalPages || 0;
-
-        if (isMobile) {
-          setProductList(products);
-          setTotalElements(total);
-          if (products.length > 0) {
-            if (products.length < visibleCount) {
-              setHasMore(false); // 가져온 데이터가 요청한 size(5개)보다 적으면 더 가져올 게 없다고 판단
-              return;
-            }
-          } else {
-            setHasMore(false);
-          }
-        } else {
-          //pc
-          setTotalElements(data.totalElements);
-          setProductList(products);
-          setTotalPages(total);
-        }
-      } catch (error) {
-        console.log("데이터 요청 실패 - ", error);
-
-        return [];
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    // 즉시 한 번 실행
-    getProductList();
+    fetchProductList({searchFilters, currentPage, isMobile});
   }, [currentPage, isMobile, searchFilters]);
+
+    //모바일 두번째 이후 데이터 요청
+  // const getNextData = async (lastItemDate, lastItemProCd, searchFilters) => {
+
 
   //상품 목록 - 모바일
   useEffect(() => {
-    if (!isMobile || !hasMore) return; // || isLoading
+    if (!isMobile || !hasMore) return; 
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -184,7 +108,7 @@ function ProductList() {
             const lastItemProCd = currentLastItem?.productCd;
             console.log("마지막 날짜 확인 ==> ", lastItemDate);
             if (lastItemDate) {
-              getNextData(lastItemDate, lastItemProCd);
+              fetchNextProductList({lastItemDate, lastItemProCd, searchFilters});
             }
           }
         }
@@ -203,44 +127,7 @@ function ProductList() {
     };
   }, [isMobile, hasMore, productList]);
 
-  //모바일 두번째 이후 데이터 요청
-  const getNextData = async (lastItemDate, lastItemProCd) => {
-    if (isLoading || !hasMore) return;
-    setIsLoading(true);
 
-    const encodedDate = encodeURIComponent(lastItemDate);
-
-    const { brandCd, categoryCd, seasonCd, stkStatus, keyword } = searchFilters;
-    const filterQuery = `&lastDate=${encodedDate}&lastProCd=${lastItemProCd}&brandCd=${brandCd}&catCd=${categoryCd}&seasonCd=${seasonCd}&stkStatus=${stkStatus}&keyword=${encodeURIComponent(keyword)}`;
-    let fetchUrl = `${URL}/list/scroll?size=${visibleCount}${filterQuery}`;
-
-    try {
-      const response = await fetch(fetchUrl, {
-        method: "GET",
-        credentials: "include",
-      });
-      if (response.ok) {
-        const nextDataList = await response.json();
-        console.log("다음 목록 리스트 --> ", nextDataList);
-
-        if (nextDataList.length > 0) {
-          setProductList((prev) => [...prev, ...nextDataList]);
-
-          if (nextDataList.length < visibleCount) {
-            setHasMore(false);
-            return;
-          }
-        } else {
-          setHasMore(false);
-        }
-      }
-    } catch (error) {
-      console.log("데이터 요청 실패 : ", error);
-      return [];
-    } finally {
-      setIsLoading(false); // 다시 Observer 작동시키지 위해 로딩 종료
-    }
-  };
 
   // 인풋창 타이핑용 (서버 요청 안 보냄)
   const handleKeywordTyping = (e) => {
@@ -335,7 +222,10 @@ function ProductList() {
 
   return (
     <div>
-      <PageInfo title={"Product List"} description={"상품 목록을 확인하세요."}/>
+      <PageInfo
+        title={"Product List"}
+        description={"상품 목록을 확인하세요."}
+      />
       <div className={styleList.actionArea}>
         <CommonButton as={Link} to="/product/register" variant="primary">
           상품 등록
@@ -353,7 +243,7 @@ function ProductList() {
               name="keyword"
               value={keywordInput}
               onChange={handleKeywordTyping}
-              onKeyDown={(e) => e.key === "Enter" && handleSearchClick()} // 엔터키 지원
+              onKeyDown={(e) => e.key === "Enter" && handleSearchClick()}
               type="text"
               placeholder="상품명 또는 코드 검색"
             ></input>
