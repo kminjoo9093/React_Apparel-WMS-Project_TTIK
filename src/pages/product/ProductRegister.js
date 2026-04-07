@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styleRegister from "../../css/ProductRegister.module.css";
 import RegistModalFrame from "../../components/RegistModalFrame";
@@ -6,7 +6,7 @@ import ProductSeasonModal from "./ProductSeasonModal";
 import ProductCodeModal from "./ProductCodeModal";
 import BrandSearchModal from "./BrandSearchModal";
 import { CommonButton } from "../../components/CommonButton";
-import { registerProduct } from "../../api/product";
+import { registerProduct } from "../../api/product/productRegister";
 import PageInfo from "../../components/PageInfo";
 import {
   useErrors,

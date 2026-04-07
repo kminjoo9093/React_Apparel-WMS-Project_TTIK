@@ -5,7 +5,7 @@ import { useFormData, useSetFormData } from "../store/product";
 import { CommonButton } from "./CommonButton";
 import { useOpenModal } from "../store/productModal";
 import { checkStyleNo } from "../utils/validation/styleNo";
-import { fetchSizeMap } from "../api/product";
+import { fetchSizeMap } from "../api/product/productRegister";
 import { useOpenAlert } from "../store/alert";
 
 export default function ProductBasicInfo() {

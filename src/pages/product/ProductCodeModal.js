@@ -2,7 +2,7 @@ import { useState } from "react";
 import styleProdModal from "../../css/ProductModal.module.css";
 import { CommonButton } from "../../components/CommonButton";
 import { useOpenAlert } from "../../store/alert";
-import { checkProductCdExists } from "../../api/product";
+import { checkProductCdExists } from "../../api/product/productRegister";
 
 function ProductCodeModal({ onClose, productCd, setProductCd }) {
   const openAlert = useOpenAlert();

@@ -1,4 +1,4 @@
-import serverUrl from "../db/server.json";
+import serverUrl from "../../db/server.json";
 
 const SERVER_URL = serverUrl.SERVER_URL;
 const PRODUCT_BASE = `${SERVER_URL}/ttik/product`;
