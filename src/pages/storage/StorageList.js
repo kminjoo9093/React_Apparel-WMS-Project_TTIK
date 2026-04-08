@@ -5,7 +5,6 @@ import styleModal from "../../css/Modal.module.css";
 import serverUrl from "../../db/server.json";
 import Pagination from "../Pagination";
 import { useLocation } from "react-router-dom";
-import Alert from "../../components/Alert";
 import { CommonButton } from "../../components/CommonButton";
 import { useOpenAlert } from "../../store/alert";
 
@@ -364,7 +363,6 @@ function StorageList({ storageList: storageOptions = [] }) {
           </div>
         </div>
       )}
-      <Alert {...alert} />
     </>
   );
 }

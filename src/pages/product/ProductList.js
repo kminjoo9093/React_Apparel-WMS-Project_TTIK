@@ -7,24 +7,31 @@ import { CommonSelect } from "../../components/CommonSelect";
 import ProductItem from "../../components/ProductItem";
 import { ProductContext } from "./ProductDataProvider";
 import PageInfo from "../../components/PageInfo";
-import { useOpenAlert } from "../../store/alert";
 import { useProductList } from "../../hooks/product/useProductList";
+import { ScrollContext } from "../../context/scrollContext";
+
+const stkStatusConfig = [
+  { value: "대기", status: "입고 대기" },
+  { value: "정상", status: "정상" },
+  { value: "부족", status: "부족" },
+];
+
+const postsPerPagePC = 10; 
 
 function ProductList() {
-  const openAlert = useOpenAlert();
-  const location = useLocation(); // 추가: 대시보드에서 넘어온 쿼리 스트링 읽기
-  const visibleCount = 5; // 한 번에 5개씩 (모바일)
-  const postsPerPagePC = 10; // 한페이지에 10개씩 (Pc)
-
-  const {productList, isLoading, hasMore, totalElements, totalPages, fetchProductList, fetchNextProductList} = useProductList();
-
-  // const [productList, setProductList] = useState([]);
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [hasMore, setHasMore] = useState(true); //더 가져올 데이터가 있는지
-  const [keywordInput, setKeywordInput] = useState("");
-
-  //브랜드, 시즌, 카테고리 공통 데이터
   const { brandList, categoryList, seasonList } = useContext(ProductContext);
+  const location = useLocation(); // 추가: 대시보드에서 넘어온 쿼리 스트링 읽기
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const scrollRef = useContext(ScrollContext);
+
+  // 페이지네이션 관련 로직
+  const [currentPage, setCurrentPage] = useState(1);
+  const indexOfLast = currentPage * postsPerPagePC;
+
+  const isScrollingToTop = useRef(false);
+  const scrollContainerRef = useRef(null);
+  const [showBtn, setShowBtn] = useState(false);
+  const [keywordInput, setKeywordInput] = useState("");
 
   // 필터 상태 (초기값에 URL 파라미터 로직 통합)
   const [searchFilters, setSearchFilters] = useState({
@@ -35,33 +42,21 @@ function ProductList() {
     keyword: new URLSearchParams(location.search).get("search") || "",
   });
 
-  const stkStatusConfig = [
-    { value: "대기", status: "입고 대기" },
-    { value: "정상", status: "정상" },
-    { value: "부족", status: "부족" },
-  ];
+  const {
+    productList,
+    isLoading,
+    hasMore,
+    totalElements,
+    totalPages,
+    fetchProductList,
+    fetchNextProductList,
+    resetList,
+  } = useProductList();
 
-  // 페이지네이션 관련 로직
-  const [currentPage, setCurrentPage] = useState(1);
-  // const [totalPages, setTotalPages] = useState(null);
-  // const [totalElements, setTotalElements] = useState(null); //전체 상품 수
-  const indexOfLast = currentPage * postsPerPagePC;
-  const indexOfFirst = indexOfLast - postsPerPagePC;
-
-  const scrollRef = useRef(null);
-
-  // 1. 관찰할 대상을 가리킬 Ref 생성
-  const observerTarget = useRef(null);
-
-  //모바일 무한 스크롤
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
-  // 모바일 감지
+  // 상품 전체 목록 불러오기
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    fetchProductList({ searchFilters, currentPage, isMobile });
+  }, [currentPage, isMobile, searchFilters]);
 
   //추가(김윤중) -- 레이아웃에서 상품명(코드) 검색시 이동할때 받는 함수
   useEffect(() => {
@@ -79,55 +74,61 @@ function ProductList() {
     // 입력창 상태 업데이트 (이 부분이 추가되어야 검색창에 글자가 남습니다)
     setKeywordInput(urlSearch);
 
-    setCurrentPage(1); // 검색 시 1페이지로
+    setCurrentPage(1);
   }, [location.search]);
 
-  // 상품 전체 목록 불러오기
+  // 모바일 감지
   useEffect(() => {
-    fetchProductList({searchFilters, currentPage, isMobile});
-  }, [currentPage, isMobile, searchFilters]);
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-    //모바일 두번째 이후 데이터 요청
-  // const getNextData = async (lastItemDate, lastItemProCd, searchFilters) => {
+  // 1. 관찰할 대상을 가리킬 Ref 생성
+  const observerTarget = useRef(null);
+  const observerRef = useRef(null);
+  const stateRef = useRef();
 
+  useEffect(() => {
+    stateRef.current = {
+      productList,
+      hasMore,
+      isLoading,
+      searchFilters,
+    };
+  }, [productList, hasMore, isLoading, searchFilters]);
 
   //상품 목록 - 모바일
   useEffect(() => {
-    if (!isMobile || !hasMore) return; 
+    if (!isMobile) return;
 
-    const observer = new IntersectionObserver(
+    observerRef.current = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          console.log("바닥 감지");
-          if (isScrollingToTop.current) return;
+        if (!entries[0].isIntersecting) return;
 
-          if (productList.length > 0) {
-            //모바일 리스트 fetch
-            const currentLastItem = productList[productList.length - 1];
-            const lastItemDate = currentLastItem?.frstRegDt;
-            const lastItemProCd = currentLastItem?.productCd;
-            console.log("마지막 날짜 확인 ==> ", lastItemDate);
-            if (lastItemDate) {
-              fetchNextProductList({lastItemDate, lastItemProCd, searchFilters});
-            }
-          }
-        }
+        const { productList, hasMore, isLoading, searchFilters } =
+          stateRef.current;
+        if (productList.length <= 0 || isLoading || !hasMore) return;
+
+        const lastItem = productList[productList.length - 1];
+
+        fetchNextProductList({
+          lastItemDate: lastItem?.frstRegDt,
+          lastItemProCd: lastItem?.productCd,
+          searchFilters,
+        });
       },
       { threshold: 0.5 },
     );
 
-    // 4. 관찰 시작
     if (observerTarget.current) {
-      observer.observe(observerTarget.current);
+      observerRef.current.observe(observerTarget.current);
     }
 
-    // 5. 언마운트 시 관찰 중단
     return () => {
-      if (observerTarget.current) observer.disconnect();
+      if (observerTarget.current) observerRef.current.disconnect();
     };
-  }, [isMobile, hasMore, productList]);
-
-
+  }, [isMobile, hasMore, isLoading]);
 
   // 인풋창 타이핑용 (서버 요청 안 보냄)
   const handleKeywordTyping = (e) => {
@@ -146,10 +147,8 @@ function ProductList() {
     setCurrentPage(1);
 
     if (isMobile) {
-      setProductList([]);
-      setHasMore(true);
+      resetList();
     }
-    setCurrentPage(1);
   };
 
   // 입력값 변경 핸들러
@@ -161,8 +160,7 @@ function ProductList() {
     }));
 
     if (isMobile) {
-      setProductList([]); //초기화
-      setHasMore(true); //초기화
+      resetList();
     }
     setCurrentPage(1);
   };
@@ -180,45 +178,24 @@ function ProductList() {
     setCurrentPage(1);
   };
 
-  const isScrollingToTop = useRef(false);
-  const scrollContainerRef = useRef(null);
-  const [showBtn, setShowBtn] = useState(false);
-
   useEffect(() => {
-    const el = document
-      .querySelector(`.${styleList.productListBox}`)
-      ?.closest('[style*="overflow"], [class]');
-
-    let current = el;
-
-    while (current) {
-      const style = getComputedStyle(current);
-      if (
-        /(auto|scroll)/.test(style.overflowY) &&
-        current.scrollHeight > current.clientHeight
-      ) {
-        scrollContainerRef.current = current;
-        break;
-      }
-      current = current.parentElement;
-    }
-
-    if (!scrollContainerRef.current) {
-      scrollContainerRef.current = document.scrollingElement;
-    }
-  }, []);
-
-  useEffect(() => {
-    const el = scrollContainerRef.current;
-    if (!el) return;
+    const scrollTarget = scrollRef.current;
+    if (!scrollTarget) return;
 
     const handleScroll = () => {
-      setShowBtn(el.scrollTop > 300);
+      setShowBtn(scrollTarget.scrollTop > 300);
     };
 
-    el.addEventListener("scroll", handleScroll);
-    return () => el.removeEventListener("scroll", handleScroll);
+    scrollTarget.addEventListener("scroll", handleScroll);
+    return () => scrollTarget.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const scrollToTop = () => {
+    scrollRef.current.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <div>
@@ -323,7 +300,6 @@ function ProductList() {
         </div>
 
         {isMobile ? (
-          /* 모바일용: 스크롤 감지 타겟 */
           <div
             ref={observerTarget}
             style={{ height: "60px", textAlign: "center" }}
@@ -346,18 +322,7 @@ function ProductList() {
       {isMobile && showBtn && (
         <button
           className={styleList.scrollToTopBtn}
-          onClick={() => {
-            isScrollingToTop.current = true;
-            console.log("위로 가기 버튼 클릭");
-            scrollContainerRef.current?.scrollTo({
-              top: 0,
-              behavior: "smooth",
-            });
-
-            setTimeout(() => {
-              isScrollingToTop.current = false;
-            }, 800); // smooth scroll 끝날 시간
-          }}
+          onClick={scrollToTop}
         ></button>
       )}
     </div>

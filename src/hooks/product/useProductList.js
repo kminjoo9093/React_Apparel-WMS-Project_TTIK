@@ -13,22 +13,27 @@ export const useProductList = () => {
   const [totalPages, setTotalPages] = useState(null);
   const openAlert = useOpenAlert();
 
+  const resetList = () => {
+    setProductList([]);
+    setHasMore(true);
+  };
+
   const fetchProductList = async ({ searchFilters, currentPage, isMobile }) => {
     setIsLoading(true);
 
     try {
       const data = await getProductList(searchFilters, currentPage, isMobile);
       const products = data.content || [];
-      const total = data.totalPages || 0;
+      const pages = data.totalPages || 0;
 
       setProductList(products);
-      setTotalElements(data.totalElements || 0);
 
       if (isMobile) {
         setHasMore(products.length >= visibleCountMobile);
+              setTotalElements(pages);
       } else {
-        //pc
-        setTotalPages(total);
+        setTotalPages(pages);
+        setTotalElements(data.totalElements || 0);
       }
     } catch (error) {
       return [];
@@ -55,6 +60,8 @@ export const useProductList = () => {
         setProductList((prev) => [...prev, ...nextDataList]);
         setHasMore(nextDataList.length >= visibleCountMobile);
       }
+      //test
+      setTotalElements(nextDataList.totalElements || 0);
     } catch (error) {
       openAlert({
         title: "Error",
@@ -74,5 +81,6 @@ export const useProductList = () => {
     totalPages,
     fetchProductList,
     fetchNextProductList,
+    resetList,
   };
 };
