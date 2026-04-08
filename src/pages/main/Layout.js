@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import styleLayout from "../../css/Layout.module.css";
 import { useOpenAlert } from "../../store/alert";
 import serverUrl from "../../db/server.json";
+import { useContext } from "react";
+import { ScrollContext } from "../../context/scrollContext";
 
 const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
   const location = useLocation();
@@ -14,6 +16,7 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
   const [isNotiOpen, setIsNotiOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const notiRef = useRef(null);
+  const scrollRef = useRef(null);
 
   const openAlert = useOpenAlert();
 
@@ -401,7 +404,11 @@ const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
           </div>
         </header>
 
-        <main className={styleLayout.scrollArea}>{children}</main>
+        <ScrollContext.Provider value={scrollRef}>
+          <main ref={scrollRef} className={styleLayout.scrollArea}>
+            {children}
+          </main>
+        </ScrollContext.Provider>
       </div>
     </div>
   );
