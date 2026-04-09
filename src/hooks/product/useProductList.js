@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { getProductList } from "../../api/product/productList";
-import { getNextProductList } from "../../api/product/productList";
+import { getProductList } from "../../api/product/fetchProductListData";
+import { getNextProductList } from "../../api/product/fetchProductListData";
 import { useOpenAlert } from "../../store/alert";
 
 const visibleCountMobile = 5;

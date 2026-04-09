@@ -5,7 +5,7 @@ import Pagination from "../Pagination";
 import { CommonButton } from "../../components/CommonButton";
 import { CommonSelect } from "../../components/CommonSelect";
 import ProductItem from "../../components/ProductItem";
-import { ProductContext } from "./ProductDataProvider";
+import { ProductContext } from "../../context/ProductDataProvider";
 import PageInfo from "../../components/PageInfo";
 import { useProductList } from "../../hooks/product/useProductList";
 import { ScrollContext } from "../../context/ScrollContext";

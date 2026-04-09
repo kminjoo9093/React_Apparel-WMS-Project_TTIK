@@ -1,4 +1,4 @@
-import { fetchStorageData } from "../api/storage/storageList";
+import { getStorageData } from "../api/storage/fetchstorageData";
 import { createContext, useState, useContext, useEffect } from "react";
 import { useOpenAlert } from "../store/alert";
 
@@ -8,9 +8,9 @@ export default function StorageProvider({ children }) {
   const [storageList, setStorageList] = useState([]);
   const openAlert = useOpenAlert();
 
-  const getStorageData = async () => {
+  const fetchStorageData = async () => {
     try {
-      const storageData = await fetchStorageData();
+      const storageData = await getStorageData();
       setStorageList(storageData);
     } catch (error) {
       openAlert({
@@ -22,11 +22,11 @@ export default function StorageProvider({ children }) {
   };
 
   useEffect(() => {
-    getStorageData();
+    fetchStorageData();
   }, []);
 
   return (
-    <storageContext.Provider value={{ storageList, getStorageData }}>
+    <storageContext.Provider value={{ storageList, fetchStorageData }}>
       {children}
     </storageContext.Provider>
   );

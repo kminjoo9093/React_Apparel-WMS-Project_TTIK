@@ -6,7 +6,7 @@ import { useOpenAlert } from "../../store/alert";
 import { useStorageContext } from "../../context/StorageProvider";
 
 function StorageAdd({ setView }) {
-  const { storageList, getStorageData } = useStorageContext();
+  const { storageList, fetchStorageData } = useStorageContext();
 
   const SERVER_URL = serverUrl.SERVER_URL;
   const [selectedStorage, setSelectedStorage] = useState(1); //창고 일련번호
@@ -192,7 +192,7 @@ function StorageAdd({ setView }) {
         });
 
         resetForm();
-        if (getStorageData) getStorageData();
+        if (fetchStorageData) fetchStorageData();
 
         setView("list"); //수정 후 창고 조회 리스트가 보이도록
       } else {

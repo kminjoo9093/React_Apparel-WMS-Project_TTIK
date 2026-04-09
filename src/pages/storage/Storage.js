@@ -1,10 +1,10 @@
 import styleStorage from "../../css/Storage.module.css";
 import { useState } from "react";
 import StorageModify from "./StorageModify";
-import StorageList from "./StorageList";
 import StorageRegister from "./StorageRegister";
 import styleList from "../../css/ProductList.module.css";
 import PageInfo from "../../components/PageInfo";
+import RackList from "./RackList";
 
 const storageMenuConfig = [
   {
@@ -56,7 +56,7 @@ function Storage() {
           <section className={styleStorage.mainContentWrap}>
             {view === "register" && <StorageRegister setView={setView} />}
             {view === "modify" && <StorageModify setView={setView} />}
-            {view === "list" && <StorageList setView={setView} />}
+            {view === "list" && <RackList setView={setView} />}
           </section>
         </div>
       </div>

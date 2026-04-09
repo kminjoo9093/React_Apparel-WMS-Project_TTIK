@@ -1,11 +1,11 @@
 import styleRegister from "../css/ProductRegister.module.css";
 import { useContext, useState, useEffect } from "react";
-import { ProductContext } from "../pages/product/ProductDataProvider";
+import { ProductContext } from "../context/ProductDataProvider";
 import { useFormData, useSetFormData } from "../store/product";
 import { CommonButton } from "./CommonButton";
 import { useOpenModal } from "../store/productModal";
 import { checkStyleNo } from "../utils/validation/styleNo";
-import { fetchSizeMap } from "../api/product/productRegister";
+import { fetchSizeMap } from "../api/product/fetchProductRegisterData";
 import { useOpenAlert } from "../store/alert";
 
 export default function ProductBasicInfo() {

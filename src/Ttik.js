@@ -19,7 +19,7 @@ import History from "../src/pages/stock/StockHistory";
 import StockDetailInbound from "./pages/stock/StockDetailInbound";
 import StockDetailOutbound from "./pages/stock/StockDetailOutbound";
 import Storage from "./pages/storage/Storage";
-import ProductDataProvider from "./pages/product/ProductDataProvider";
+import ProductDataProvider from "./context/ProductDataProvider";
 import Alert from "./components/Alert";
 import { useAlertStore } from "./store/alert";
 import StorageProvider from "./context/StorageProvider";

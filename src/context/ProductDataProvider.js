@@ -1,6 +1,6 @@
 import { createContext, useReducer, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import serverUrl from "../../db/server.json";
+import serverUrl from "../db/server.json";
 
 const SERVER_URL = serverUrl.SERVER_URL;
 const URL = `${SERVER_URL}/ttik/product`;
