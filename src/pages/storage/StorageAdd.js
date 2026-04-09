@@ -3,8 +3,11 @@ import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
 import { useOpenAlert } from "../../store/alert";
+import { useStorageContext } from "../../context/StorageProvider";
 
-function StorageAdd({ storageList, onUpdate, setView }) {
+function StorageAdd({ setView }) {
+  const { storageList, getStorageData } = useStorageContext();
+
   const SERVER_URL = serverUrl.SERVER_URL;
   const [selectedStorage, setSelectedStorage] = useState(1); //창고 일련번호
   const [selectedZone, setSelectedZone] = useState(null); //구역 일련번호
@@ -189,10 +192,9 @@ function StorageAdd({ storageList, onUpdate, setView }) {
         });
 
         resetForm();
-        if (onUpdate) onUpdate();
+        if (getStorageData) getStorageData();
 
         setView("list"); //수정 후 창고 조회 리스트가 보이도록
-
       } else {
         const errorData = await res.json();
         openAlert({

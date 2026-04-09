@@ -3,8 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import styleLayout from "../../css/Layout.module.css";
 import { useOpenAlert } from "../../store/alert";
 import serverUrl from "../../db/server.json";
-import { useContext } from "react";
-import { ScrollContext } from "../../context/scrollContext";
+import { ScrollContext } from "../../context/ScrollContext";
 
 const Layout = ({ children, user, setUser, setIsLoggedIn }) => {
   const location = useLocation();
