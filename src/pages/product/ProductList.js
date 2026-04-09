@@ -8,7 +8,7 @@ import ProductItem from "../../components/ProductItem";
 import { ProductContext } from "./ProductDataProvider";
 import PageInfo from "../../components/PageInfo";
 import { useProductList } from "../../hooks/product/useProductList";
-import { ScrollContext } from "../../context/scrollContext";
+import { ScrollContext } from "../../context/ScrollContext";
 
 const stkStatusConfig = [
   { value: "대기", status: "입고 대기" },
@@ -16,7 +16,7 @@ const stkStatusConfig = [
   { value: "부족", status: "부족" },
 ];
 
-const postsPerPagePC = 10; 
+const postsPerPagePC = 10;
 
 function ProductList() {
   const { brandList, categoryList, seasonList } = useContext(ProductContext);
@@ -24,12 +24,8 @@ function ProductList() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const scrollRef = useContext(ScrollContext);
 
-  // 페이지네이션 관련 로직
   const [currentPage, setCurrentPage] = useState(1);
-  const indexOfLast = currentPage * postsPerPagePC;
 
-  const isScrollingToTop = useRef(false);
-  const scrollContainerRef = useRef(null);
   const [showBtn, setShowBtn] = useState(false);
   const [keywordInput, setKeywordInput] = useState("");
 

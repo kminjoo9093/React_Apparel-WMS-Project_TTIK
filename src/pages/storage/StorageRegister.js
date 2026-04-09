@@ -5,10 +5,12 @@ import { useNavigate } from "react-router-dom";
 import serverUrl from "../../db/server.json";
 import { checkNumber } from "../../utils/validation/numbers";
 import { useOpenAlert } from "../../store/alert";
+import { useStorageContext } from "../../context/StorageProvider";
 
-function StorageRegister({ storageList, onUpdate }) {
+function StorageRegister() {
   const navigate = useNavigate();
   const SERVER_URL = serverUrl.SERVER_URL;
+  const { storageList } = useStorageContext();
   const [storageNm, setStorageNm] = useState("");
   const [zoneList, setZoneList] = useState([{ zone: 1, rack: "" }]);
   const openAlert = useOpenAlert();

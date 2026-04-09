@@ -3,8 +3,11 @@ import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
 import { useOpenAlert } from "../../store/alert";
+import { useStorageContext } from "../../context/StorageProvider";
 
-function StorageDelete({ storageList, onUpdate, setView }) {
+function StorageDelete({ setView }) {
+  const {storageList, getStorageData} = useStorageContext();
+
   const SERVER_URL = serverUrl.SERVER_URL;
   const [selectedStorage, setSelectedStorage] = useState(1); //창고 일련번호
   const [selectedZone, setSelectedZone] = useState(null); //구역 일련번호
@@ -113,7 +116,7 @@ function StorageDelete({ storageList, onUpdate, setView }) {
               title: "Success",
               message: data.message,
               onConfirm: () => {
-                if (onUpdate) onUpdate();
+                if (getStorageData) getStorageData();
                 resetForm();
                 setView("list"); // 수정 후 창고 조회 리스트가 보이도록
               },
