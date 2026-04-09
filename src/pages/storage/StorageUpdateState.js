@@ -6,7 +6,7 @@ import { useOpenAlert } from "../../store/alert";
 import { useStorageContext } from "../../context/StorageProvider";
 
 function StorageUpdateState({ setView }) {
-  const {storageList, getStorageData} = useStorageContext;
+  const {storageList, fetchStorageData} = useStorageContext();
 
   const SERVER_URL = serverUrl.SERVER_URL;
   const [selectedStorage, setSelectedStorage] = useState(1); //창고 일련번호
@@ -149,7 +149,7 @@ function StorageUpdateState({ setView }) {
               message: data.message,
               onConfirm: () => {
                 resetForm();
-                if (getStorageData) getStorageData();
+                if (fetchStorageData) fetchStorageData();
                 setView("list"); // 수정 후 리스트 보기
               },
             });

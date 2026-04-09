@@ -19,9 +19,10 @@ import History from "../src/pages/stock/StockHistory";
 import StockDetailInbound from "./pages/stock/StockDetailInbound";
 import StockDetailOutbound from "./pages/stock/StockDetailOutbound";
 import Storage from "./pages/storage/Storage";
-import ProductDataProvider from "./pages/product/ProductDataProvider";
+import ProductDataProvider from "./context/ProductDataProvider";
 import Alert from "./components/Alert";
 import { useAlertStore } from "./store/alert";
+import StorageProvider from "./context/StorageProvider";
 
 function Ttik() {
   const [user, setUser] = useState(null);
@@ -118,7 +119,14 @@ function Ttik() {
                   />
                   <Route path="/stock/plans/qr/print" element={<QRsave />} />
                   <Route path="/stock/history" element={<History />} />
-                  <Route path="/storage" element={<Storage />} />
+                  <Route
+                    path="/storage"
+                    element={
+                      <StorageProvider>
+                        <Storage />
+                      </StorageProvider>
+                    }
+                  />
 
                   <Route
                     path="/register-admin"

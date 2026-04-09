@@ -2,7 +2,7 @@ import styleRegister from "../css/ProductRegister.module.css";
 import { CommonButton } from "./CommonButton";
 import { useFormData, useProductCd, useSetProductCd } from "../store/product";
 import { useOpenModal } from "../store/productModal";
-import { createProductCd } from "../api/product/productRegister";
+import { createProductCd } from "../api/product/fetchProductRegisterData";
 import Alert from "./Alert";
 import { useOpenAlert } from "../store/alert";
 
@@ -78,7 +78,7 @@ export default function ProductCodeField() {
           </CommonButton>
         </div>
       </div>
-      <Alert {...alert} /> 
+      <Alert {...alert} />
     </fieldset>
   );
 }

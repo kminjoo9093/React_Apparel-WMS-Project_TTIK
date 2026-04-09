@@ -1,7 +1,7 @@
 import { useContext, useRef } from "react";
 import styleProdModal from "../../css/ProductModal.module.css";
 import { CommonButton } from "../../components/CommonButton";
-import { SeasonDispatchContext } from "./ProductDataProvider";
+import { SeasonDispatchContext } from "../../context/ProductDataProvider";
 import { useOpenAlert } from "../../store/alert";
 import { registerSeasonData } from "../../api/season";
 

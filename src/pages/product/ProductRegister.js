@@ -6,7 +6,7 @@ import ProductSeasonModal from "./ProductSeasonModal";
 import ProductCodeModal from "./ProductCodeModal";
 import BrandSearchModal from "./BrandSearchModal";
 import { CommonButton } from "../../components/CommonButton";
-import { registerProduct } from "../../api/product/productRegister";
+import { registerProduct } from "../../api/product/fetchProductRegisterData";
 import PageInfo from "../../components/PageInfo";
 import {
   useErrors,
