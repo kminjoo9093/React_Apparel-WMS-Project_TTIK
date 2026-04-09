@@ -1,5 +1,5 @@
 import { fetchStorageData } from "../api/storage/storageList";
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import { useOpenAlert } from "../store/alert";
 
 const storageContext = createContext();
@@ -20,6 +20,10 @@ export default function StorageProvider({ children }) {
       return [];
     }
   };
+
+  useEffect(() => {
+    getStorageData();
+  }, []);
 
   return (
     <storageContext.Provider value={{ storageList, getStorageData }}>

@@ -1,11 +1,10 @@
 import styleStorage from "../../css/Storage.module.css";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import StorageModify from "./StorageModify";
 import StorageList from "./StorageList";
 import StorageRegister from "./StorageRegister";
 import styleList from "../../css/ProductList.module.css";
 import PageInfo from "../../components/PageInfo";
-import { useStorageContext } from "../../context/StorageProvider";
 
 const storageMenuConfig = [
   {
@@ -26,12 +25,7 @@ const storageMenuConfig = [
 ];
 
 function Storage() {
-  const { storageList, getStorageData } = useStorageContext();
   const [view, setView] = useState("list");
-
-  useEffect(() => {
-    getStorageData();
-  }, []);
 
   return (
     <div className={styleStorage.storage}>
