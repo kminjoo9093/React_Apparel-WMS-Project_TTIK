@@ -8,7 +8,7 @@ import RackDetailModal from "./RackDetailModal";
 import {
   getRackDetailInfo,
   getRackListData,
-} from "../../api/storage/fetchstorageData";
+} from "../../api/storage/fetchStorageData";
 
 function RackList() {
   const { storageList } = useStorageContext();
@@ -20,31 +20,27 @@ function RackList() {
   const [isLoading, setIsLoading] = useState(true);
   const [storageFilter, setStorageFilter] = useState("");
 
-  //조회리스트에서 선택한 선반 정보
+  // 선택한 선반 정보
   const [selectedRack, setSelectedRack] = useState("");
   const [rackDetailList, setRackDetailList] = useState([]);
-  const [detailRackNm, setDetailRackNm] = useState("");
-  const [boxCount, setBoxCount] = useState(null);
 
   // 페이지네이션
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 10; // 한페이지에 10개씩
+  const postsPerPage = 10; 
   const [totalPages, setTotalPages] = useState(null);
-
-  const indexOfLast = currentPage * postsPerPage;
-  const indexOfFirst = indexOfLast - postsPerPage;
 
   //메인 대시보드에서 창고 적재현황 클릭시 넘어오는 페이지 - 김윤중
   useEffect(() => {
-    if (location.state?.autoOpenRackSn) {
-      setSelectedRack(location.state.autoOpenRackSn);
-      fetchRackDetailInfo(location.state.autoOpenRackSn);
+    const state = location.state;
+    if (state?.autoOpenRackSn) {
+      setSelectedRack(state.autoOpenRackSn);
+      fetchRackDetailInfo(state.autoOpenRackSn);
       setIsOpen(true);
 
       // 창고 필터 자동 선택 로직
-      if (location.state.autoOpenStorageNm && storageList.length > 0) {
+      if (state.autoOpenStorageNm && storageList.length > 0) {
         const targetStorage = storageList.find(
-          (s) => s.storageNm === location.state.autoOpenStorageNm,
+          (s) => s.storageNm === state.autoOpenStorageNm,
         );
         if (targetStorage) {
           setStorageFilter(targetStorage.storageSn.toString());
@@ -72,7 +68,6 @@ function RackList() {
         title: "Error",
         message: "선반 목록을 받아오지 못했습니다.",
       });
-      return [];
     } finally {
       setIsLoading(false);
     }
@@ -86,8 +81,6 @@ function RackList() {
     try {
       const data = await getRackDetailInfo(rackSn);
       setRackDetailList(data);
-      setDetailRackNm(data.rackNm);
-      setBoxCount(data.boxQty);
     } catch (error) {
       openAlert({
         title: "Error",
@@ -104,11 +97,8 @@ function RackList() {
 
   const onCloseModal = () => {
     setIsOpen(false);
-    //상태값 초기화
     setSelectedRack("");
     setRackDetailList([]);
-    setDetailRackNm("");
-    setBoxCount(null);
   };
 
   const handleRackStts = (rackStts, hasBox, rackEnabled) => {
@@ -163,7 +153,13 @@ function RackList() {
           {isLoading ? (
             <tr>
               <td colSpan={5} className={styleStorage.loading}>
-                데이터를 불러오는 중입니다
+                데이터를 불러오는 중입니다..
+              </td>
+            </tr>
+          ) : rackList.length === 0 ? (
+            <tr>
+              <td colSpan={5} className={styleStorage.loading}>
+                데이터가 없습니다.
               </td>
             </tr>
           ) : (
@@ -207,11 +203,9 @@ function RackList() {
 
       {isOpen && (
         <RackDetailModal
-          boxCount={boxCount}
           selectedRack={selectedRack}
           rackDetailList={rackDetailList}
           setRackDetailList={setRackDetailList}
-          detailRackNm={detailRackNm}
           onCloseModal={onCloseModal}
         />
       )}

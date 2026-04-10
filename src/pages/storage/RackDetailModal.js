@@ -6,14 +6,12 @@ import { useOpenAlert } from "../../store/alert";
 import {
   getRackListData,
   updateBoxLocation,
-} from "../../api/storage/fetchstorageData";
+} from "../../api/storage/fetchStorageData";
 
 export default function RackDetailModal({
-  boxCount,
   selectedRack,
   rackDetailList,
   setRackDetailList,
-  detailRackNm,
   onCloseModal,
 }) {
   const openAlert = useOpenAlert();
@@ -89,8 +87,8 @@ export default function RackDetailModal({
           style={{ alignItems: "stretch" }}
         >
           <h3 className={styleStorage.rackHeading}>
-            Rack : {detailRackNm}
-            <span> (수량 : {boxCount}개) </span>
+            Rack : {rackDetailList.rackNm}
+            <span> (수량 : {rackDetailList.boxQty}개) </span>
           </h3>
           <div className={styleStorage.modalTableArea}>
             <table className={styleStorage.storageTable}>
@@ -111,7 +109,7 @@ export default function RackDetailModal({
                         <td>{index + 1}</td>
                         <td>{box.boxQr}</td>
                         <td>{box.productNm}</td>
-                        <td>{detailRackNm}</td>
+                        <td>{box.rackNm}</td>
                         <td>
                           <select
                             name="newLoc"
