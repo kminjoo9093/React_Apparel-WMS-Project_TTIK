@@ -11,7 +11,7 @@ const modifyTypes = [
   { id: "delete", type: "삭제" },
 ];
 
-function StorageModify({ setView }) {
+function StorageModify({ setStorageMenu }) {
   const [modifyType, setModifyType] = useState("update");
 
   return (
@@ -32,9 +32,9 @@ function StorageModify({ setView }) {
             ))}
           </div>
 
-          {modifyType === "update" && <StorageUpdateState setView={setView} />}
-          {modifyType === "add" && <StorageAdd setView={setView} />}
-          {modifyType === "delete" && <StorageDelete setView={setView} />}
+          {modifyType === "update" && <StorageUpdateState setStorageMenu={setStorageMenu} />}
+          {modifyType === "add" && <StorageAdd setStorageMenu={setStorageMenu} />}
+          {modifyType === "delete" && <StorageDelete setStorageMenu={setStorageMenu} />}
 
           <div className={styleStorage.btnSubmitWrap}>
             <CommonButton variant="primary" type="submit">

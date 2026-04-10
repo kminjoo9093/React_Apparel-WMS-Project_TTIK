@@ -4,9 +4,11 @@ import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
 import { useOpenAlert } from "../../store/alert";
 import { useStorageContext } from "../../context/StorageProvider";
+import StorageSelector from "../../components/StorageSelector";
+import ToggleSwitch from "../../components/ToggleSwitch";
 
-function StorageUpdateState({ setView }) {
-  const {storageList, fetchStorageData} = useStorageContext();
+function StorageUpdateState({ setStorageMenu }) {
+  const { fetchStorageData } = useStorageContext();
 
   const SERVER_URL = serverUrl.SERVER_URL;
   const [selectedStorage, setSelectedStorage] = useState(1); //창고 일련번호
@@ -21,10 +23,6 @@ function StorageUpdateState({ setView }) {
   });
 
   const openAlert = useOpenAlert();
-
-  const handleSelectStorage = (e) => {
-    setSelectedStorage(Number(e.target.value));
-  };
 
   // 선택한 창고, 구역별 구역, 선반 옵션 리스트
   const { zoneOptions, rackOptions } = useStorageData(
@@ -72,12 +70,12 @@ function StorageUpdateState({ setView }) {
   };
 
   const resetForm = () => {
-    // 1. 선택 데이터 초기화
+    // 선택 데이터 초기화
     setSelectedStorage(1);
     setSelectedZone("");
     setSelectedRack("");
 
-    // 2. 입력 필드 초기화
+    // 입력 필드 초기화
     setRackCapacity("");
     setRackEnabled("");
 
@@ -150,11 +148,10 @@ function StorageUpdateState({ setView }) {
               onConfirm: () => {
                 resetForm();
                 if (fetchStorageData) fetchStorageData();
-                setView("list"); // 수정 후 리스트 보기
+                setStorageMenu("list"); // 수정 후 리스트 보기
               },
             });
           } else {
-            console.log("수정 요청 실패-->", res.status);
             const errorData = await res.json();
             openAlert({
               title: "Again",
@@ -176,27 +173,10 @@ function StorageUpdateState({ setView }) {
       <form className={styleStorage.updateForm} onSubmit={handelSubmit}>
         <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
           <h3 className={styleStorage.modifyHeading}>창고</h3>
-          <div className={styleStorage.storageBtnWrap}>
-            {storageList.map((item) => (
-              <div key={item.storageSn}>
-                <label
-                  htmlFor={`storage${item.storageNm}`}
-                  className={`${styleStorage.btnStorage} ${selectedStorage === item.storageSn ? styleStorage.selected : ""}`}
-                >
-                  {item.storageNm}동
-                </label>
-                <input
-                  type="radio"
-                  name="storage"
-                  value={item.storageSn}
-                  checked={selectedStorage === item.storageSn}
-                  id={`storage${item.storageNm}`}
-                  className={styleStorage.modifyRadio}
-                  onChange={handleSelectStorage}
-                />
-              </div>
-            ))}
-          </div>
+          <StorageSelector
+            selectedStorage={selectedStorage}
+            setSelectedStorage={setSelectedStorage}
+          />
         </div>
 
         <div>
@@ -216,23 +196,13 @@ function StorageUpdateState({ setView }) {
                   </option>
                 ))}
               </select>
-
-              <label
-                htmlFor="disabledZone"
-                className={`${styleStorage.disableButton} 
-                                                ${disableValues.disabledZone ? styleStorage.disable : ""}`}
-              >
-                <div className={styleStorage.disableText}>
-                  {disableValues.disabledZone ? "비활성화" : "활성화"}
-                </div>
-                <input
-                  type="checkbox"
-                  name="disabledZone"
-                  checked={disableValues.disabledZone}
-                  onChange={handleDisabledChange}
-                  id="disabledZone"
-                />
-              </label>
+              <ToggleSwitch
+                id={"disabledZone"}
+                name={"disabledZone"}
+                onChange={handleDisabledChange}
+                labelOn={"비활성화"}
+                labelOff={"활성화"}
+              />
             </div>
           </div>
           <div className={`${styleStorage.contentRow} ${styleStorage.row3}`}>
@@ -252,23 +222,13 @@ function StorageUpdateState({ setView }) {
                     </option>
                   ))}
                 </select>
-
-                <label
-                  htmlFor="disabledRack"
-                  className={`${styleStorage.disableButton} 
-                                                    ${disableValues.disabledRack ? styleStorage.disable : ""}`}
-                >
-                  <div className={styleStorage.disableText}>
-                    {disableValues.disabledRack ? "비활성화" : "활성화"}
-                  </div>
-                  <input
-                    type="checkbox"
-                    name="disabledRack"
-                    checked={disableValues.disabledRack}
-                    onChange={handleDisabledChange}
-                    id="disabledRack"
-                  />
-                </label>
+                <ToggleSwitch
+                  id={"disabledRack"}
+                  name={"disabledRack"}
+                  onChange={handleDisabledChange}
+                  labelOn={"비활성화"}
+                  labelOff={"활성화"}
+                />
               </div>
               <div className={styleStorage.statusSelectWrap}>
                 <select

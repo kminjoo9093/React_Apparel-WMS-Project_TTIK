@@ -4,8 +4,9 @@ import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
 import { useOpenAlert } from "../../store/alert";
 import { useStorageContext } from "../../context/StorageProvider";
+import StorageSelector from "../../components/StorageSelector";
 
-function StorageDelete({ setView }) {
+function StorageDelete({ setStorageMenu }) {
   const {storageList, fetchStorageData} = useStorageContext();
 
   const SERVER_URL = serverUrl.SERVER_URL;
@@ -20,10 +21,6 @@ function StorageDelete({ setView }) {
   });
 
   const openAlert = useOpenAlert();
-
-  const handleSelectStorage = (e) => {
-    setSelectedStorage(Number(e.target.value));
-  };
 
   //창고별 구역리스트, 구역별 선반리스트
   const { zoneOptions, rackOptions } = useStorageData(
@@ -118,7 +115,7 @@ function StorageDelete({ setView }) {
               onConfirm: () => {
                 if (fetchStorageData) fetchStorageData();
                 resetForm();
-                setView("list"); // 수정 후 창고 조회 리스트가 보이도록
+                setStorageMenu("list"); // 수정 후 창고 조회 리스트가 보이도록
               },
             });
           } else {
@@ -143,27 +140,10 @@ function StorageDelete({ setView }) {
       <form className={styleStorage.deleteForm} onSubmit={handelSubmit}>
         <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
           <h3 className={styleStorage.modifyHeading}>창고</h3>
-          <div className={styleStorage.storageBtnWrap}>
-            {storageList.map((item) => (
-              <div key={item.storageSn}>
-                <label
-                  htmlFor={`storage${item.storageNm}`}
-                  className={`${styleStorage.btnStorage} ${selectedStorage === item.storageSn ? styleStorage.selected : ""}`}
-                >
-                  {item.storageNm}동
-                </label>
-                <input
-                  type="radio"
-                  name="storage"
-                  value={item.storageSn}
-                  checked={selectedStorage === item.storageSn}
-                  id={`storage${item.storageNm}`}
-                  className={styleStorage.modifyRadio}
-                  onChange={handleSelectStorage}
-                />
-              </div>
-            ))}
-          </div>
+          <StorageSelector
+                      selectedStorage={selectedStorage}
+                      setSelectedStorage={setSelectedStorage}
+                    />
           <label className={styleStorage.checkDelete} htmlFor="deleteStorage">
             <input
               type="checkbox"

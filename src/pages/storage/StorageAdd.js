@@ -4,9 +4,10 @@ import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/useStorageData";
 import { useOpenAlert } from "../../store/alert";
 import { useStorageContext } from "../../context/StorageProvider";
+import StorageSelector from "../../components/StorageSelector";
 
-function StorageAdd({ setView }) {
-  const { storageList, fetchStorageData } = useStorageContext();
+function StorageAdd({ setStorageMenu }) {
+  const { fetchStorageData } = useStorageContext();
 
   const SERVER_URL = serverUrl.SERVER_URL;
   const [selectedStorage, setSelectedStorage] = useState(1); //창고 일련번호
@@ -27,10 +28,6 @@ function StorageAdd({ setView }) {
   const [currentZoneNm, setCurrentZoneNm] = useState(null);
 
   const openAlert = useOpenAlert();
-
-  const handleSelectStorage = (e) => {
-    setSelectedStorage(Number(e.target.value));
-  };
 
   // 선택한 창고 별 구역 옵션 리스트, 구역 별 선반 옵션 리스트
   const { zoneOptions, rackOptions } = useStorageData(
@@ -194,7 +191,7 @@ function StorageAdd({ setView }) {
         resetForm();
         if (fetchStorageData) fetchStorageData();
 
-        setView("list"); //수정 후 창고 조회 리스트가 보이도록
+        setStorageMenu("list"); //수정 후 창고 조회 리스트가 보이도록
       } else {
         const errorData = await res.json();
         openAlert({
@@ -212,27 +209,10 @@ function StorageAdd({ setView }) {
       <form className={styleStorage.addForm} onSubmit={handelSubmit}>
         <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
           <h3 className={styleStorage.modifyHeading}>창고</h3>
-          <div className={styleStorage.storageBtnWrap}>
-            {storageList.map((item) => (
-              <div key={item.storageSn}>
-                <label
-                  htmlFor={`storage${item.storageNm}`}
-                  className={`${styleStorage.btnStorage} ${selectedStorage === item.storageSn ? styleStorage.selected : ""}`}
-                >
-                  {item.storageNm}동
-                </label>
-                <input
-                  type="radio"
-                  name="storage"
-                  value={item.storageSn}
-                  checked={selectedStorage === item.storageSn}
-                  id={`storage${item.storageNm}`}
-                  className={styleStorage.modifyRadio}
-                  onChange={handleSelectStorage}
-                />
-              </div>
-            ))}
-          </div>
+          <StorageSelector
+            selectedStorage={selectedStorage}
+            setSelectedStorage={setSelectedStorage}
+          />
         </div>
 
         <div className={`${styleStorage.contentRow} ${styleStorage.row2}`}>
