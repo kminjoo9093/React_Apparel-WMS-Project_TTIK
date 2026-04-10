@@ -1,13 +1,13 @@
 import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
-import useStorageData from "../../hooks/useStorageData";
+import useStorageData from "../../hooks/storage/useStorageData";
 import { useOpenAlert } from "../../store/alert";
 import { useStorageContext } from "../../context/StorageProvider";
 import StorageSelector from "../../components/StorageSelector";
 
 function StorageDelete({ setStorageMenu }) {
-  const {storageList, fetchStorageData} = useStorageContext();
+  const { storageList, fetchStorageData } = useStorageContext();
 
   const SERVER_URL = serverUrl.SERVER_URL;
   const [selectedStorage, setSelectedStorage] = useState(1); //창고 일련번호
@@ -141,9 +141,9 @@ function StorageDelete({ setStorageMenu }) {
         <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
           <h3 className={styleStorage.modifyHeading}>창고</h3>
           <StorageSelector
-                      selectedStorage={selectedStorage}
-                      setSelectedStorage={setSelectedStorage}
-                    />
+            selectedStorage={selectedStorage}
+            setSelectedStorage={setSelectedStorage}
+          />
           <label className={styleStorage.checkDelete} htmlFor="deleteStorage">
             <input
               type="checkbox"

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import serverUrl from "../../db/server.json";
-import useStorageData from "../../hooks/useStorageData";
+import useStorageData from "../../hooks/storage/useStorageData";
 import { useOpenAlert } from "../../store/alert";
 import { useStorageContext } from "../../context/StorageProvider";
 import StorageSelector from "../../components/StorageSelector";
