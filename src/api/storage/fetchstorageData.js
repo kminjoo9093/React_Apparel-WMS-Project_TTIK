@@ -27,8 +27,24 @@ export async function registerStorage(submitData) {
     headers: { "Content-type": "application/json" },
     body: JSON.stringify(submitData),
   });
-  if(!res.ok) throw new Error('register new storage failed');
+  if (!res.ok) throw new Error("register new storage failed");
 
   const data = await res.json();
+  return data;
+}
+
+//창고 정보 수정
+export async function updateStorageState(storageModifyReq) {
+  const url = `${STORAGE_BASE}/modify`;
+  const res = await fetch(url, {
+    method: "PUT",
+    credentials: "include",
+    headers: { "Content-type": "application/json" },
+    body: JSON.stringify(storageModifyReq),
+  });
+  const data = await res.json();
+
+  if(!res.ok) throw new Error(data.message);
+  
   return data;
 }

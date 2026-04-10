@@ -25,7 +25,7 @@ const storageMenuConfig = [
 ];
 
 function Storage() {
-  const [view, setView] = useState("list");
+  const [storageMenu, setStorageMenu] = useState("list");
 
   return (
     <div className={styleStorage.storage}>
@@ -42,8 +42,8 @@ function Storage() {
                   return (
                     <li
                       key={item.id}
-                      onClick={() => setView(item.id)}
-                      className={`${view === item.id ? styleStorage.selected : ""} ${styleStorage.menu} ${item.className}`}
+                      onClick={() => setStorageMenu(item.id)}
+                      className={`${storageMenu === item.id ? styleStorage.selected : ""} ${styleStorage.menu} ${item.className}`}
                     >
                       {item.text}
                     </li>
@@ -54,9 +54,9 @@ function Storage() {
           </aside>
 
           <section className={styleStorage.mainContentWrap}>
-            {view === "register" && <StorageRegister setView={setView} />}
-            {view === "modify" && <StorageModify setView={setView} />}
-            {view === "list" && <RackList setView={setView} />}
+            {storageMenu === "register" && <StorageRegister setView={setStorageMenu} />}
+            {storageMenu === "modify" && <StorageModify setView={setStorageMenu} />}
+            {storageMenu === "list" && <RackList setView={setStorageMenu} />}
           </section>
         </div>
       </div>
