@@ -104,7 +104,7 @@ function ProductRegister() {
     }
 
     try {
-      const res = await registerProduct({
+      await registerProduct({
         productCd: productCd,
         styleNo: formData.styleNo,
         productNm: formData.productNm,

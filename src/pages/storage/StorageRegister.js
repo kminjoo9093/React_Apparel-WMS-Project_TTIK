@@ -2,18 +2,21 @@ import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import styleRegister from "../../css/ProductRegister.module.css";
 import { useNavigate } from "react-router-dom";
-import serverUrl from "../../db/server.json";
 import { checkNumber } from "../../utils/validation/numbers";
 import { useOpenAlert } from "../../store/alert";
 import { useStorageContext } from "../../context/StorageProvider";
+import { CommonButton } from "../../components/CommonButton";
+import { registerStorage } from "../../api/storage/fetchStorageData";
 
 function StorageRegister() {
   const navigate = useNavigate();
-  const SERVER_URL = serverUrl.SERVER_URL;
   const { storageList } = useStorageContext();
   const [storageNm, setStorageNm] = useState("");
   const [zoneList, setZoneList] = useState([{ zone: 1, rack: "" }]);
   const openAlert = useOpenAlert();
+  // 숫자 입력 유효성 검사
+  const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleAddBtn = () => {
     setZoneList((prev) => {
@@ -27,10 +30,6 @@ function StorageRegister() {
       prev.filter((item, index) => index !== indexToRemove),
     );
   };
-
-  // 숫자 입력 유효성 검사 - 선반 층수
-  const [error, setError] = useState(false); //선반 층수
-  const [errorMsg, setErrorMsg] = useState("");
 
   const validateNumber = (e, rackNo) => {
     const value = e.target.value;
@@ -46,63 +45,35 @@ function StorageRegister() {
     setErrorMsg(message);
   };
 
+  const validateStorageName = (value, storageList) => {
+    if (!value) {
+      return "창고명을 입력해주세요";
+    }
+
+    const parsedValue = value.includes("동")
+      ? value.split("동").join("")
+      : value;
+    const isAlphabet = (v) => v >= "A" && v <= "Z";
+
+    if (parsedValue.length > 1 || !isAlphabet(value)) {
+      return "창고명을 다시 입력해주세요";
+    }
+
+    const existStorage = storageList.some((item) => item.storageNm === value);
+
+    if (existStorage) {
+      return "이미 등록된 창고입니다.";
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let value = storageNm;
-
-    console.log(value);
-    //창고명 입력하지 않은 경우
-    if (!value) {
+    const errorMessage = validateStorageName(storageNm, storageList);
+    if (errorMessage) {
       openAlert({
         title: "Again",
-        message: "창고명을 입력해주세요",
-      });
-      return;
-    }
-
-    //창고명에 동이 포함된 경우 파싱
-    if (value.includes("동")) {
-      console.log("파싱");
-      value = value.split("동").join("");
-    }
-
-    const adminCreate = () => {
-      openAlert({
-        title: "Success",
-        message: (
-          <>
-            등록이 완료되었습니다.
-            <br />
-            관리자/모니터 등록을 진행해 주세요
-          </>
-        ),
-        onConfirm: () => {
-          navigate("/register/admin");
-        },
-      });
-    };
-
-    //알파벳이 맞는지 확인, 자릿수 확인
-    const isAlphabet = (value) => value >= "A" && value <= "Z";
-
-    if (value.length > 1 || !isAlphabet(value)) {
-      openAlert({
-        title: "Again",
-        message: "창고명을 다시 입력해주세요",
-      });
-      return;
-    }
-
-    //창고명 존재 여부 검사
-    const hasStorage = storageList.some(
-      (storage) => storage.storageNm === storageNm,
-    );
-
-    if (hasStorage) {
-      openAlert({
-        title: "Again",
-        message: "이미 등록된 창고입니다.",
+        message: errorMessage,
       });
       return;
     }
@@ -116,38 +87,29 @@ function StorageRegister() {
       })),
     };
 
-    console.log(submitData);
-
     try {
-      const res = await fetch(`${SERVER_URL}/ttik/storage/register`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify(submitData),
+      await registerStorage(submitData);
+
+      setStorageNm("");
+      setZoneList([{ zone: 1, rack: "" }]);
+      openAlert({
+        title: "Success",
+        message: (
+          <>
+            등록이 완료되었습니다.
+            <br />
+            관리자/모니터 등록을 진행해 주세요
+          </>
+        ),
+        onConfirm: () => {
+          navigate("/register/admin");
+        },
       });
-
-      console.log("응답 상태 코드:", res.status); // 상태 코드 확인
-
-      if (res.ok) {
-        console.log("성공 블록 진입");
-
-        // 폼 초기화
-        setStorageNm("");
-        setZoneList([{ zone: 1, rack: "" }]);
-
-        // 알림 띄우기
-        adminCreate();
-
-        //const data = await res.json(); post일땐 빈 객체 (200ok)를 보내서 데이터가 비어있음 -> 파싱오류
-      } else {
-        const errText = await res.text(); // 실패 원인 파악용
-        openAlert({
-          title: "Error",
-          message: "등록에 실패했습니다.",
-        });
-      }
     } catch (error) {
-      console.log(error);
+      openAlert({
+        title: "Error",
+        message: "등록에 실패했습니다.",
+      });
     }
   };
 
@@ -229,12 +191,9 @@ function StorageRegister() {
           ></button>
         </div>
         <div className={styleStorage.btnSubmitWrap}>
-          <button
-            type="submit"
-            className={`${styleStorage.btnRegister} btnSubmit`}
-          >
+          <CommonButton variant="primary" type="submit">
             등록
-          </button>
+          </CommonButton>
         </div>
       </form>
     </>

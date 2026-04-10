@@ -8,7 +8,7 @@ import RackDetailModal from "./RackDetailModal";
 import {
   getRackDetailInfo,
   getRackListData,
-} from "../../api/storage/fetchStorageData";
+} from "../../api/storage/fetchRackData";
 
 function RackList() {
   const { storageList } = useStorageContext();

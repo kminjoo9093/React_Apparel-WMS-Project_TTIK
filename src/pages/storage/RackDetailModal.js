@@ -3,10 +3,8 @@ import styleModal from "../../css/Modal.module.css";
 import styleStorage from "../../css/Storage.module.css";
 import { CommonButton } from "../../components/CommonButton";
 import { useOpenAlert } from "../../store/alert";
-import {
-  getRackListData,
-  updateBoxLocation,
-} from "../../api/storage/fetchStorageData";
+import { getRackListData } from "../../api/storage/fetchRackData";
+import { updateBoxLocation } from "../../api/storage/fetchBoxesData";
 
 export default function RackDetailModal({
   selectedRack,
@@ -64,8 +62,8 @@ export default function RackDetailModal({
             title: "Success",
             message: "모든 박스의 위치 변경 및 이력 등록이 완료되었습니다.",
             onConfirm: () => {
-              onCloseModal(); // 위치 수정 모달 닫기
-              getRackListData(); // 리스트 새로고침
+              onCloseModal();
+              getRackListData();
             },
           });
         } catch (error) {
