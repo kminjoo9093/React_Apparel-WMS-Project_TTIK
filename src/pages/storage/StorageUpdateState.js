@@ -7,12 +7,11 @@ import StorageSelector from "../../components/StorageSelector";
 import ToggleSwitch from "../../components/ToggleSwitch";
 import { updateStorageState } from "../../api/storage/fetchStorageData";
 import { getCheckMessage } from "../../utils/storage/getCheckMessage";
-import {useStorageToggle} from "../../hooks/storage/useStorageToggle";
+import { useStorageToggle } from "../../hooks/storage/useStorageToggle";
 
 function StorageUpdateState({ setStorageMenu }) {
   const { fetchStorageData } = useStorageContext();
 
-  // const SERVER_URL = serverUrl.SERVER_URL;
   const [selectedStorage, setSelectedStorage] = useState(1); //창고 일련번호
   const [selectedZone, setSelectedZone] = useState(""); //구역 일련번호
   const [selectedRack, setSelectedRack] = useState(""); //선반 일련번호
@@ -28,7 +27,7 @@ function StorageUpdateState({ setStorageMenu }) {
     selectedZone,
   );
 
-  const resetZoneState = () => {
+  const resetRackInfo = () => {
     setSelectedRack("");
     setRackCapacity("");
     setRackEnabled("");
@@ -39,41 +38,24 @@ function StorageUpdateState({ setStorageMenu }) {
     setRackEnabled("");
   };
 
-  const {disableValues, setDisableValues, handleToggle} = useStorageToggle({resetZoneState, resetRackState});
+  const { disableValues, setDisableValues, handleToggle } = useStorageToggle({
+    resetRackInfo,
+    resetRackState,
+  });
 
   const resetForm = () => {
     // 선택 데이터 초기화
     setSelectedStorage(1);
     setSelectedZone("");
-    setSelectedRack("");
-
-    // 입력 필드 초기화
-    setRackCapacity("");
-    setRackEnabled("");
-
+    resetRackInfo();
     setDisableValues({
-      disabledZone: false,
-      disabledRack: false,
+      isDisabledZone: false,
+      isDisabledRack: false,
     });
   };
 
-  // 창고 정보 수정 서버 요청
-  const handelSubmit = async (e) => {
-    e.preventDefault();
-
-    // 선반 선택을 하고, 비활성화가 아닌경우 적재 상태를 선택해야하도록
-    if (selectedRack !== "" && !disableValues.isDisabledRack) {
-      if (rackCapacity === "") {
-        openAlert({
-          title: "Again",
-          message: "선반 적재 상태를 선택하세요.",
-        });
-        return;
-      }
-    }
-
-    // 창고 정보 수정 파라미터
-    const storageModifyReq = {
+  const createPayload = () => {
+    return {
       storageSn: selectedStorage,
       zoneSn: selectedZone,
       isDisabledZone: disableValues.isDisabledZone,
@@ -82,8 +64,37 @@ function StorageUpdateState({ setStorageMenu }) {
       rackEnabled: disableValues.isDisabledRack ? "N" : "Y",
       rackStts: disableValues.isDisabledRack ? "Y" : rackCapacity || "N",
     };
+  };
 
-    let checkMessage = getCheckMessage();
+  const validateForm = () => {
+    if (selectedRack !== "" && !disableValues.isDisabledRack) {
+      if (rackCapacity === "") {
+        openAlert({
+          title: "Again",
+          message: "선반 적재 상태를 선택하세요.",
+        });
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // 창고 정보 수정 서버 요청
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+
+    if(!validateForm()) return;
+
+    // 창고 정보 수정 파라미터
+    const storageModifyReq = createPayload();
+
+    let checkMessage = getCheckMessage(
+      rackCapacity,
+      selectedZone,
+      selectedRack,
+      disableValues,
+    );
 
     openAlert({
       title: "Modify",
@@ -97,7 +108,7 @@ function StorageUpdateState({ setStorageMenu }) {
             onConfirm: () => {
               resetForm();
               if (fetchStorageData) fetchStorageData();
-              setStorageMenu("list"); // 수정 후 리스트 보기
+              setStorageMenu("list"); 
             },
           });
         } catch (error) {
@@ -119,7 +130,7 @@ function StorageUpdateState({ setStorageMenu }) {
 
   return (
     <>
-      <form className={styleStorage.updateForm} onSubmit={handelSubmit}>
+      <form className={styleStorage.updateForm} onSubmit={handleSubmit}>
         <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
           <h3 className={styleStorage.modifyHeading}>창고</h3>
           <StorageSelector
@@ -149,7 +160,7 @@ function StorageUpdateState({ setStorageMenu }) {
                 id={"disabledZone"}
                 name={"disabledZone"}
                 checked={disableValues.isDisabledZone}
-                onChange={handleToggle}
+                onChange={(e) => handleToggle(e, selectedZone, selectedRack)}
                 labelOn={"비활성화"}
                 labelOff={"활성화"}
               />
@@ -162,7 +173,7 @@ function StorageUpdateState({ setStorageMenu }) {
                 <select
                   name="rack"
                   value={selectedRack || ""}
-                  disabled={!selectedZone || disableValues.disabledZone}
+                  disabled={!selectedZone || disableValues.isDisabledZone}
                   onChange={(e) => setSelectedRack(Number(e.target.value))}
                 >
                   <option value="">선반 선택</option>
@@ -176,7 +187,7 @@ function StorageUpdateState({ setStorageMenu }) {
                   id={"disabledRack"}
                   name={"disabledRack"}
                   checked={disableValues.isDisabledRack}
-                  onChange={handleToggle}
+                  onChange={(e) => handleToggle(e, selectedZone, selectedRack)}
                   labelOn={"비활성화"}
                   labelOff={"활성화"}
                 />

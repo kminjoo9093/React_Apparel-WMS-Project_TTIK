@@ -1,7 +1,7 @@
 import { useOpenAlert } from "../../store/alert";
 import { useState } from "react";
 
-export const useStorageToggle = ({ resetZoneState, resetRackState }) => {
+export const useStorageToggle = ({ resetRackInfo, resetRackState }) => {
   const [disableValues, setDisableValues] = useState({
     isDisabledZone: false,
     isDisabledRack: false,
@@ -34,7 +34,7 @@ export const useStorageToggle = ({ resetZoneState, resetRackState }) => {
 
     //구역 비활성화 -> 선반 관련 상태 초기화
     if (name === "disabledZone" && checked) {
-      resetZoneState?.();
+      resetRackInfo?.();
     }
 
     //선반 비활성화 -> 선반 재고 상태 초기화
