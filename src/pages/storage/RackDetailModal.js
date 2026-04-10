@@ -3,17 +3,13 @@ import styleModal from "../../css/Modal.module.css";
 import styleStorage from "../../css/Storage.module.css";
 import { CommonButton } from "../../components/CommonButton";
 import { useOpenAlert } from "../../store/alert";
-import {
-  getRackListData,
-  updateBoxLocation,
-} from "../../api/storage/fetchstorageData";
+import { getRackListData } from "../../api/storage/fetchRackData";
+import { updateBoxLocation } from "../../api/storage/fetchBoxesData";
 
 export default function RackDetailModal({
-  boxCount,
   selectedRack,
   rackDetailList,
   setRackDetailList,
-  detailRackNm,
   onCloseModal,
 }) {
   const openAlert = useOpenAlert();
@@ -66,8 +62,8 @@ export default function RackDetailModal({
             title: "Success",
             message: "모든 박스의 위치 변경 및 이력 등록이 완료되었습니다.",
             onConfirm: () => {
-              onCloseModal(); // 위치 수정 모달 닫기
-              getRackListData(); // 리스트 새로고침
+              onCloseModal();
+              getRackListData();
             },
           });
         } catch (error) {
@@ -89,8 +85,8 @@ export default function RackDetailModal({
           style={{ alignItems: "stretch" }}
         >
           <h3 className={styleStorage.rackHeading}>
-            Rack : {detailRackNm}
-            <span> (수량 : {boxCount}개) </span>
+            Rack : {rackDetailList.rackNm}
+            <span> (수량 : {rackDetailList.boxQty}개) </span>
           </h3>
           <div className={styleStorage.modalTableArea}>
             <table className={styleStorage.storageTable}>
@@ -111,7 +107,7 @@ export default function RackDetailModal({
                         <td>{index + 1}</td>
                         <td>{box.boxQr}</td>
                         <td>{box.productNm}</td>
-                        <td>{detailRackNm}</td>
+                        <td>{box.rackNm}</td>
                         <td>
                           <select
                             name="newLoc"

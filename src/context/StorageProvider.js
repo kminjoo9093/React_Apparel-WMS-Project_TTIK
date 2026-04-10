@@ -1,4 +1,4 @@
-import { getStorageData } from "../api/storage/fetchstorageData";
+import { getStorageData } from "../api/storage/fetchStorageData";
 import { createContext, useState, useContext, useEffect } from "react";
 import { useOpenAlert } from "../store/alert";
 
