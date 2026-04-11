@@ -7,7 +7,6 @@ export function getCheckMessage({
   let message = "수정을 진행하시겠습니까?";
   const newRackStatus = rackCapacity === "Y" ? "여유" : "포화";
 
-  // 조건별 메시지 생성 로직 (기존 로직 유지)
   if (selectedZone && !disableValues.isDisabledZone && !selectedRack) {
     message = `해당 구역을 활성화 상태로 수정하시겠습니까?`;
   } else if (selectedZone && selectedRack) {
