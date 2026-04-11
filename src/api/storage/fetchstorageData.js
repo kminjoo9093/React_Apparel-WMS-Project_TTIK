@@ -44,7 +44,21 @@ export async function updateStorageState(storageModifyReq) {
   });
   const data = await res.json();
 
+  if (!res.ok) throw new Error(data.message);
+
+  return data;
+}
+
+// 구역/선반 추가
+export async function addStorageStructure(payload) {
+  const url = `${STORAGE_BASE}/add`;
+  const res = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
   if(!res.ok) throw new Error(data.message);
-  
   return data;
 }

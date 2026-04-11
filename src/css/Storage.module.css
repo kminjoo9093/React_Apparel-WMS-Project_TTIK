@@ -370,7 +370,7 @@
     margin-top: 2rem;
 }
 
-.checkDelete, .addZone{
+.delete, .add{
     font-size: 1.4rem;
     font-weight: 600;
     color: #fff;
@@ -378,7 +378,7 @@
     padding: 0.8rem 1.5rem;
     border-radius: 100px;
 }
-.checkDelete{
+.delete{
     background-color: var(--red-ff);
     text-wrap: nowrap;
     width: 8rem;
@@ -399,12 +399,12 @@
     color: var(--gray-64);
 }
 
-.addZone{
+.add{
     background-color: var(--primary-color);
 }
 
-.checkDelete input[type="checkbox"], 
-.addZone input[type="checkbox"]{
+.delete input[type="checkbox"], 
+.add input[type="checkbox"]{
     width: 1.5rem;
     height: auto;
     aspect-ratio: 1;
@@ -563,7 +563,7 @@
     .selectWrap{
         width: 100%;
     }
-    .deleteForm .row1 .checkDelete{
+    .deleteForm .row1 .delete{
         align-self: flex-end;
     }
 

@@ -5,6 +5,7 @@ import useStorageData from "../../hooks/storage/useStorageData";
 import { useOpenAlert } from "../../store/alert";
 import { useStorageContext } from "../../context/StorageProvider";
 import StorageSelector from "../../components/StorageSelector";
+import CheckButton from "../../components/CheckButton";
 
 function StorageDelete({ setStorageMenu }) {
   const { storageList, fetchStorageData } = useStorageContext();
@@ -80,7 +81,7 @@ function StorageDelete({ setStorageMenu }) {
       return;
     }
 
-    // 창고 삭제시 관련 관리자 삭제를 위한 데이터 준비
+    // 창고 삭제시 관련 관리자 삭제를 위한 데이터 준비 - 김윤중
     const currentStorageNm = storageList.find(
       (s) => s.storageSn === selectedStorage,
     )?.storageNm;
@@ -144,16 +145,14 @@ function StorageDelete({ setStorageMenu }) {
             selectedStorage={selectedStorage}
             setSelectedStorage={setSelectedStorage}
           />
-          <label className={styleStorage.checkDelete} htmlFor="deleteStorage">
-            <input
-              type="checkbox"
-              name="deleteStorage"
-              checked={isCheckedDelete.deleteStorage}
-              onChange={handleCheckChange}
-              id="deleteStorage"
-            />
-            삭제
-          </label>
+          <CheckButton
+            type={"delete"}
+            id={"deleteStorage"}
+            name={"deleteStorage"}
+            checked={isCheckedDelete.deleteStorage}
+            onChange={handleCheckChange}
+            label={"삭제"}
+          />
         </div>
 
         <div>
@@ -174,16 +173,14 @@ function StorageDelete({ setStorageMenu }) {
                   </option>
                 ))}
               </select>
-              <label className={styleStorage.checkDelete} htmlFor="deleteZone">
-                <input
-                  type="checkbox"
-                  name="deleteZone"
-                  checked={isCheckedDelete.deleteZone}
-                  onChange={handleCheckChange}
-                  id="deleteZone"
-                />
-                삭제
-              </label>
+              <CheckButton
+                type={"delete"}
+                id={"deleteZone"}
+                name={"deleteZone"}
+                checked={isCheckedDelete.deleteZone}
+                onChange={handleCheckChange}
+                label={"삭제"}
+              />
             </div>
           </div>
           <div className={`${styleStorage.contentRow} ${styleStorage.row3}`}>
@@ -205,19 +202,14 @@ function StorageDelete({ setStorageMenu }) {
                     </option>
                   ))}
                 </select>
-                <label
-                  className={styleStorage.checkDelete}
-                  htmlFor="deleteRack"
-                >
-                  <input
-                    type="checkbox"
-                    name="deleteRack"
-                    checked={isCheckedDelete.deleteRack}
-                    onChange={handleCheckChange}
-                    id="deleteRack"
-                  />
-                  삭제
-                </label>
+                <CheckButton
+                  type={"delete"}
+                  id={"deleteRack"}
+                  name={"deleteRack"}
+                  checked={isCheckedDelete.deleteRack}
+                  onChange={handleCheckChange}
+                  label={"삭제"}
+                />
               </div>
             </div>
           </div>
