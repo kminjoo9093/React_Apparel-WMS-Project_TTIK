@@ -31,21 +31,21 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 ## 기여한 부분
 
 
-#### **상품 등록 페이지 개발** &emsp; [ 코드 보기 → ](./src/pages/product/ProductRegister.js)
+#### **상품 등록 페이지 개발** &emsp; 
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계**
-- children 기반의 재사용 가능한 **공통 Modal 컴포넌트** 설계 &emsp; [ 관련 코드 바로가기 → ](./src/components/RegistModalFrame.js)
+- [children 기반의 재사용 가능한 **공통 Modal 컴포넌트** 설계](./src/components/RegistModalFrame.js)
     - 브랜드, 시즌, 상품코드 모달에 활용
-- [Context API를 활용하여 브랜드, 시즌, 카테고리 데이터를 전역 상태 관리](./src/store/productModal.js)
-- Zustand를 활용한 상품 등록 폼 상태 관리로 컴포넌트 간 상태 공유 및 관리 단순화
+- [Context API를 활용하여 브랜드, 시즌, 카테고리 데이터를 전역 상태 관리](./src/context/ProductDataProvider.js)
+- [Zustand를 활용한 상품 등록 폼 상태 관리로 컴포넌트 간 상태 공유 및 관리 단순화](./src/store/product.js)
 - 입력값 유효성 검증 (숫자, 자릿수, 알파벳)
 - 비동기 API 요청 및 실패 응답에 대한 예외 처리 로직 구현
 
 <br>
 
-#### **상품 목록 페이지 개발**  &emsp; [ 코드 보기 → ](./src/pages/product/ProductList.js)
+#### **상품 목록 페이지 개발**  &emsp; 
 - API 연동으로 상품 조회 및 재고 상태 확인<br>
 - 필터링 및 검색어 기반 상품 검색<br>
-- 디바이스 환경 기반 **데이터 목록 조회 전략 분리** 구현  <br>
+- [ 디바이스 환경 기반 **데이터 목록 조회 전략 분리** 구현](./src/pages/product/ProductList.js)<br>
 PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 - 컬러 활용한 상태 구분으로 정보의 직관성 높임 : 입고 대기, 부족, 정상<Br>
 
@@ -53,9 +53,9 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 
 #### 창고 관리 페이지 개발   &emsp; [ 코드 보기 → ](./src/pages/storage/)
 - 창고 정보 수정(등록, 구조 수정, 삭제) 및 선반 정보 조회와 재고 위치 변경 기능 구현
-- 다수의 재고 위치 변경 시 Promise.all 활용한 병렬 처리로
+- [다수의 재고 위치 변경 시 Promise.all 활용한 병렬 처리](./src/pages/storage/RackDetailModal.js)
 - 구역 미선택 시 선반 비활성화 등 사용자 입력 흐름을 고려한 조건 기반 UI 제어 구현
-- **컨텍스트 인식형 입력 가이드** 구현 &emsp; [ 관련 코드 바로가기 → ](./src/pages/storage/StorageAdd.js#L38-L51)
+- **컨텍스트 인식형 입력 가이드** 구현 &emsp; [ 관련 코드 바로가기 → ](./src/pages/storage/StorageAdd.js)
     - 창고 관리의 구역/선반 추가 시 **현재 최댓값 및 상태 정보 실시간 조회하여 정보 제공**으로 오류 차단
 - 현장 상황과 데이터의 일치를 고려한 **예외 처리**
     - 적재 상품 존재 시 창고/구역/선반 삭제 불가
@@ -75,7 +75,7 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
     - **품번(성별 식별자+3자리 숫자) 도입**으로 상품 코드 구조 재설계 &emsp; <br>
       →  (브랜드 코드 + 시즌 코드) - (카테고리 코드 + 사이즈 코드) - 품번
     - 표준화가 어려운 컬러 정보를 품번 내에 반영하도록 설계하여 관리 유연성 확보
-    - 데이터 적재 전 **상품 코드 중복 여부 체크**로 검증 로직 강화 &emsp; [ 관련 코드 바로가기 → ](./src/pages/product/ProductCode.js#L17-L48)
+    - [ 데이터 적재 전 **상품 코드 중복 여부 체크**로 검증 로직 강화 ](./src/pages/product/ProductCodeModal.js)
     
 - **결과**
     - 모든 등록 상품에 대해 **100% 고유 식별 가능**한 체계를 구축
@@ -89,9 +89,9 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
     하나의 컴포넌트에 모든 로직이 집중되어 코드 복잡도 증가 및 유지보수 어려움 발생
     
 - **해결**
-    - 구역/선반의 활성화 상태 변경 로직을 커스텀 훅(useStorageToggle)으로 분리하고
+    - [구역/선반의 활성화 상태 변경 로직을 커스텀 훅(useStorageToggle)으로 분리](./src/hooks/storage/useStorageToggle.js)하고
       상태 초기화 로직(resetRackInfo, resetRackState)을 외부에서 주입받도록 설계
-    - 창고 상태와 선택 조건에 따른 확인 메시지 생성 로직을 getCheckMessage 함수로 분리
+    - 창고 상태와 선택 조건에 따른 [확인 메시지 생성 로직을 getCheckMessage 함수로 분리](./src/utils/storage/getCheckMessage.js)
     
 - **결과**
     - 상태 및 비즈니스 로직을 외부로 분리하여 코드 가독성 향상 및 유지보수성 개선
