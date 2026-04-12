@@ -1,78 +1,64 @@
 import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
-import serverUrl from "../../db/server.json";
 import useStorageData from "../../hooks/storage/useStorageData";
 import { useOpenAlert } from "../../store/alert";
 import { useStorageContext } from "../../context/StorageProvider";
 import StorageSelector from "../../components/StorageSelector";
 import CheckButton from "../../components/CheckButton";
+import { deleteStorageStructure } from "../../api/storage/fetchStorageData";
 
 function StorageDelete({ setStorageMenu }) {
   const { storageList, fetchStorageData } = useStorageContext();
-
-  const SERVER_URL = serverUrl.SERVER_URL;
-  const [selectedStorage, setSelectedStorage] = useState(1); //창고 일련번호
-  const [selectedZone, setSelectedZone] = useState(null); //구역 일련번호
-  const [selectedRack, setSelectedRack] = useState(null); //선반 일련번호
-
-  const [isCheckedDelete, setIsCheckedDelete] = useState({
-    deleteStorage: false, //창고 삭제
-    deleteZone: false, //구역 삭제
-    deleteRack: false, //선반 삭제
-  });
-
+  const initialFormData = {
+    selectedStorage: 1,
+    selectedZone: null,
+    selectedRack: null,
+    //삭제 여부
+    isDeleteStorage: false,
+    isDeleteZone: false,
+    isDeleteRack: false,
+  };
+  const [formData, setFormData] = useState(initialFormData);
   const openAlert = useOpenAlert();
 
   //창고별 구역리스트, 구역별 선반리스트
   const { zoneOptions, rackOptions } = useStorageData(
-    SERVER_URL,
-    selectedStorage,
-    selectedZone,
+    formData.selectedStorage,
+    formData.selectedZone,
   );
 
   const handleCheckChange = (e) => {
     const { name, checked } = e.target;
 
-    setIsCheckedDelete((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
+    setFormData((prev) => {
+      let result = {
+        ...prev,
+        [name]: checked,
+      };
+      if (checked) {
+        if (name === "deleteStorage") {
+          result.selectedZone = null;
+          result.selectedRack = null;
+        }
+      }
 
-    //창고 삭제 선택 -> 구역, 선반, 구역추가 선택상태 초기화
-    if (name === "deleteStorage" && checked) {
-      setSelectedZone(null);
-      setSelectedRack(null);
-    }
+      if (name === "deleteZone") {
+        result.selectedRack = null;
+      }
 
-    //구역 삭제 선택 -> 선반 선택상태 초기화
-    if (name === "deleteZone" && checked) {
-      setSelectedRack(null);
-    }
-  };
-
-  const resetForm = () => {
-    // 1. 선택 데이터 초기화
-    setSelectedStorage(1);
-    setSelectedZone(null);
-    setSelectedRack(null);
-
-    // 2. 체크박스 및 입력 필드 초기화
-    setIsCheckedDelete({
-      deleteStorage: false,
-      deleteZone: false,
-      deleteRack: false,
+      return result;
     });
   };
 
-  // 창고 정보 수정(삭제) 서버 요청
+  const resetForm = () => setFormData(initialFormData);
+
   const handelSubmit = async (e) => {
     e.preventDefault();
 
-    // 삭제 체크가 하나도 없을 경우
     if (
-      !isCheckedDelete.deleteStorage &&
-      !isCheckedDelete.deleteZone &&
-      !isCheckedDelete.deleteRack
+      !formData.isDeleteStorage &&
+      !formData.isDeleteZone &&
+      !formData.isDeleteRack
     ) {
       openAlert({
         title: "",
@@ -83,15 +69,14 @@ function StorageDelete({ setStorageMenu }) {
 
     // 창고 삭제시 관련 관리자 삭제를 위한 데이터 준비 - 김윤중
     const currentStorageNm = storageList.find(
-      (s) => s.storageSn === selectedStorage,
+      (s) => s.storageSn === formData.selectedStorage,
     )?.storageNm;
 
-    // 창고 정보 수정(삭제) 파라미터
     const storageDeleteReq = {
-      storageSn: selectedStorage,
-      zoneSn: selectedZone,
-      rackSn: selectedRack,
-      storageNm: isCheckedDelete.deleteStorage ? currentStorageNm : null,
+      storageSn: formData.selectedStorage,
+      zoneSn: formData.selectedZone,
+      rackSn: formData.selectedRack,
+      storageNm: formData.isDeleteStorage ? currentStorageNm : null,
     };
 
     openAlert({
@@ -99,39 +84,28 @@ function StorageDelete({ setStorageMenu }) {
       message: "삭제를 진행하시겠습니까?",
       onConfirm: async () => {
         try {
-          const res = await fetch(`${SERVER_URL}/ttik/storage/delete`, {
-            method: "DELETE",
-            credentials: "include",
-            headers: { "Content-type": "application/json" },
-            body: JSON.stringify(storageDeleteReq),
+          const data = await deleteStorageStructure(storageDeleteReq);
+          openAlert({
+            title: "Success",
+            message: data.message,
+            onConfirm: () => {
+              if (fetchStorageData) fetchStorageData();
+              resetForm();
+              setStorageMenu("list");
+            },
           });
-
-          if (res.ok) {
-            const data = await res.json();
-
-            // 어떤 구역, 선반을 삭제했는지 안내
-            openAlert({
-              title: "Success",
-              message: data.message,
-              onConfirm: () => {
-                if (fetchStorageData) fetchStorageData();
-                resetForm();
-                setStorageMenu("list"); // 수정 후 창고 조회 리스트가 보이도록
-              },
-            });
-          } else {
-            const errorData = await res.json();
+        } catch (error) {
+          if (error.message) {
             openAlert({
               title: "DELETE",
-              message: errorData.message,
+              message: error.message,
+            });
+          } else {
+            openAlert({
+              title: "Error",
+              message: "서버 통신 중 에러가 발생했습니다.",
             });
           }
-        } catch (error) {
-          console.log("수정 요청 실패", error);
-          openAlert({
-            title: "Error",
-            message: "서버 통신 중 에러가 발생했습니다.",
-          });
         }
       },
     });
@@ -142,14 +116,19 @@ function StorageDelete({ setStorageMenu }) {
         <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
           <h3 className={styleStorage.modifyHeading}>창고</h3>
           <StorageSelector
-            selectedStorage={selectedStorage}
-            setSelectedStorage={setSelectedStorage}
+            selectedStorage={formData.selectedStorage}
+            setSelectedStorage={(value) =>
+              setFormData({
+                ...initialFormData,
+                selectedStorage: value,
+              })
+            }
           />
           <CheckButton
             type={"delete"}
             id={"deleteStorage"}
-            name={"deleteStorage"}
-            checked={isCheckedDelete.deleteStorage}
+            name={"isDeleteStorage"}
+            checked={formData.isDeleteStorage}
             onChange={handleCheckChange}
             label={"삭제"}
           />
@@ -161,10 +140,15 @@ function StorageDelete({ setStorageMenu }) {
             <div className={styleStorage.selectWrap}>
               <select
                 name="zone"
-                value={selectedZone}
+                value={formData.selectedZone}
                 className={styleStorage.modifyZoneSelect}
-                disabled={isCheckedDelete.deleteStorage}
-                onChange={(e) => setSelectedZone(Number(e.target.value))}
+                disabled={formData.isDeleteStorage}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    selectedZone: Number(e.target.value),
+                  }))
+                }
               >
                 <option value="">구역 선택</option>
                 {zoneOptions.map((item) => (
@@ -176,8 +160,8 @@ function StorageDelete({ setStorageMenu }) {
               <CheckButton
                 type={"delete"}
                 id={"deleteZone"}
-                name={"deleteZone"}
-                checked={isCheckedDelete.deleteZone}
+                name={"isDeleteZone"}
+                checked={formData.isDeleteZone}
                 onChange={handleCheckChange}
                 label={"삭제"}
               />
@@ -189,11 +173,14 @@ function StorageDelete({ setStorageMenu }) {
               <div className={styleStorage.selectWrap}>
                 <select
                   name="rack"
-                  value={selectedRack}
-                  disabled={
-                    isCheckedDelete.deleteStorage || isCheckedDelete.deleteZone
+                  value={formData.selectedRack}
+                  disabled={formData.isDeleteStorage || formData.isDeleteZone}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      selectedRack: Number(e.target.value),
+                    }))
                   }
-                  onChange={(e) => setSelectedRack(Number(e.target.value))}
                 >
                   <option value="">선반 선택</option>
                   {rackOptions.map((item) => (
@@ -205,8 +192,8 @@ function StorageDelete({ setStorageMenu }) {
                 <CheckButton
                   type={"delete"}
                   id={"deleteRack"}
-                  name={"deleteRack"}
-                  checked={isCheckedDelete.deleteRack}
+                  name={"isDeleteRack"}
+                  checked={formData.isDeleteRack}
                   onChange={handleCheckChange}
                   label={"삭제"}
                 />

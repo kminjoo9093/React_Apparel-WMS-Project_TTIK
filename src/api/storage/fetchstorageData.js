@@ -59,6 +59,19 @@ export async function addStorageStructure(payload) {
     body: JSON.stringify(payload),
   });
   const data = await res.json();
+  if (!res.ok) throw new Error(data.message);
+  return data;
+}
+
+export async function deleteStorageStructure(payload) {
+  const url = `${STORAGE_BASE}/delete`;
+  const res = await fetch(url, {
+    method: "DELETE",
+    credentials: "include",
+    headers: { "Content-type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
   if(!res.ok) throw new Error(data.message);
   return data;
 }
