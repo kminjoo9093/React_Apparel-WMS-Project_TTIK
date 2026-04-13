@@ -56,7 +56,7 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 - [다수의 재고 위치 변경 시 Promise.all 활용한 병렬 처리](./src/pages/storage/RackDetailModal.js)
 - [선택 상태 및 비활성화 여부에 따라 입력 필드를 동적으로 제어 하여 입력 오류 방지](./src/pages/storage/StorageUpdateState.js#L176)
 - [구역/선반 간 의존 관계를 고려하여 상위 상태 변경 시 하위 상태 자동 초기화하는 로직 설계](./src/hooks/storage/useStorageToggle.js)
-- [해당 창고의 구역/선반 정보를 실시간 조회하여 사용자 입력 가이드를 제공하고 오류를 사전 방지](./src/pages/storage/StorageAdd.js#L266-270)
+- [해당 창고의 구역/선반 정보를 실시간 조회하여 사용자 입력 가이드를 제공하고 오류를 사전 방지](./src/pages/storage/StorageAdd.js#L266-L270)
 - 현장 상황과 데이터의 일치를 고려한 **예외 처리** ( 적재 상품 존재 시 삭제 불가/최상층 선반 삭제 불가 )
 <br>
 
