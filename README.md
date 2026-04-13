@@ -83,11 +83,11 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 
 ### **2. 상태 관리 분리로 컴포넌트 단순화**
 - **문제**
-    - 창고 관리 기능의 구역/선반 선택 상태, 활성/비활성 토글 상태, 적재 상태 값이 서로 영향을 주는 구조로 인해
+    - 창고 관리 기능의 구역/선반 선택 상태, 활성/비활성 토글 상태, 적재 상태 값이 서로 영향을 주는 구조로 인해 <br/>
     하나의 컴포넌트에 모든 로직이 집중되어 코드 복잡도 증가 및 유지보수 어려움 발생
     
 - **해결**
-    - [구역/선반의 활성화 상태 변경 로직을 커스텀 훅(useStorageToggle)으로 분리](./src/hooks/storage/useStorageToggle.js)하고
+    - [구역/선반의 활성화 상태 변경 로직을 커스텀 훅(useStorageToggle)으로 분리](./src/hooks/storage/useStorageToggle.js)하고 <br/>
       상태 초기화 로직(resetRackInfo, resetRackState)을 외부에서 주입받도록 설계
     - 창고 상태와 선택 조건에 따른 [확인 메시지 생성 로직을 getCheckMessage 함수로 분리](./src/utils/storage/getCheckMessage.js)
     
