@@ -24,12 +24,10 @@ function useStorageData(selectedStorage, selectedZone) {
 
         if (res.ok) {
           const zoneData = await res.json();
-          console.log(getZoneData);
 
           setZoneOptions(zoneData);
         }
       } catch (error) {
-        console.log(error);
         return [];
       }
     };

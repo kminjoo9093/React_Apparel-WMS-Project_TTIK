@@ -13,7 +13,7 @@ function StorageAdd({ setStorageMenu }) {
   const openAlert = useOpenAlert();
   const initialFormData = {
     //선택
-    selectedStorage: 1,
+    selectedStorage: null,
     selectedZone: null,
     //추가 여부
     addZone: false,
