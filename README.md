@@ -13,7 +13,6 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 
 ### Tech Skills
-![JavaScript](https://img.shields.io/badge/JavaScript-000000?style=for-the-badge&logo=javascript)
 ![React](https://img.shields.io/badge/React-000000?style=for-the-badge&logo=react)
 ![Java](https://img.shields.io/badge/Java-000000?style=for-the-badge&logo=Java)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-000000?style=for-the-badge&logo=springboot)
@@ -81,7 +80,7 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 
 <br>
 
-### **2. 상태 관리 분리로 컴포넌트 단순화**
+### **2. 상태 및 비즈니스 로직 분리를 통한 컴포넌트 구조 개선 **
 - **문제**
     - 창고 관리 기능의 구역/선반 선택 상태, 활성/비활성 토글 상태, 적재 상태 값이 서로 영향을 주는 구조로 인해 <br/>
     하나의 컴포넌트에 모든 로직이 집중되어 코드 복잡도 증가 및 유지보수 어려움 발생
