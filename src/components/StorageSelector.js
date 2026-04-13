@@ -18,8 +18,6 @@ export default function StorageSelector({
     setSelectedStorage(Number(e.target.value));
   };
 
-  console.log(selectedStorage);
-
   return (
     <div className={styleStorage.storageBtnWrap}>
       {storageList.map((item) => (
