@@ -13,7 +13,7 @@ function StorageAdd({ setStorageMenu }) {
   const openAlert = useOpenAlert();
   const initialFormData = {
     //선택
-    selectedStorage: 1,
+    selectedStorage: null,
     selectedZone: null,
     //추가 여부
     addZone: false,
@@ -263,7 +263,7 @@ function StorageAdd({ setStorageMenu }) {
               >
                 {errorMsg.newZone}
               </p>
-              {formData.addZone && formData.selectedStorage && (
+              {formData.addZone && (
                 <span className={styleStorage.informZoneCount}>
                   현재 해당 창고의 마지막 구역은 {zoneOptions.length} 입니다.
                 </span>

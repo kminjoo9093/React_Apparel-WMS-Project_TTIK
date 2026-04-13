@@ -10,7 +10,7 @@ import { deleteStorageStructure } from "../../api/storage/fetchStorageData";
 function StorageDelete({ setStorageMenu }) {
   const { storageList, fetchStorageData } = useStorageContext();
   const initialFormData = {
-    selectedStorage: 1,
+    selectedStorage: null,
     selectedZone: null,
     selectedRack: null,
     //삭제 여부

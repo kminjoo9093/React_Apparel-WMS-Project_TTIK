@@ -12,9 +12,9 @@ import { useStorageToggle } from "../../hooks/storage/useStorageToggle";
 function StorageUpdateState({ setStorageMenu }) {
   const { fetchStorageData } = useStorageContext();
 
-  const [selectedStorage, setSelectedStorage] = useState(1); //창고 일련번호
-  const [selectedZone, setSelectedZone] = useState(""); //구역 일련번호
-  const [selectedRack, setSelectedRack] = useState(""); //선반 일련번호
+  const [selectedStorage, setSelectedStorage] = useState(null); //창고 일련번호
+  const [selectedZone, setSelectedZone] = useState(null); //구역 일련번호
+  const [selectedRack, setSelectedRack] = useState(null); //선반 일련번호
 
   const [rackEnabled, setRackEnabled] = useState(""); //선반 활성(Y)/비활성(N)
   const [rackCapacity, setRackCapacity] = useState(""); //선반 여유(Y)/포화(N)
