@@ -51,7 +51,7 @@ PC: 페이지네이션 / Mobile: 무한스크롤<Br>
 
 <br>
 
-#### 창고 관리 페이지 개발   &emsp; [ 코드 보기 → ](./src/pages/storage/)
+#### 창고 관리 페이지 개발  
 - 창고 정보 수정(등록, 구조 수정, 삭제) 및 선반 정보 조회와 재고 위치 변경 기능 구현
 - [다수의 재고 위치 변경 시 Promise.all 활용한 병렬 처리](./src/pages/storage/RackDetailModal.js)
 - [선택 상태 및 비활성화 여부에 따라 입력 필드를 동적으로 제어 하여 입력 오류 방지](./src/pages/storage/StorageUpdateState.js#L176)
