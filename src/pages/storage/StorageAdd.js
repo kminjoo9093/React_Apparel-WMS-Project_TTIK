@@ -7,6 +7,7 @@ import StorageSelector from "../../components/StorageSelector";
 import CheckButton from "../../components/CheckButton";
 import { addStorageStructure } from "../../api/storage/fetchStorageData";
 import { checkNumber } from "../../utils/validation/numbers";
+import StorageModifyButton from "../../components/StorageModifyButton";
 
 function StorageAdd({ setStorageMenu }) {
   const { fetchStorageData } = useStorageContext();
@@ -294,6 +295,7 @@ function StorageAdd({ setStorageMenu }) {
             </div>
           </div>
         </div>
+        <StorageModifyButton/>
       </form>
     </>
   );
