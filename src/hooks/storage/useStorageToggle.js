@@ -8,10 +8,12 @@ export const useStorageToggle = ({ resetRackInfo, resetRackState }) => {
   });
   const openAlert = useOpenAlert();
 
-  const handleToggle = (e, selectedZone, selectedRack) => {
+  const handleToggle = (e, selectedZone = null, selectedRack = null) => {
     const { name, checked } = e.target;
 
-    if (name === "disabledZone" && !selectedZone) {
+    console.log("change event test:", selectedZone, selectedRack);
+
+    if (name === "isDisabledZone" && !selectedZone) {
       openAlert({
         title: "Again",
         message: "구역을 먼저 선택해주세요.",
@@ -19,7 +21,7 @@ export const useStorageToggle = ({ resetRackInfo, resetRackState }) => {
       return;
     }
 
-    if (name === "disabledRack" && !selectedRack) {
+    if (name === "isDisabledRack" && !selectedRack) {
       openAlert({
         title: "Again",
         message: "선반을 먼저 선택해주세요.",
@@ -43,5 +45,5 @@ export const useStorageToggle = ({ resetRackInfo, resetRackState }) => {
     }
   };
 
-  return {disableValues, setDisableValues, handleToggle};
+  return { disableValues, setDisableValues, handleToggle };
 };
