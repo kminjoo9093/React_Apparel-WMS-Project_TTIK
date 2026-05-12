@@ -3,7 +3,6 @@ import { useState } from "react";
 import StorageUpdateState from "./StorageUpdateState";
 import StorageAdd from "./StorageAdd";
 import StorageDelete from "./StorageDelete";
-import { CommonButton } from "../../components/CommonButton";
 
 const modifyTypes = [
   { id: "update", type: "상태 수정" },
@@ -35,12 +34,6 @@ function StorageModify({ setStorageMenu }) {
           {modifyType === "update" && <StorageUpdateState setStorageMenu={setStorageMenu} />}
           {modifyType === "add" && <StorageAdd setStorageMenu={setStorageMenu} />}
           {modifyType === "delete" && <StorageDelete setStorageMenu={setStorageMenu} />}
-
-          <div className={styleStorage.btnSubmitWrap}>
-            <CommonButton variant="primary" type="submit">
-              수정
-            </CommonButton>
-          </div>
         </div>
       </div>
     </>

@@ -6,6 +6,7 @@ import { useStorageContext } from "../../context/StorageProvider";
 import StorageSelector from "../../components/StorageSelector";
 import CheckButton from "../../components/CheckButton";
 import { deleteStorageStructure } from "../../api/storage/fetchStorageData";
+import StorageModifyButton from "../../components/StorageModifyButton";
 
 function StorageDelete({ setStorageMenu }) {
   const { storageList, fetchStorageData } = useStorageContext();
@@ -201,6 +202,7 @@ function StorageDelete({ setStorageMenu }) {
             </div>
           </div>
         </div>
+        <StorageModifyButton />
       </form>
     </>
   );

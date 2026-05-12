@@ -8,6 +8,7 @@ import ToggleSwitch from "../../components/ToggleSwitch";
 import { updateStorageState } from "../../api/storage/fetchStorageData";
 import { getCheckMessage } from "../../utils/storage/getCheckMessage";
 import { useStorageToggle } from "../../hooks/storage/useStorageToggle";
+import StorageModifyButton from "../../components/StorageModifyButton";
 
 function StorageUpdateState({ setStorageMenu }) {
   const { fetchStorageData } = useStorageContext();
@@ -211,6 +212,7 @@ function StorageUpdateState({ setStorageMenu }) {
             </div>
           </div>
         </div>
+        <StorageModifyButton/>
       </form>
     </>
   );
