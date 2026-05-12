@@ -207,6 +207,7 @@ function RackList() {
           rackDetailList={rackDetailList}
           setRackDetailList={setRackDetailList}
           onCloseModal={onCloseModal}
+          fetchRackList={fetchRackList}
         />
       )}
     </>

@@ -30,7 +30,7 @@ export const useProductList = () => {
 
       if (isMobile) {
         setHasMore(products.length >= visibleCountMobile);
-              setTotalElements(pages);
+        setTotalElements(pages);
       } else {
         setTotalPages(pages);
         setTotalElements(data.totalElements || 0);
@@ -60,7 +60,7 @@ export const useProductList = () => {
         setProductList((prev) => [...prev, ...nextDataList]);
         setHasMore(nextDataList.length >= visibleCountMobile);
       }
-      //test
+
       setTotalElements(nextDataList.totalElements || 0);
     } catch (error) {
       openAlert({
@@ -69,7 +69,7 @@ export const useProductList = () => {
       });
       return [];
     } finally {
-      setIsLoading(false); // 다시 Observer 작동시키지 위해 로딩 종료
+      setIsLoading(false); 
     }
   };
 

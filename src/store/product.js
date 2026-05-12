@@ -13,12 +13,12 @@ const useProductStore = create((set) => ({
     threshold: "",
   },
   errors: {
-    qty: false, // 박스 입수량
+    inboxQty: false, // 박스 입수량
     price: false, // 단가
     threshold: false, // 임계치
   },
   errorMsg: {
-    qty: "",
+    inboxQty: "",
     price: "",
     threshold: "",
   },
@@ -52,12 +52,12 @@ const useProductStore = create((set) => ({
           threshold: "",
         },
         errors: {
-          qty: false,
+          inboxQty: false,
           price: false,
           threshold: false,
         },
         errorMsg: {
-          qty: "",
+          inboxQty: "",
           price: "",
           threshold: "",
         },

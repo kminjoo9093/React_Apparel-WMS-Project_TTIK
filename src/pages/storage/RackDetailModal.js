@@ -3,7 +3,6 @@ import styleModal from "../../css/Modal.module.css";
 import styleStorage from "../../css/Storage.module.css";
 import { CommonButton } from "../../components/CommonButton";
 import { useOpenAlert } from "../../store/alert";
-import { getRackListData } from "../../api/storage/fetchRackData";
 import { updateBoxLocation } from "../../api/storage/fetchBoxesData";
 
 export default function RackDetailModal({
@@ -11,6 +10,7 @@ export default function RackDetailModal({
   rackDetailList,
   setRackDetailList,
   onCloseModal,
+  fetchRackList,
 }) {
   const openAlert = useOpenAlert();
 
@@ -63,10 +63,12 @@ export default function RackDetailModal({
             message: "모든 박스의 위치 변경 및 이력 등록이 완료되었습니다.",
             onConfirm: () => {
               onCloseModal();
-              getRackListData();
+              fetchRackList();
             },
           });
         } catch (error) {
+          console.log("박스 이동 에러:", error);
+
           openAlert({
             isOpen: true,
             title: "Error",
