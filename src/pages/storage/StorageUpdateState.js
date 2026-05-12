@@ -68,7 +68,7 @@ function StorageUpdateState({ setStorageMenu }) {
   };
 
   const validateForm = () => {
-    if (selectedRack !== "" && !disableValues.isDisabledRack) {
+    if (selectedRack !== null && !disableValues.isDisabledRack) {
       if (rackCapacity === "") {
         openAlert({
           title: "Again",
@@ -83,7 +83,6 @@ function StorageUpdateState({ setStorageMenu }) {
   // 창고 정보 수정 서버 요청
   const handleSubmit = async (e) => {
     e.preventDefault();
-
 
     if(!validateForm()) return;
 
@@ -159,7 +158,7 @@ function StorageUpdateState({ setStorageMenu }) {
               </select>
               <ToggleSwitch
                 id={"disabledZone"}
-                name={"disabledZone"}
+                name={"isDisabledZone"}
                 checked={disableValues.isDisabledZone}
                 onChange={(e) => handleToggle(e, selectedZone, selectedRack)}
                 labelOn={"비활성화"}
@@ -186,7 +185,7 @@ function StorageUpdateState({ setStorageMenu }) {
                 </select>
                 <ToggleSwitch
                   id={"disabledRack"}
-                  name={"disabledRack"}
+                  name={"isDisabledRack"}
                   checked={disableValues.isDisabledRack}
                   onChange={(e) => handleToggle(e, selectedZone, selectedRack)}
                   labelOn={"비활성화"}
