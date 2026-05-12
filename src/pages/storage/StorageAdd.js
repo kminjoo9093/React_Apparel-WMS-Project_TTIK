@@ -42,6 +42,7 @@ function StorageAdd({ setStorageMenu }) {
       if (name === "addRack" && !checked) {
         return {
           ...prev,
+          addRack: false,
           addRackCount: "",
           selectedZone: null,
         };
@@ -50,6 +51,7 @@ function StorageAdd({ setStorageMenu }) {
       if (name === "addZone" && !checked) {
         return {
           ...prev,
+          addZone: false,
           newZone: "",
           rackCountForNewZone: "",
         };
@@ -103,7 +105,7 @@ function StorageAdd({ setStorageMenu }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("구역/선반 추가 요청")
+    console.log("구역/선반 추가 요청");
 
     if (formData.addRack && !formData.selectedZone) {
       return openAlert({ message: "구역을 선택하세요." });
@@ -213,7 +215,7 @@ function StorageAdd({ setStorageMenu }) {
                 type="number"
                 name="addRackCount"
                 value={formData.addRackCount}
-                required
+                required={formData.addRack}
                 min="0"
                 disabled={!formData.addRack}
                 placeholder="추가할 층수 입력"
@@ -254,7 +256,7 @@ function StorageAdd({ setStorageMenu }) {
                 type="number"
                 name="newZone"
                 value={formData.newZone}
-                required
+                required={formData.addZone}
                 min="0"
                 disabled={!formData.addZone}
                 placeholder="구역 번호 입력"
@@ -295,7 +297,7 @@ function StorageAdd({ setStorageMenu }) {
             </div>
           </div>
         </div>
-        <StorageModifyButton/>
+        <StorageModifyButton />
       </form>
     </>
   );
