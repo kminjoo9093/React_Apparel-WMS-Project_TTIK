@@ -96,6 +96,8 @@ function ProductRegister() {
 
     const hasError = Object.values(errors).some((val) => val === true);
     if (hasError) {
+      console.log("에러", errors);
+
       openAlert({
         title: "Again",
         message: "입력값을 확인하세요",
@@ -110,7 +112,7 @@ function ProductRegister() {
         productNm: formData.productNm,
         brandSn: Number(formData.brandCd),
         sizeCd: formData.sizeCd,
-        catCd: formData.brandCd,
+        catCd: formData.category,
         seasonCd: formData.seasonCd,
         inboxQty: Number(formData.inboxQty), //입수량
         price: Number(formData.price), //단가
@@ -121,7 +123,7 @@ function ProductRegister() {
         title: "Success",
         message: "상품 등록이 완료되었습니다.",
         onConfirm: () => {
-          navigate("/product/list"); 
+          navigate("/product/list");
         },
       });
       setFormData({
@@ -138,6 +140,7 @@ function ProductRegister() {
 
       setProductCd("");
     } catch (error) {
+      console.log("catch error : ", error.message);
       openAlert({
         title: "Again",
         message: "입력한 정보를 확인하세요.",

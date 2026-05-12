@@ -12,8 +12,8 @@ export async function updateBoxLocation({ boxQr, oldRack, newRack }) {
     headers: { "Content-type": "application/json" },
     body: JSON.stringify({
       boxQr,
-      oldRack,
-      newRack,
+      oldRack: Number(oldRack),
+      newRack: Number(newRack),
     }),
   });
   if (!res.ok) throw new Error("Error: update box location failed");

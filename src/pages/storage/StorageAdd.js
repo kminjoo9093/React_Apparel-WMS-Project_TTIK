@@ -102,6 +102,8 @@ function StorageAdd({ setStorageMenu }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log("구역/선반 추가 요청")
+
     if (formData.addRack && !formData.selectedZone) {
       return openAlert({ message: "구역을 선택하세요." });
     }
