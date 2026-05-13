@@ -38,10 +38,10 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 <br>
 
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계** <br>
--  [children 기반의 재사용 가능한 **공통 Modal 컴포넌트** 설계](./src/components/RegistModalFrame.js)<br>
+-  children 기반의 재사용 가능한 [**공통 Modal 컴포넌트** 설계](./src/components/RegistModalFrame.js)<br>
     - 브랜드, 시즌, 상품코드 모달에 활용<br>
-- [Context API를 활용하여 브랜드, 시즌, 카테고리 데이터를 전역 상태 관리](./src/context/ProductDataProvider.js)<br>
-- [Zustand를 활용한 상품 등록 폼 상태 관리로 컴포넌트 간 상태 공유 및 관리 단순화](./src/store/product.js)<br>
+- [Context API를 활용](./src/context/ProductDataProvider.js)하여 브랜드, 시즌, 카테고리 데이터 공유 <br>
+- 컴포넌트 간 상태 공유 및 관리 단순화를 위해 [Zustand를 활용한 상품 등록 폼 상태 관리](./src/store/product.js)<br>
 - 입력값 유효성 검증과 안내 (숫자, 자릿수, 알파벳)<br>
 - 비동기 API 요청 및 실패 응답에 대한 예외 처리 로직 구현<br>
 
