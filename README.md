@@ -27,31 +27,32 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 ## 🔍 기여한 부분
 
-#### **상품 등록 페이지 개발** &emsp; 
+### **상품 등록 페이지 개발** &emsp; 
   <img width="600" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/45274b49-593f-4809-8652-ac3cc713e45a" />
   <img width="250" alt="image" src="https://github.com/user-attachments/assets/ab668ca0-bd7c-42c0-8fe5-da84fa1edf2f" />
   <img width="250" alt="image" src="https://github.com/user-attachments/assets/d595d559-0334-4cc9-9e79-9dd2944db833" />
 
-
 <br>
-- **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계**
-- [children 기반의 재사용 가능한 **공통 Modal 컴포넌트** 설계](./src/components/RegistModalFrame.js)
-    - 브랜드, 시즌, 상품코드 모달에 활용
-- [Context API를 활용하여 브랜드, 시즌, 카테고리 데이터를 전역 상태 관리](./src/context/ProductDataProvider.js)
-- [Zustand를 활용한 상품 등록 폼 상태 관리로 컴포넌트 간 상태 공유 및 관리 단순화](./src/store/product.js)
-- 입력값 유효성 검증과 안내 (숫자, 자릿수, 알파벳)
-- 비동기 API 요청 및 실패 응답에 대한 예외 처리 로직 구현
 
-<br>br>
+- **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계** <br>
+-  [children 기반의 재사용 가능한 **공통 Modal 컴포넌트** 설계](./src/components/RegistModalFrame.js)<br>
+    - 브랜드, 시즌, 상품코드 모달에 활용<br>
+- [Context API를 활용하여 브랜드, 시즌, 카테고리 데이터를 전역 상태 관리](./src/context/ProductDataProvider.js)<br>
+- [Zustand를 활용한 상품 등록 폼 상태 관리로 컴포넌트 간 상태 공유 및 관리 단순화](./src/store/product.js)<br>
+- 입력값 유효성 검증과 안내 (숫자, 자릿수, 알파벳)<br>
+- 비동기 API 요청 및 실패 응답에 대한 예외 처리 로직 구현<br>
 
-#### **상품 목록 페이지 개발**  &emsp; 
+<br><br>
+
+### **상품 목록 페이지 개발**  &emsp; 
 <img width="450" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/a389780f-454a-411d-8376-7eb6140fddbc" />
-<img height="350" alt="image" src="https://github.com/user-attachments/assets/8e2b8ac9-35ad-4220-b93a-c7e1d3d63427" />
-<img height="350" alt="image" src="https://github.com/user-attachments/assets/a16b4e36-727b-4421-80e1-b75b6434b667" />
+<img height="350" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/8e2b8ac9-35ad-4220-b93a-c7e1d3d63427" />
+<img height="350" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/a16b4e36-727b-4421-80e1-b75b6434b667" />
+
 <br>
 
 - 상품 조회 및 재고 상태 확인<br>
-  - 컬러 활용한 상태 구분으로 정보의 직관성 높임 : 입고 대기, 부족, 정상<Br>
+  - 컬러 활용한 상태 구분으로 정보의 직관성 높임 : 입고 대기, 부족, 정상<br>
 - 필터링 및 검색어 기반 상품 검색<br>
 - [ 디바이스 환경 기반 **데이터 목록 조회 전략 분리** 구현](./src/pages/product/ProductList.js) (PC: 페이지네이션 / Mobile: 무한스크롤)<br>
 - 상품 목록 관련 데이터 처리 로직을 [커스텀 훅(useProductList)로 분리](./src/hooks/product/useProductList.js)하여 구조 개선
@@ -59,11 +60,12 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 <br><br>
 
-#### 창고 관리 페이지 개발  
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/28fddc1a-b0a7-4e53-92b1-8f1bd2bca7c2" />
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/4fcee0d8-30f2-47b2-a44c-935be531cfde" />
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/c4bd89f2-7427-484e-b89b-a1ffcda8879c" />
+### 창고 관리 페이지 개발  
+<img width="500" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/28fddc1a-b0a7-4e53-92b1-8f1bd2bca7c2" />
+<img width="500" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/4fcee0d8-30f2-47b2-a44c-935be531cfde" />
+<img width="500" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/c4bd89f2-7427-484e-b89b-a1ffcda8879c" />
 <img width="400" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/bacb3e55-eb5a-4cd7-bb46-c92195e7720d" />
+
 <br>
 
 - 창고 정보 수정(등록, 구조 수정, 삭제) 및 선반 정보 조회와 재고 위치 변경 기능 구현
@@ -72,8 +74,8 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 - [구역/선반 간 의존 관계를 고려하여 상위 상태 변경 시 하위 상태 자동 초기화하는 로직 설계](./src/hooks/storage/useStorageToggle.js)
 - [해당 창고의 구역/선반 정보를 실시간 조회하여 사용자 입력 가이드를 제공하여 오류 방지](./src/pages/storage/StorageAdd.js#L266-L270)
 - 현장 상황과 데이터의 일치를 고려한 **예외 처리** ( 적재 상품 존재 시 삭제 불가/최상층 선반 삭제 불가 )
-<br>
 
+<br>
 <br>
 
 ## 💡 문제 해결 및 성과
