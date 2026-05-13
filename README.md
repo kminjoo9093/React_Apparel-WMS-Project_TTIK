@@ -37,6 +37,16 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 <br>
 <br>
 
+- **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계** <br>
+-  [children 기반의 재사용 가능한 **공통 Modal 컴포넌트** 설계](./src/components/RegistModalFrame.js)<br>
+    - 브랜드, 시즌, 상품코드 모달에 활용<br>
+- [Context API를 활용하여 브랜드, 시즌, 카테고리 데이터를 전역 상태 관리](./src/context/ProductDataProvider.js)<br>
+- [Zustand를 활용한 상품 등록 폼 상태 관리로 컴포넌트 간 상태 공유 및 관리 단순화](./src/store/product.js)<br>
+- 입력값 유효성 검증과 안내 (숫자, 자릿수, 알파벳)<br>
+- 비동기 API 요청 및 실패 응답에 대한 예외 처리 로직 구현<br>
+
+<br>
+<br>
 
 ### 창고 관리 페이지 개발  
 <img width="400" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/28fddc1a-b0a7-4e53-92b1-8f1bd2bca7c2" />
@@ -54,14 +64,6 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 - [구역/선반 간 의존 관계를 고려하여 상위 상태 변경 시 하위 상태 자동 초기화하는 로직 설계](./src/hooks/storage/useStorageToggle.js)
 - [해당 창고의 구역/선반 정보를 실시간 조회하여 사용자 입력 가이드를 제공하여 오류 방지](./src/pages/storage/StorageAdd.js#L266-L270)
 - 현장 상황과 데이터의 일치를 고려한 **예외 처리** ( 적재 상품 존재 시 삭제 불가/최상층 선반 삭제 불가 )
-
-- **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계** <br>
--  [children 기반의 재사용 가능한 **공통 Modal 컴포넌트** 설계](./src/components/RegistModalFrame.js)<br>
-    - 브랜드, 시즌, 상품코드 모달에 활용<br>
-- [Context API를 활용하여 브랜드, 시즌, 카테고리 데이터를 전역 상태 관리](./src/context/ProductDataProvider.js)<br>
-- [Zustand를 활용한 상품 등록 폼 상태 관리로 컴포넌트 간 상태 공유 및 관리 단순화](./src/store/product.js)<br>
-- 입력값 유효성 검증과 안내 (숫자, 자릿수, 알파벳)<br>
-- 비동기 API 요청 및 실패 응답에 대한 예외 처리 로직 구현<br>
 
 <br>
 <br>
