@@ -56,7 +56,7 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/28fddc1a-b0a7-4e53-92b1-8f1bd2bca7c2" />
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/4fcee0d8-30f2-47b2-a44c-935be531cfde" />
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/c4bd89f2-7427-484e-b89b-a1ffcda8879c" />
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/bacb3e55-eb5a-4cd7-bb46-c92195e7720d" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/bacb3e55-eb5a-4cd7-bb46-c92195e7720d" />
 
 
 - 창고 정보 수정(등록, 구조 수정, 삭제) 및 선반 정보 조회와 재고 위치 변경 기능 구현
