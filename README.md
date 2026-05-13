@@ -38,9 +38,9 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 <br>
 
 #### **상품 목록 페이지 개발**  &emsp; 
-<img width="450" alt="image" src="https://github.com/user-attachments/assets/a389780f-454a-411d-8376-7eb6140fddbc" />
-<img height="450" alt="image" src="https://github.com/user-attachments/assets/8e2b8ac9-35ad-4220-b93a-c7e1d3d63427" />
-<img height="450" alt="image" src="https://github.com/user-attachments/assets/a16b4e36-727b-4421-80e1-b75b6434b667" />
+<img width="450" vertual-align="middle" alt="image" src="https://github.com/user-attachments/assets/a389780f-454a-411d-8376-7eb6140fddbc" />
+<img height="350" alt="image" src="https://github.com/user-attachments/assets/8e2b8ac9-35ad-4220-b93a-c7e1d3d63427" />
+<img height="350" alt="image" src="https://github.com/user-attachments/assets/a16b4e36-727b-4421-80e1-b75b6434b667" />
 
 
 - 상품 조회 및 재고 상태 확인<br>
