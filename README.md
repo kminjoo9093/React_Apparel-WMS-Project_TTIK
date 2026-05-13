@@ -3,19 +3,22 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 박스/단품별 물류 추적과 B2B·B2C 맞춤형 출고가 가능한 패션 물류 WMS
 
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/94fa6d0d-93ed-4201-af6e-ebd6bb995cec" />
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/de466499-b920-4e99-ab48-68cee5de4ce0" />
 
 
 <br><br>
 
 ### 🔗 Link
 - 🎬 [ 담당 기능 시연 영상 바로가기 → ](https://drive.google.com/file/d/1SmhvBcRSdJg7eU3xR7mTtKnKi20nCUL4/view?usp=sharing)
-  <br>
+  
+  <br><br>
+  
 - 🎬 [ 입출고 프로세스 시연 영상 바로가기 → ](https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing)
-  <br>
+
+  <br><br>
+  
 - ⚙️[Backend Repository 바로가기 → ](https://github.com/kminjoo9093/SpringBoot_Apparel-WMS-Project_TTIK)
 
-<br><br>
+<br>
 
 ### 🛠 Frontend Stack
 ![React](https://img.shields.io/badge/React-000000?style=for-the-badge&logo=react)
@@ -27,9 +30,15 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 ## 🔍 기여한 부분
 
 #### **상품 등록 페이지 개발** &emsp; 
-<img width="600" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/45274b49-593f-4809-8652-ac3cc713e45a" />
-<img width="350" alt="image" src="https://github.com/user-attachments/assets/ab668ca0-bd7c-42c0-8fe5-da84fa1edf2f" />
-<img width="350" alt="image" src="https://github.com/user-attachments/assets/d595d559-0334-4cc9-9e79-9dd2944db833" />
+<figure>
+  <img width="600" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/45274b49-593f-4809-8652-ac3cc713e45a" />
+  <figcaption>상품 등록 페이지</figcaption>
+</figure>
+<figure>
+  <img width="250" alt="image" src="https://github.com/user-attachments/assets/ab668ca0-bd7c-42c0-8fe5-da84fa1edf2f" />
+  <img width="250" alt="image" src="https://github.com/user-attachments/assets/d595d559-0334-4cc9-9e79-9dd2944db833" />
+  <figcaption>공통 모달 컴포넌트 활용</figcaption>
+</figure>
 
 <br>
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계**
