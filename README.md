@@ -10,7 +10,9 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 ### 🔗 Link
 - 🎬 [ 담당 기능 시연 영상 바로가기 → ](https://drive.google.com/file/d/1SmhvBcRSdJg7eU3xR7mTtKnKi20nCUL4/view?usp=sharing)
+  <br>
 - 🎬 [ 입출고 프로세스 시연 영상 바로가기 → ](https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing)
+  <br>
 - ⚙️[Backend Repository 바로가기 → ](https://github.com/kminjoo9093/SpringBoot_Apparel-WMS-Project_TTIK)
 
 <br><br>
@@ -25,11 +27,11 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 ## 🔍 기여한 부분
 
 #### **상품 등록 페이지 개발** &emsp; 
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/45274b49-593f-4809-8652-ac3cc713e45a" />
-<img width="350" height="406" alt="image" src="https://github.com/user-attachments/assets/ab668ca0-bd7c-42c0-8fe5-da84fa1edf2f" />
-<img width="350" height="409" alt="image" src="https://github.com/user-attachments/assets/d595d559-0334-4cc9-9e79-9dd2944db833" />
+<img width="600" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/45274b49-593f-4809-8652-ac3cc713e45a" />
+<img width="350" alt="image" src="https://github.com/user-attachments/assets/ab668ca0-bd7c-42c0-8fe5-da84fa1edf2f" />
+<img width="350" alt="image" src="https://github.com/user-attachments/assets/d595d559-0334-4cc9-9e79-9dd2944db833" />
 
-
+<br>
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계**
 - [children 기반의 재사용 가능한 **공통 Modal 컴포넌트** 설계](./src/components/RegistModalFrame.js)
     - 브랜드, 시즌, 상품코드 모달에 활용
@@ -44,7 +46,7 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 <img width="450" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/a389780f-454a-411d-8376-7eb6140fddbc" />
 <img height="350" alt="image" src="https://github.com/user-attachments/assets/8e2b8ac9-35ad-4220-b93a-c7e1d3d63427" />
 <img height="350" alt="image" src="https://github.com/user-attachments/assets/a16b4e36-727b-4421-80e1-b75b6434b667" />
-
+<br>
 
 - 상품 조회 및 재고 상태 확인<br>
   - 컬러 활용한 상태 구분으로 정보의 직관성 높임 : 입고 대기, 부족, 정상<Br>
@@ -60,7 +62,7 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/4fcee0d8-30f2-47b2-a44c-935be531cfde" />
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/c4bd89f2-7427-484e-b89b-a1ffcda8879c" />
 <img width="400" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/bacb3e55-eb5a-4cd7-bb46-c92195e7720d" />
-
+<br>
 
 - 창고 정보 수정(등록, 구조 수정, 삭제) 및 선반 정보 조회와 재고 위치 변경 기능 구현
 - [다수의 재고 위치 변경 시 Promise.all 활용한 병렬 처리](./src/pages/storage/RackDetailModal.js)
