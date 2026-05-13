@@ -2,6 +2,8 @@
 QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 박스/단품별 물류 추적과 B2B·B2C 맞춤형 출고가 가능한 패션 물류 WMS
 
+<br>
+
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/94fa6d0d-93ed-4201-af6e-ebd6bb995cec" />
 
 
