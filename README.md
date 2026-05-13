@@ -34,7 +34,26 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/ab668ca0-bd7c-42c0-8fe5-da84fa1edf2f" />
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/d595d559-0334-4cc9-9e79-9dd2944db833" />
 
-<br><br>
+<br>
+<br>
+
+
+### 창고 관리 페이지 개발  
+<img width="400" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/28fddc1a-b0a7-4e53-92b1-8f1bd2bca7c2" />
+<img width="400" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/4fcee0d8-30f2-47b2-a44c-935be531cfde" />
+<div style="display: flex; align-items: flex-start; gap: 10px;">
+  <img width="400" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/c4bd89f2-7427-484e-b89b-a1ffcda8879c" />
+  <img width="300" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/bacb3e55-eb5a-4cd7-bb46-c92195e7720d" />
+</div>
+
+<br>
+
+- 창고 정보 수정(등록, 구조 수정, 삭제) 및 선반 정보 조회와 [적재된 박스 위치 변경 기능](./src/pages/storage/RackDetailModal.js) 구현
+  - 다수의 박스 위치 변경 시 Promise.all 활용한 병렬 처리
+- [선택 상태 및 비활성화 여부에 따라 입력 필드를 동적으로 제어 하여 입력 오류 방지](./src/pages/storage/StorageUpdateState.js#L176)
+- [구역/선반 간 의존 관계를 고려하여 상위 상태 변경 시 하위 상태 자동 초기화하는 로직 설계](./src/hooks/storage/useStorageToggle.js)
+- [해당 창고의 구역/선반 정보를 실시간 조회하여 사용자 입력 가이드를 제공하여 오류 방지](./src/pages/storage/StorageAdd.js#L266-L270)
+- 현장 상황과 데이터의 일치를 고려한 **예외 처리** ( 적재 상품 존재 시 삭제 불가/최상층 선반 삭제 불가 )
 
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계** <br>
 -  [children 기반의 재사용 가능한 **공통 Modal 컴포넌트** 설계](./src/components/RegistModalFrame.js)<br>
@@ -44,7 +63,9 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 - 입력값 유효성 검증과 안내 (숫자, 자릿수, 알파벳)<br>
 - 비동기 API 요청 및 실패 응답에 대한 예외 처리 로직 구현<br>
 
-<br><br>
+<br>
+<br>
+
 
 ### **상품 목록 페이지 개발**  &emsp; 
 <div style="display: flex; align-items: flex-start; gap: 10px;">
@@ -61,25 +82,6 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 - [ 디바이스 환경 기반 **데이터 목록 조회 전략 분리** 구현](./src/pages/product/ProductList.js) (PC: 페이지네이션 / Mobile: 무한스크롤)<br>
 - 상품 목록 관련 데이터 처리 로직을 [커스텀 훅(useProductList)로 분리](./src/hooks/product/useProductList.js)하여 구조 개선
 
-
-<br><br>
-
-### 창고 관리 페이지 개발  
-<img width="400" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/28fddc1a-b0a7-4e53-92b1-8f1bd2bca7c2" />
-<img width="400" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/4fcee0d8-30f2-47b2-a44c-935be531cfde" />
-<div style="display: flex; align-items: flex-start; gap: 10px;">
-  <img width="400" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/c4bd89f2-7427-484e-b89b-a1ffcda8879c" />
-  <img width="300" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/bacb3e55-eb5a-4cd7-bb46-c92195e7720d" />
-</div>
-
-<br>
-
-- 창고 정보 수정(등록, 구조 수정, 삭제) 및 선반 정보 조회와 재고 위치 변경 기능 구현
-- [다수의 재고 위치 변경 시 Promise.all 활용한 병렬 처리](./src/pages/storage/RackDetailModal.js)
-- [선택 상태 및 비활성화 여부에 따라 입력 필드를 동적으로 제어 하여 입력 오류 방지](./src/pages/storage/StorageUpdateState.js#L176)
-- [구역/선반 간 의존 관계를 고려하여 상위 상태 변경 시 하위 상태 자동 초기화하는 로직 설계](./src/hooks/storage/useStorageToggle.js)
-- [해당 창고의 구역/선반 정보를 실시간 조회하여 사용자 입력 가이드를 제공하여 오류 방지](./src/pages/storage/StorageAdd.js#L266-L270)
-- 현장 상황과 데이터의 일치를 고려한 **예외 처리** ( 적재 상품 존재 시 삭제 불가/최상층 선반 삭제 불가 )
 
 <br>
 <br>
