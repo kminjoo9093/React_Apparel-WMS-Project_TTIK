@@ -2,8 +2,8 @@
 QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 박스/단품별 물류 추적과 B2B·B2C 맞춤형 출고가 가능한 패션 물류 WMS
 
-<img width="1711" height="992" alt="image" src="https://github.com/user-attachments/assets/94fa6d0d-93ed-4201-af6e-ebd6bb995cec" />
-<img width="1713" height="996" alt="image" src="https://github.com/user-attachments/assets/de466499-b920-4e99-ab48-68cee5de4ce0" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/94fa6d0d-93ed-4201-af6e-ebd6bb995cec" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/de466499-b920-4e99-ab48-68cee5de4ce0" />
 
 
 <br><br>
@@ -25,7 +25,7 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 ## 🔍 기여한 부분
 
 #### **상품 등록 페이지 개발** &emsp; 
-<img width="1712" height="995" alt="image" src="https://github.com/user-attachments/assets/45274b49-593f-4809-8652-ac3cc713e45a" />
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/45274b49-593f-4809-8652-ac3cc713e45a" />
 
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계**
 - [children 기반의 재사용 가능한 **공통 Modal 컴포넌트** 설계](./src/components/RegistModalFrame.js)
@@ -38,9 +38,9 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 <br>
 
 #### **상품 목록 페이지 개발**  &emsp; 
-<img width="1709" height="997" alt="image" src="https://github.com/user-attachments/assets/a389780f-454a-411d-8376-7eb6140fddbc" />
-<img width="441" height="818" alt="image" src="https://github.com/user-attachments/assets/8e2b8ac9-35ad-4220-b93a-c7e1d3d63427" />
-<img width="440" height="818" alt="image" src="https://github.com/user-attachments/assets/a16b4e36-727b-4421-80e1-b75b6434b667" />
+<img width="450" alt="image" src="https://github.com/user-attachments/assets/a389780f-454a-411d-8376-7eb6140fddbc" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/8e2b8ac9-35ad-4220-b93a-c7e1d3d63427" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/a16b4e36-727b-4421-80e1-b75b6434b667" />
 
 
 - 상품 조회 및 재고 상태 확인<br>
@@ -53,6 +53,12 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 <br>
 
 #### 창고 관리 페이지 개발  
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/28fddc1a-b0a7-4e53-92b1-8f1bd2bca7c2" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/4fcee0d8-30f2-47b2-a44c-935be531cfde" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/c4bd89f2-7427-484e-b89b-a1ffcda8879c" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/bacb3e55-eb5a-4cd7-bb46-c92195e7720d" />
+
+
 - 창고 정보 수정(등록, 구조 수정, 삭제) 및 선반 정보 조회와 재고 위치 변경 기능 구현
 - [다수의 재고 위치 변경 시 Promise.all 활용한 병렬 처리](./src/pages/storage/RackDetailModal.js)
 - [선택 상태 및 비활성화 여부에 따라 입력 필드를 동적으로 제어 하여 입력 오류 방지](./src/pages/storage/StorageUpdateState.js#L176)
