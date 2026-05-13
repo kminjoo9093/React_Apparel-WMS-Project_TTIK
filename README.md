@@ -4,10 +4,9 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 
 <br><br>
-
-프로세스 시연 영상 : https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing
+담당 기능 시연 영상 : https://drive.google.com/drive/u/0/folders/1IssXr__ts01AyVWOFUwbhWCEY2l9ABE_
 <br>
-시스템 기능 설명 영상 : https://drive.google.com/file/d/16UDGscPzfVxy5I_0mqD-jndgrWXfUIAl/view?usp=sharing
+프로세스 시연 영상 : https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing
 <br>
 <br>
 
