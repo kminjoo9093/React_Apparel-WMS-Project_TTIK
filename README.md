@@ -9,12 +9,10 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 ### 🔗 Link
 - 🎬 [ 담당 기능 시연 영상 바로가기 → ](https://drive.google.com/file/d/1SmhvBcRSdJg7eU3xR7mTtKnKi20nCUL4/view?usp=sharing)
-  
-  <br><br>
+  <br>
   
 - 🎬 [ 입출고 프로세스 시연 영상 바로가기 → ](https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing)
-
-  <br><br>
+  <br>
   
 - ⚙️[Backend Repository 바로가기 → ](https://github.com/kminjoo9093/SpringBoot_Apparel-WMS-Project_TTIK)
 
@@ -30,15 +28,10 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 ## 🔍 기여한 부분
 
 #### **상품 등록 페이지 개발** &emsp; 
-<figure>
   <img width="600" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/45274b49-593f-4809-8652-ac3cc713e45a" />
-  <figcaption>상품 등록 페이지</figcaption>
-</figure>
-<figure>
   <img width="250" alt="image" src="https://github.com/user-attachments/assets/ab668ca0-bd7c-42c0-8fe5-da84fa1edf2f" />
   <img width="250" alt="image" src="https://github.com/user-attachments/assets/d595d559-0334-4cc9-9e79-9dd2944db833" />
-  <figcaption>공통 모달 컴포넌트 활용</figcaption>
-</figure>
+
 
 <br>
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계**
@@ -49,7 +42,7 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 - 입력값 유효성 검증과 안내 (숫자, 자릿수, 알파벳)
 - 비동기 API 요청 및 실패 응답에 대한 예외 처리 로직 구현
 
-<br>
+<br>br>
 
 #### **상품 목록 페이지 개발**  &emsp; 
 <img width="450" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/a389780f-454a-411d-8376-7eb6140fddbc" />
@@ -64,7 +57,7 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 - 상품 목록 관련 데이터 처리 로직을 [커스텀 훅(useProductList)로 분리](./src/hooks/product/useProductList.js)하여 구조 개선
 
 
-<br>
+<br><br>
 
 #### 창고 관리 페이지 개발  
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/28fddc1a-b0a7-4e53-92b1-8f1bd2bca7c2" />
