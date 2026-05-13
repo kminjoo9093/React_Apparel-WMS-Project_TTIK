@@ -2,16 +2,18 @@
 QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 박스/단품별 물류 추적과 B2B·B2C 맞춤형 출고가 가능한 패션 물류 WMS
 
+<img width="1711" height="992" alt="image" src="https://github.com/user-attachments/assets/94fa6d0d-93ed-4201-af6e-ebd6bb995cec" />
+<img width="1713" height="996" alt="image" src="https://github.com/user-attachments/assets/de466499-b920-4e99-ab48-68cee5de4ce0" />
+
 
 <br><br>
 
 ### 🔗 Link
-- 🎬 담당 기능 시연 영상 : https://drive.google.com/file/d/1SmhvBcRSdJg7eU3xR7mTtKnKi20nCUL4/view?usp=sharing
-<br>
-- 🎬 입출고 프로세스 시연 영상 : https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing
-<br>
+- 🎬 [ 담당 기능 시연 영상 바로가기 → ](https://drive.google.com/file/d/1SmhvBcRSdJg7eU3xR7mTtKnKi20nCUL4/view?usp=sharing)
+- 🎬 [ 입출고 프로세스 시연 영상 바로가기 → ](https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing)
 - ⚙️[Backend Repository 바로가기 → ](https://github.com/kminjoo9093/SpringBoot_Apparel-WMS-Project_TTIK)
 
+<br><br>
 
 ### 🛠 Frontend Stack
 ![React](https://img.shields.io/badge/React-000000?style=for-the-badge&logo=react)
@@ -23,6 +25,8 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 ## 🔍 기여한 부분
 
 #### **상품 등록 페이지 개발** &emsp; 
+<img width="1712" height="995" alt="image" src="https://github.com/user-attachments/assets/45274b49-593f-4809-8652-ac3cc713e45a" />
+
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계**
 - [children 기반의 재사용 가능한 **공통 Modal 컴포넌트** 설계](./src/components/RegistModalFrame.js)
     - 브랜드, 시즌, 상품코드 모달에 활용
@@ -34,6 +38,11 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 <br>
 
 #### **상품 목록 페이지 개발**  &emsp; 
+<img width="1709" height="997" alt="image" src="https://github.com/user-attachments/assets/a389780f-454a-411d-8376-7eb6140fddbc" />
+<img width="441" height="818" alt="image" src="https://github.com/user-attachments/assets/8e2b8ac9-35ad-4220-b93a-c7e1d3d63427" />
+<img width="440" height="818" alt="image" src="https://github.com/user-attachments/assets/a16b4e36-727b-4421-80e1-b75b6434b667" />
+
+
 - 상품 조회 및 재고 상태 확인<br>
   - 컬러 활용한 상태 구분으로 정보의 직관성 높임 : 입고 대기, 부족, 정상<Br>
 - 필터링 및 검색어 기반 상품 검색<br>
