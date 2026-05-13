@@ -34,7 +34,7 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/ab668ca0-bd7c-42c0-8fe5-da84fa1edf2f" />
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/d595d559-0334-4cc9-9e79-9dd2944db833" />
 
-<br>
+<br><br>
 
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계** <br>
 -  [children 기반의 재사용 가능한 **공통 Modal 컴포넌트** 설계](./src/components/RegistModalFrame.js)<br>
