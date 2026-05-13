@@ -4,30 +4,23 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 
 <br><br>
-담당 기능 시연 영상 : https://drive.google.com/file/d/1SmhvBcRSdJg7eU3xR7mTtKnKi20nCUL4/view?usp=sharing
+
+### 🔗 Link
+- 🎬 담당 기능 시연 영상 : https://drive.google.com/file/d/1SmhvBcRSdJg7eU3xR7mTtKnKi20nCUL4/view?usp=sharing
 <br>
-프로세스 시연 영상 : https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing
+- 🎬 입출고 프로세스 시연 영상 : https://drive.google.com/file/d/1aeK2BOoRoCKSpT8KB41ZeHfSyoa4tdJT/view?usp=sharing
 <br>
-<br>
+- ⚙️[Backend Repository 바로가기 → ](https://github.com/kminjoo9093/SpringBoot_Apparel-WMS-Project_TTIK)
 
 
-### Tech Skills
+### 🛠 Frontend Stack
 ![React](https://img.shields.io/badge/React-000000?style=for-the-badge&logo=react)
-![Java](https://img.shields.io/badge/Java-000000?style=for-the-badge&logo=Java)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-000000?style=for-the-badge&logo=springboot)
-![JPA](https://img.shields.io/badge/JPA-000000?style=for-the-badge&logo=JPA)
-![MyBatis](https://img.shields.io/badge/MyBatis-000000?style=for-the-badge&logo=MyBatis)
-![Oracle](https://img.shields.io/badge/Oracle-000000?style=for-the-badge&logo=oracle)
-![SQL](https://img.shields.io/badge/SQL-000000?style=for-the-badge&logo=SQL)
+![Zustand](https://img.shields.io/badge/Zustand-000000?style=for-the-badge)
 
-<br>
-
-[Backend Repository 바로가기 → ](https://github.com/kminjoo9093/SpringBoot_Apparel-WMS-Project_TTIK)
 
 <br><br>
 
-## 기여한 부분
-
+## 🔍 기여한 부분
 
 #### **상품 등록 페이지 개발** &emsp; 
 - **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계**
@@ -61,7 +54,7 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 <br>
 
-## 문제 해결 및 성과
+## 💡 문제 해결 및 성과
 
 ### **1. 상품 코드 체계 재설계로 데이터 고유성 확보 및 시스템 확장에 기여** 
 - **문제**
