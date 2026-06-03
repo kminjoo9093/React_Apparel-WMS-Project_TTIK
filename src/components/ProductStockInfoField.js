@@ -48,7 +48,7 @@ export default function ProductStockInfo() {
           <div className={styleRegister.numberWrapper}>
             <input
               type="number"
-              name="qty"
+              name="inboxQty"
               min="0"
               required
               placeholder="EA 수량 입력"
@@ -57,9 +57,9 @@ export default function ProductStockInfo() {
             ></input>
             <p
               className={styleRegister.errorMsg}
-              style={{ visibility: errors.qty ? "visible" : "hidden" }}
+              style={{ visibility: errors.inboxQty ? "visible" : "hidden" }}
             >
-              {errorMsg.qty}
+              {errorMsg.inboxQty}
             </p>
           </div>
         </div>
