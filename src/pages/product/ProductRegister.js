@@ -12,6 +12,7 @@ import {
   useErrors,
   useFormData,
   useProductCd,
+  useResetFormData,
   useSetFormData,
   useSetProductCd,
 } from "../../store/product";
@@ -29,6 +30,7 @@ function ProductRegister() {
   const errors = useErrors();
   const productCd = useProductCd();
   const setProductCd = useSetProductCd();
+  const resetFormData = useResetFormData();
   const modalConfig = useModalConfig();
   const closeModal = useCloseModal();
   const openAlert = useOpenAlert();
@@ -147,6 +149,10 @@ function ProductRegister() {
       });
     }
   }
+
+  useEffect(() => {
+    return () => resetFormData();
+  }, []);
 
   return (
     <div className={`${styleRegister.register} container`}>

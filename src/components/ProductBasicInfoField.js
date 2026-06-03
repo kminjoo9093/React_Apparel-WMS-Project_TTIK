@@ -64,6 +64,12 @@ export default function ProductBasicInfo() {
     fetchData();
   }, [target, formData.category]);
 
+  useEffect(() => {
+    if (!formData.styleNo) {
+      setInputValue("");
+    }
+  }, [formData.styleNo]);
+
   return (
     <fieldset className={`${styleRegister.productInfo}`}>
       <div className={styleRegister.row}>
