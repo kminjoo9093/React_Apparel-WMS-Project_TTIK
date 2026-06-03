@@ -3,7 +3,6 @@ import { CommonButton } from "./CommonButton";
 import { useFormData, useProductCd, useSetProductCd } from "../store/product";
 import { useOpenModal } from "../store/productModal";
 import { createProductCd } from "../api/product/fetchProductRegisterData";
-import Alert from "./Alert";
 import { useOpenAlert } from "../store/alert";
 
 export default function ProductCodeField() {
@@ -78,7 +77,6 @@ export default function ProductCodeField() {
           </CommonButton>
         </div>
       </div>
-      <Alert {...alert} />
     </fieldset>
   );
 }
