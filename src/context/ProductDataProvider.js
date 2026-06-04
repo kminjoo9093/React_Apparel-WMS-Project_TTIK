@@ -1,4 +1,4 @@
-import { createContext, useReducer, useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import serverUrl from "../db/server.json";
 
@@ -8,32 +8,8 @@ const URL = `${SERVER_URL}/ttik/product`;
 export const ProductContext = createContext();
 export const SeasonDispatchContext = createContext();
 
-function reducer(state, action) {
-  switch (action.type) {
-    case "SET":
-      return {
-        brandList: action.data.brandData,
-        categoryList: action.data.categoryData,
-        seasonList: action.data.seasonData,
-      };
-    case "UPDATE_SEASON":
-      return {
-        ...state,
-        seasonList: action.data.newSeasonList,
-      };
-    default:
-      return state;
-  }
-}
-
-const productData = {
-  brandList: [],
-  categoryList: [],
-  seasonList: [],
-};
-
 export default function ProductDataProvider() {
-  const [state, dispatch] = useReducer(reducer, productData);
+  const [productMeta, setProductMeta] = useState({ brandList: [], categoryList: [], seasonList: [] });
 
   async function getData(url) {
     try {
@@ -47,7 +23,6 @@ export default function ProductDataProvider() {
       const data = await res.json();
       return data;
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
@@ -58,27 +33,17 @@ export default function ProductDataProvider() {
       const categoryData = await getData(`${URL}/category`);
       const seasonData = await getData(`${URL}/season`);
 
-      dispatch({
-        type: "SET",
-        data: {
-          brandData,
-          categoryData,
-          seasonData,
-        },
-      });
+      setProductMeta({ brandList: brandData, categoryList: categoryData, seasonList: seasonData });
     };
     fetchData();
   }, []);
 
-  const updateSeasonList = (newSeasonList) => {
-    dispatch({
-      type: "UPDATE_SEASON",
-      data: newSeasonList,
-    });
+  const updateSeasonList = (seasonList) => {
+    setProductMeta((prev) => ({ ...prev, seasonList }));
   };
 
   return (
-    <ProductContext.Provider value={state}>
+    <ProductContext.Provider value={productMeta}>
       <SeasonDispatchContext.Provider value={updateSeasonList}>
         <Outlet />
       </SeasonDispatchContext.Provider>

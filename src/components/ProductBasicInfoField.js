@@ -17,7 +17,7 @@ export default function ProductBasicInfo() {
   const openAlert = useOpenAlert();
   const openModal = useOpenModal();
 
-  const [inputValue, setInputValue] = useState(""); //임시 인풋값
+  const [styleNoInput, setStyleNoInput] = useState(""); 
   const [target, setTarget] = useState("");
   const [sizeMap, setSizeMap] = useState({});
 
@@ -38,7 +38,7 @@ export default function ProductBasicInfo() {
         title: "Error",
         message: "입력 형식을 확인하세요.",
       });
-      setInputValue("");
+      setStyleNoInput("");
     }
   }
 
@@ -66,7 +66,7 @@ export default function ProductBasicInfo() {
 
   useEffect(() => {
     if (!formData.styleNo) {
-      setInputValue("");
+      setStyleNoInput("");
     }
   }, [formData.styleNo]);
 
@@ -110,8 +110,8 @@ export default function ProductBasicInfo() {
             required
             placeholder="ex) M001 (성별 영문 + 숫자3자리)"
             maxLength={4}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            value={styleNoInput}
+            onChange={(e) => setStyleNoInput(e.target.value)}
             onBlur={handleStyleNo}
             style={{ textTransform: "uppercase" }}
           ></input>

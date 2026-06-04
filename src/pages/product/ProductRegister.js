@@ -98,7 +98,6 @@ function ProductRegister() {
 
     const hasError = Object.values(errors).some((val) => val === true);
     if (hasError) {
-      console.log("에러", errors);
 
       openAlert({
         title: "Again",
@@ -128,21 +127,9 @@ function ProductRegister() {
           navigate("/product/list");
         },
       });
-      setFormData({
-        brandCd: "",
-        productNm: "",
-        category: "",
-        seasonCd: "",
-        sizeCd: "",
-        inboxQty: "",
-        price: "",
-        threshold: "",
-        styleNo: "",
-      });
 
-      setProductCd("");
+      resetFormData();
     } catch (error) {
-      console.log("catch error : ", error.message);
       openAlert({
         title: "Again",
         message: "입력한 정보를 확인하세요.",
