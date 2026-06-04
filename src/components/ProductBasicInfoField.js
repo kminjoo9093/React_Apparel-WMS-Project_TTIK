@@ -5,11 +5,10 @@ import { useFormData, useSetFormData } from "../store/product";
 import { CommonButton } from "./CommonButton";
 import { useOpenModal } from "../store/productModal";
 import { checkStyleNo } from "../utils/validation/styleNo";
-import { fetchSizeMap } from "../api/product/fetchProductRegisterData";
 import { useOpenAlert } from "../store/alert";
+import { useGetSizeMap } from "../hooks/queries/useGetSizeMap";
 
 export default function ProductBasicInfo() {
-  //브랜드, 시즌, 카테고리 공통 데이터
   const { brandList, categoryList, seasonList } = useContext(ProductContext);
 
   const formData = useFormData();
@@ -17,9 +16,8 @@ export default function ProductBasicInfo() {
   const openAlert = useOpenAlert();
   const openModal = useOpenModal();
 
-  const [styleNoInput, setStyleNoInput] = useState(""); 
+  const [styleNoInput, setStyleNoInput] = useState("");
   const [target, setTarget] = useState("");
-  const [sizeMap, setSizeMap] = useState({});
 
   //스타일 넘버 -> 품번
   function handleStyleNo(e) {
@@ -48,27 +46,13 @@ export default function ProductBasicInfo() {
     setFormData({ category: cat, sizeCd: "" });
   }
 
-  //사이즈 옵션 받아오기
-  useEffect(() => {
-    if (!target || !formData.category) return;
-
-    const fetchData = async () => {
-      const sizeData = await fetchSizeMap(target, formData.category);
-
-      if (sizeData) {
-        setSizeMap(sizeData);
-      } else {
-        setSizeMap({});
-      }
-    };
-    fetchData();
-  }, [target, formData.category]);
-
   useEffect(() => {
     if (!formData.styleNo) {
       setStyleNoInput("");
     }
   }, [formData.styleNo]);
+
+  const { data: sizeMap = {} } = useGetSizeMap(target, formData.category);
 
   return (
     <fieldset className={`${styleRegister.productInfo}`}>
