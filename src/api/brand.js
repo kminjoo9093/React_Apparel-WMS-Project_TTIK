@@ -1,7 +1,13 @@
 import serverUrl from "../db/server.json";
+import { getData } from "./client";
 
 const SERVER_URL = serverUrl.SERVER_URL;
 const BRAND_BASE = `${SERVER_URL}/ttik/brand`;
+
+//브랜드 리스트 조회
+export async function fetchBrandList(){
+  return await getData("/ttik/product/brands");
+}
 
 export async function searchBrandData(inputVal) {
   const url = `${BRAND_BASE}/search?keyword=${inputVal}`;

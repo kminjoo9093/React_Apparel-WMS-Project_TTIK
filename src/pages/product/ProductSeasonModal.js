@@ -1,15 +1,15 @@
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import styleProdModal from "../../css/ProductModal.module.css";
 import { CommonButton } from "../../components/CommonButton";
-import { SeasonDispatchContext } from "../../context/ProductDataProvider";
 import { useOpenAlert } from "../../store/alert";
-import { registerSeasonData } from "../../api/season";
+import { useRegisterSeason } from "../../hooks/mutations/useRegisterSeason";
 
 function ProductSeasonModal({ onClose }) {
   const yearRef = useRef();
   const seasonRef = useRef();
-  const dispatch = useContext(SeasonDispatchContext);
   const openAlert = useOpenAlert();
+
+  const { mutate: registerSeasonData } = useRegisterSeason();
 
   async function registerSeason(e) {
     e.preventDefault();
@@ -26,34 +26,33 @@ function ProductSeasonModal({ onClose }) {
       return;
     }
 
-    try {
-      const updatedList = await registerSeasonData({
-        year: year,
-        season: season,
-      });
+    registerSeasonData(
+      { year, season },
+      {
+        onSuccess: () => {
+          const newSeason = season === "S" ? "S/S" : "FW";
+          openAlert({
+            title: "Success",
+            message: `${year} ${newSeason} 시즌이 정상 등록되었습니다.`,
+          });
 
-      dispatch(updatedList);
-      const newSeason = season === "S" ? "S/S" : "FW";
-      openAlert({
-        title: "Success",
-        message: `${year} ${newSeason} 시즌이 정상 등록되었습니다.`,
-      });
-
-      //모달창 닫기
-      onClose();
-    } catch (error) {
-      if (error.status === 404) {
-        openAlert({
-          title: "Error",
-          message: "네트워크 통신 중 오류가 발생했습니다.",
-        });
-      } else {
-        openAlert({
-          title: "Again",
-          message: "이미 등록된 시즌이거나 등록할 수 없는 정보입니다.",
-        });
-      }
-    }
+          onClose();
+        },
+        onError: (error) => {
+          if (error.status === 404) {
+            openAlert({
+              title: "Error",
+              message: "네트워크 통신 중 오류가 발생했습니다.",
+            });
+          } else {
+            openAlert({
+              title: "Again",
+              message: "이미 등록된 시즌이거나 등록할 수 없는 정보입니다.",
+            });
+          }
+        },
+      },
+    );
   }
 
   return (

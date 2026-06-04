@@ -1,22 +1,14 @@
-import serverUrl from "../db/server.json";
+import { getData } from "./client";
+import { postData } from "./client";
 
-const SERVER_URL = serverUrl.SERVER_URL;
-const SEASON_BASE = `${SERVER_URL}/ttik/product/season`;
+const SEASON_BASE = `/ttik/product/season`;
 
-export async function registerSeasonData(payload) {
-  const url = `${SEASON_BASE}/register`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
-  if(!res.ok) {
-    const error = new Error();
-    error.status = res.status;
-    throw error;
-  };
+//시즌 리스트 조회
+export async function fetchSeasonList(){
+  return await getData(SEASON_BASE);
+}
 
-  const data = await res.json();
-  return data;
+//시즌 등록
+export async function registerSeason(data){
+  return await postData(`${SEASON_BASE}/register`, data);
 }
