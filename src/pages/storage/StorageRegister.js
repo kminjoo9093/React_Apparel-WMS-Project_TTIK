@@ -12,16 +12,13 @@ function StorageRegister() {
   const navigate = useNavigate();
   const { storageList } = useStorageContext();
   const [storageNm, setStorageNm] = useState("");
-  const [zoneList, setZoneList] = useState([{ zone: 1, rack: "" }]);
+  const [zoneList, setZoneList] = useState([{ zone: 1, rack: "", error: false, errorMsg: "" }]);
   const openAlert = useOpenAlert();
-  // 숫자 입력 유효성 검사
-  const [error, setError] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
 
   const handleAddBtn = () => {
     setZoneList((prev) => {
       const nextZone = prev.length + 1;
-      return [...prev, { zone: nextZone, rack: "" }];
+      return [...prev, { zone: nextZone, rack: "", error: false, errorMsg: "" }];
     });
   };
 
@@ -35,14 +32,13 @@ function StorageRegister() {
     const value = e.target.value;
     const { isInvalid, message } = checkNumber(value);
 
-    if (!isInvalid) {
-      setZoneList((prev) =>
-        prev.map((obj, i) => (i === rackNo ? { ...obj, rack: value } : obj)),
-      );
-    }
-
-    setError(isInvalid);
-    setErrorMsg(message);
+    setZoneList((prev) =>
+      prev.map((obj, i) =>
+        i === rackNo
+          ? { ...obj, rack: isInvalid ? obj.rack : value, error: isInvalid, errorMsg: message }
+          : obj
+      )
+    );
   };
 
   const validateStorageName = (value, storageList) => {
@@ -168,9 +164,9 @@ function StorageRegister() {
                   ></input>
                   <p
                     className={`${styleRegister.errorMsg} ${styleStorage.errorMsg}`}
-                    style={{ visibility: error ? "visible" : "hidden" }}
+                    style={{ visibility: item.error ? "visible" : "hidden" }}
                   >
-                    {errorMsg}
+                    {item.errorMsg}
                   </p>
                 </div>
               </div>
