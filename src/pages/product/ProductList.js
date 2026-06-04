@@ -20,7 +20,7 @@ const postsPerPagePC = 10;
 
 function ProductList() {
   const { brandList, categoryList, seasonList } = useContext(ProductContext);
-  const location = useLocation(); // 추가: 대시보드에서 넘어온 쿼리 스트링 읽기
+  const location = useLocation(); 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const scrollRef = useContext(ScrollContext);
 
@@ -28,16 +28,13 @@ function ProductList() {
 
   const [showBtn, setShowBtn] = useState(false);
   const [keywordInput, setKeywordInput] = useState("");
-
-  // 필터 상태 (초기값에 URL 파라미터 로직 통합)
   const [searchFilters, setSearchFilters] = useState({
     brandCd: "",
     categoryCd: "",
     seasonCd: "",
-    stkStatus: new URLSearchParams(location.search).get("status") || "",
-    keyword: new URLSearchParams(location.search).get("search") || "",
+    stkStatus: "",
+    keyword: "",
   });
-
   const {
     productList,
     isLoading,
@@ -54,7 +51,7 @@ function ProductList() {
     fetchProductList({ searchFilters, currentPage, isMobile });
   }, [currentPage, isMobile, searchFilters]);
 
-  //추가(김윤중) -- 레이아웃에서 상품명(코드) 검색시 이동할때 받는 함수
+  // URL 파라미터 동기화
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const urlSearch = params.get("search") || "";
@@ -67,9 +64,7 @@ function ProductList() {
       stkStatus: urlStatus,
     }));
 
-    // 입력창 상태 업데이트 (이 부분이 추가되어야 검색창에 글자가 남습니다)
     setKeywordInput(urlSearch);
-
     setCurrentPage(1);
   }, [location.search]);
 
@@ -80,7 +75,7 @@ function ProductList() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 1. 관찰할 대상을 가리킬 Ref 생성
+  // 관찰할 대상을 가리킬 Ref 생성
   const observerTarget = useRef(null);
   const observerRef = useRef(null);
   const stateRef = useRef();
@@ -172,6 +167,7 @@ function ProductList() {
       keyword: "",
     });
     setCurrentPage(1);
+    setKeywordInput("")
   };
 
   useEffect(() => {
@@ -304,7 +300,7 @@ function ProductList() {
               ? "상품을 불러오는 중입니다..."
               : !hasMore
                 ? "모든 상품을 다 불러왔습니다."
-                : "상품을 불러오는 중입니다..."}
+                : ""}
           </div>
         ) : (
           <Pagination

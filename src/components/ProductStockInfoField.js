@@ -19,7 +19,7 @@ export default function ProductStockInfo() {
       let updateData = {};
 
       switch (name) {
-        case "qty":
+        case "inboxQty":
           updateData = { inboxQty: value };
           break;
         case "price":

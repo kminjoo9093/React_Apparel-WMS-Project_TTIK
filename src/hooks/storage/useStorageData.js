@@ -50,12 +50,10 @@ function useStorageData(selectedStorage, selectedZone) {
 
         if (res.ok) {
           const rackData = await res.json();
-          console.log(rackData);
 
           setRackOptions(rackData);
         }
       } catch (error) {
-        console.log(error);
         return [];
       }
     };

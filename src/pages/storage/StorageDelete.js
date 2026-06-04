@@ -53,7 +53,7 @@ function StorageDelete({ setStorageMenu }) {
 
   const resetForm = () => setFormData(initialFormData);
 
-  const handelSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (
@@ -113,7 +113,7 @@ function StorageDelete({ setStorageMenu }) {
   };
   return (
     <>
-      <form className={styleStorage.deleteForm} onSubmit={handelSubmit}>
+      <form className={styleStorage.deleteForm} onSubmit={handleSubmit}>
         <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
           <h3 className={styleStorage.modifyHeading}>창고</h3>
           <StorageSelector
