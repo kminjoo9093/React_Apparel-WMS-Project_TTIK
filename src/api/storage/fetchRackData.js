@@ -1,7 +1,6 @@
-import serverUrl from "../../db/server.json";
+import { getData } from "../client";
 
-const SERVER_URL = serverUrl.SERVER_URL;
-const RACK_BASE = `${SERVER_URL}/ttik/storage/rack`;
+const RACK_BASE = `/ttik/storage/rack`;
 
 // 선반 조회
 export async function getRackListData({ page, size, filter }) {
@@ -10,27 +9,10 @@ export async function getRackListData({ page, size, filter }) {
     size,
     ...(filter && { filter }),
   });
-  const url = `${RACK_BASE}/list?${params}`;
-
-  const res = await fetch(url, {
-    method: "GET",
-    credentials: "include",
-  });
-  if (!res.ok) throw new Error(`Error: fetch rack list failed`);
-
-  const data = await res.json();
-  return data;
+  return await getData(`${RACK_BASE}/list?${params.toString()}`);
 }
 
 // 선반 상세정보 조회
 export async function getRackDetailInfo(rackSn) {
-  const url = `${RACK_BASE}/detail?rackSn=${rackSn}`;
-  const res = await fetch(url, {
-    method: "GET",
-    credentials: "include",
-  });
-  if (!res.ok) throw new Error("Error: fetch rack detail info failed");
-
-  const data = await res.json();
-  return data;
+  return await getData(`${RACK_BASE}/detail?rackSn=${rackSn}`);
 }

@@ -2,25 +2,25 @@ import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import useStorageData from "../../hooks/storage/useStorageData";
 import { useOpenAlert } from "../../store/alert";
-import { useStorageContext } from "../../context/StorageProvider";
 import StorageSelector from "../../components/StorageSelector";
 import ToggleSwitch from "../../components/ToggleSwitch";
-import { updateStorageState } from "../../api/storage/fetchStorageData";
 import { getCheckMessage } from "../../utils/storage/getCheckMessage";
 import { useStorageToggle } from "../../hooks/storage/useStorageToggle";
 import StorageModifyButton from "../../components/StorageModifyButton";
+import { useUpdateStorageState } from "../../hooks/mutations/useUpdateStorageState";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "../../lib/constants";
 
 function StorageUpdateState({ setStorageMenu }) {
-  const { fetchStorageData } = useStorageContext();
-
   const [selectedStorage, setSelectedStorage] = useState(null); //창고 일련번호
   const [selectedZone, setSelectedZone] = useState(null); //구역 일련번호
   const [selectedRack, setSelectedRack] = useState(null); //선반 일련번호
-
   const [rackEnabled, setRackEnabled] = useState(""); //선반 활성(Y)/비활성(N)
   const [rackCapacity, setRackCapacity] = useState(""); //선반 여유(Y)/포화(N)
 
   const openAlert = useOpenAlert();
+  const { mutate: updateStorageState, isPending:isUpdateStorageStatePending } = useUpdateStorageState();
+  const queryClient = useQueryClient();
 
   // 선택한 창고, 구역별 구역, 선반 옵션 리스트
   const { zoneOptions, rackOptions } = useStorageData(
@@ -84,7 +84,7 @@ function StorageUpdateState({ setStorageMenu }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if(!validateForm()) return;
+    if (!validateForm()) return;
 
     // 창고 정보 수정 파라미터
     const storageModifyReq = createPayload();
@@ -99,31 +99,38 @@ function StorageUpdateState({ setStorageMenu }) {
     openAlert({
       title: "Modify",
       message: checkMessage,
-      onConfirm: async () => {
-        try {
-          const data = await updateStorageState(storageModifyReq);
-          openAlert({
-            title: "Success",
-            message: data.message,
-            onConfirm: () => {
-              resetForm();
-              if (fetchStorageData) fetchStorageData();
-              setStorageMenu("list"); 
-            },
-          });
-        } catch (error) {
-          if (error.message) {
+      onConfirm: () => {
+        updateStorageState(storageModifyReq, {
+          onSuccess: (data) => {
             openAlert({
-              title: "Again",
-              message: error.message,
+              title: "Success",
+              message: data.message,
+              onConfirm: () => {
+                resetForm();
+                queryClient.invalidateQueries({
+                  queryKey: QUERY_KEYS.storage.all,
+                });
+                queryClient.invalidateQueries({
+                  queryKey: QUERY_KEYS.rack.all,
+                });
+                setStorageMenu("list");
+              },
             });
-          } else {
-            openAlert({
-              title: "Error",
-              message: "서버 통신 중 에러가 발생했습니다.",
-            });
-          }
-        }
+          },
+          onError: (error) => {
+            if (error.message) {
+              openAlert({
+                title: "Again",
+                message: error.message,
+              });
+            } else {
+              openAlert({
+                title: "Error",
+                message: "서버 통신 중 에러가 발생했습니다.",
+              });
+            }
+          },
+        });
       },
     });
   };
@@ -211,7 +218,7 @@ function StorageUpdateState({ setStorageMenu }) {
             </div>
           </div>
         </div>
-        <StorageModifyButton/>
+        <StorageModifyButton isPending={isUpdateStorageStatePending}/>
       </form>
     </>
   );

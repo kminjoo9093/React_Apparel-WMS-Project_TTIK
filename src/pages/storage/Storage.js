@@ -54,9 +54,9 @@ function Storage() {
           </aside>
 
           <section className={styleStorage.mainContentWrap}>
+            {storageMenu === "list" && <RackList />}
             {storageMenu === "register" && <StorageRegister />}
             {storageMenu === "modify" && <StorageModify setStorageMenu={setStorageMenu} />}
-            {storageMenu === "list" && <RackList />}
           </section>
         </div>
       </div>

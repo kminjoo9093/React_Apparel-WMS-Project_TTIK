@@ -2,15 +2,15 @@ import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import useStorageData from "../../hooks/storage/useStorageData";
 import { useOpenAlert } from "../../store/alert";
-import { useStorageContext } from "../../context/StorageProvider";
 import StorageSelector from "../../components/StorageSelector";
 import CheckButton from "../../components/CheckButton";
-import { addStorageStructure } from "../../api/storage/fetchStorageData";
 import { checkNumber } from "../../utils/validation/numbers";
 import StorageModifyButton from "../../components/StorageModifyButton";
+import { useAddStorageStructure } from "../../hooks/mutations/useAddStorageStructure";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "../../lib/constants";
 
 function StorageAdd({ setStorageMenu }) {
-  const { fetchStorageData } = useStorageContext();
   const openAlert = useOpenAlert();
   const initialFormData = {
     //선택
@@ -32,6 +32,9 @@ function StorageAdd({ setStorageMenu }) {
     formData.selectedStorage,
     formData.selectedZone,
   );
+
+  const { mutate: addStorageStructure } = useAddStorageStructure();
+  const queryClient = useQueryClient();
 
   //추가 버튼 체크
   const handleCheckChange = (e) => {
@@ -105,8 +108,6 @@ function StorageAdd({ setStorageMenu }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("구역/선반 추가 요청");
-
     if (formData.addRack && !formData.selectedZone) {
       return openAlert({ message: "구역을 선택하세요." });
     }
@@ -140,23 +141,33 @@ function StorageAdd({ setStorageMenu }) {
     openAlert({
       title: "",
       message: "수정을 진행하시겠습니까?",
+      onConfirm: () => {
+        addStorageStructure(storageAddReq, {
+          onSuccess: (data) => {
+            openAlert({
+              title: "Success",
+              message: data.message,
+              onConfirm: () => {
+                resetForm();
+                queryClient.invalidateQueries({
+                  queryKey: QUERY_KEYS.storage.all,
+                });
+                queryClient.invalidateQueries({
+                  queryKey: QUERY_KEYS.rack.all,
+                });
+                setStorageMenu("list");
+              },
+            });
+          },
+          onError: (error) => {
+            openAlert({
+              title: "Again",
+              message: error.message,
+            });
+          },
+        });
+      },
     });
-
-    try {
-      const data = await addStorageStructure(storageAddReq);
-      openAlert({
-        title: "Success",
-        message: data.message,
-      });
-      resetForm();
-      if (fetchStorageData) fetchStorageData();
-      setStorageMenu("list");
-    } catch (error) {
-      openAlert({
-        title: "Again",
-        message: error.message,
-      });
-    }
   };
 
   return (

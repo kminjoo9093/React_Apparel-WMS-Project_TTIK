@@ -2,35 +2,43 @@ import { useState } from "react";
 import styleProdModal from "../../css/ProductModal.module.css";
 import { CommonButton } from "../../components/CommonButton";
 import { useOpenAlert } from "../../store/alert";
-import { checkProductCdExists } from "../../api/product/fetchProductRegisterData";
+import { useProductCodeCheck } from "../../hooks/mutations/useProductCodeCheck";
+import { useProductCd, useSetProductCd } from "../../store/product";
+import { useCloseModal } from "../../store/productModal";
 
-function ProductCodeModal({ onClose, productCd, setProductCd }) {
+function ProductCodeModal() {
   const openAlert = useOpenAlert();
-  const [isChecked, setIsChecked] = useState(false); //중복체크 여부
-  const [isDuplicate, setIsDuplicate] = useState(null); //QR 코드 중복체크
+  const [isChecked, setIsChecked] = useState(false); //체크 여부
+  const [isDuplicate, setIsDuplicate] = useState(null); //중복 여부
+  const productCd = useProductCd();
+  const setProductCd = useSetProductCd();
+  const closeModal = useCloseModal();
+
+  const { mutate: checkProductCode } = useProductCodeCheck();
 
   // 코드 중복체크
-  async function validateProductCd(e) {
+  function validateProductCd(e) {
     e.preventDefault();
 
-    const isExist = await checkProductCdExists(productCd);
-    try {
-      if (isExist === true) {
-        //코드 중복
-        setIsDuplicate(true);
-      } else {
-        //중복 X. 사용 가능
-        setIsDuplicate(false);
-        setIsChecked(true);
-      }
-      return;
-    } catch (error) {
-      openAlert({
-        title: "Error",
-        message: "서버와의 통신이 원활하지 않습니다. 잠시 후 다시 시도해주세요",
-      });
-      return;
-    }
+    checkProductCode(productCd, {
+      onSuccess: (isExist) => {
+        if (isExist) {
+          //코드 중복
+          setIsDuplicate(true);
+        } else {
+          //중복 X
+          setIsDuplicate(false);
+          setIsChecked(true);
+        }
+      },
+      onError: () => {
+        openAlert({
+          title: "Error",
+          message:
+            "서버와의 통신이 원활하지 않습니다. 잠시 후 다시 시도해주세요",
+        });
+      },
+    });
   }
 
   // 코드 등록
@@ -45,14 +53,13 @@ function ProductCodeModal({ onClose, productCd, setProductCd }) {
         title: "Again",
         message: "상품 등록 정보를 확인해주세요.",
       });
-      onClose();
+      closeModal();
     }
 
     //바코드 이미지 생성 로직 성공하면 모달 닫기
     if (!isDuplicate && productCd) {
-      //모달창 닫기
       setIsDuplicate(null);
-      onClose();
+      closeModal();
     }
   }
 

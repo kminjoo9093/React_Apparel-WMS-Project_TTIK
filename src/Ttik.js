@@ -22,7 +22,6 @@ import Storage from "./pages/storage/Storage";
 import ProductDataProvider from "./context/ProductDataProvider";
 import Alert from "./components/Alert";
 import { useAlertStore } from "./store/alert";
-import StorageProvider from "./context/StorageProvider";
 
 function Ttik() {
   const [user, setUser] = useState(null);
@@ -119,14 +118,7 @@ function Ttik() {
                   />
                   <Route path="/stock/plans/qr/print" element={<QRsave />} />
                   <Route path="/stock/history" element={<History />} />
-                  <Route
-                    path="/storage"
-                    element={
-                      <StorageProvider>
-                        <Storage />
-                      </StorageProvider>
-                    }
-                  />
+                  <Route path="/storage" element={<Storage />} />
 
                   <Route
                     path="/register-admin"

@@ -4,21 +4,28 @@ import styleRegister from "../../css/ProductRegister.module.css";
 import { useNavigate } from "react-router-dom";
 import { checkNumber } from "../../utils/validation/numbers";
 import { useOpenAlert } from "../../store/alert";
-import { useStorageContext } from "../../context/StorageProvider";
 import { CommonButton } from "../../components/CommonButton";
-import { registerStorage } from "../../api/storage/fetchStorageData";
+import { useStorage } from "../../hooks/queries/useStorage";
+import { useRegisterStorage } from "../../hooks/mutations/useRegisterStorage";
 
 function StorageRegister() {
   const navigate = useNavigate();
-  const { storageList } = useStorageContext();
+  const { data: storageList } = useStorage();
   const [storageNm, setStorageNm] = useState("");
-  const [zoneList, setZoneList] = useState([{ zone: 1, rack: "", error: false, errorMsg: "" }]);
+  const [zoneList, setZoneList] = useState([
+    { zone: 1, rack: "", error: false, errorMsg: "" },
+  ]);
   const openAlert = useOpenAlert();
+
+  const { mutate: registerStorage } = useRegisterStorage();
 
   const handleAddBtn = () => {
     setZoneList((prev) => {
       const nextZone = prev.length + 1;
-      return [...prev, { zone: nextZone, rack: "", error: false, errorMsg: "" }];
+      return [
+        ...prev,
+        { zone: nextZone, rack: "", error: false, errorMsg: "" },
+      ];
     });
   };
 
@@ -35,9 +42,14 @@ function StorageRegister() {
     setZoneList((prev) =>
       prev.map((obj, i) =>
         i === rackNo
-          ? { ...obj, rack: isInvalid ? obj.rack : value, error: isInvalid, errorMsg: message }
-          : obj
-      )
+          ? {
+              ...obj,
+              rack: isInvalid ? obj.rack : value,
+              error: isInvalid,
+              errorMsg: message,
+            }
+          : obj,
+      ),
     );
   };
 
@@ -83,30 +95,31 @@ function StorageRegister() {
       })),
     };
 
-    try {
-      await registerStorage(submitData);
-
-      setStorageNm("");
-      setZoneList([{ zone: 1, rack: "" }]);
-      openAlert({
-        title: "Success",
-        message: (
-          <>
-            등록이 완료되었습니다.
-            <br />
-            관리자/모니터 등록을 진행해 주세요
-          </>
-        ),
-        onConfirm: () => {
-          navigate("/register/admin");
-        },
-      });
-    } catch (error) {
-      openAlert({
-        title: "Error",
-        message: "등록에 실패했습니다.",
-      });
-    }
+    registerStorage(submitData, {
+      onSuccess: () => {
+        setStorageNm("");
+        setZoneList([{ zone: 1, rack: "" }]);
+        openAlert({
+          title: "Success",
+          message: (
+            <>
+              등록이 완료되었습니다.
+              <br />
+              관리자/모니터 등록을 진행해 주세요
+            </>
+          ),
+          onConfirm: () => {
+            navigate("/register/admin");
+          },
+        });
+      },
+      onError: () => {
+        openAlert({
+          title: "Error",
+          message: "등록에 실패했습니다.",
+        });
+      },
+    });
   };
 
   return (

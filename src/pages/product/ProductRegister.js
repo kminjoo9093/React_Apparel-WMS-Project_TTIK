@@ -13,7 +13,6 @@ import {
   useFormData,
   useProductCd,
   useResetFormData,
-  useSetFormData,
   useSetProductCd,
 } from "../../store/product";
 import { useCloseModal, useModalConfig } from "../../store/productModal";
@@ -21,12 +20,13 @@ import ProductBasicInfoField from "../../components/ProductBasicInfoField";
 import ProductStockInfoField from "../../components/ProductStockInfoField";
 import ProductCodeField from "../../components/ProductCodeField";
 import { useOpenAlert } from "../../store/alert";
+import { useRegisterProduct } from "../../hooks/mutations/useRegisterProduct";
+import { useQueryClient } from "@tanstack/react-query";
 
 function ProductRegister() {
   const navigate = useNavigate();
 
   const formData = useFormData();
-  const setFormData = useSetFormData();
   const errors = useErrors();
   const productCd = useProductCd();
   const setProductCd = useSetProductCd();
@@ -34,6 +34,9 @@ function ProductRegister() {
   const modalConfig = useModalConfig();
   const closeModal = useCloseModal();
   const openAlert = useOpenAlert();
+
+  const { mutate: registerProduct } = useRegisterProduct();
+  const queryClient = useQueryClient();
 
   // 모달
   const getModalTitle = (type) => {
@@ -52,22 +55,11 @@ function ProductRegister() {
   const renderModalContent = () => {
     switch (modalConfig.type) {
       case "brand":
-        return (
-          <BrandSearchModal
-            onClose={closeModal}
-            setBrandCd={(value) => setFormData({ brandCd: value })}
-          />
-        );
+        return <BrandSearchModal />;
       case "season":
-        return <ProductSeasonModal onClose={closeModal} />;
+        return <ProductSeasonModal />;
       case "productCode":
-        return (
-          <ProductCodeModal
-            onClose={closeModal}
-            productCd={modalConfig.props.productCd}
-            setProductCd={setProductCd}
-          />
-        );
+        return <ProductCodeModal />;
       default:
         return null;
     }
@@ -85,7 +77,7 @@ function ProductRegister() {
   ]);
 
   // 상품 등록 처리
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
 
     if (!productCd) {
@@ -98,7 +90,6 @@ function ProductRegister() {
 
     const hasError = Object.values(errors).some((val) => val === true);
     if (hasError) {
-
       openAlert({
         title: "Again",
         message: "입력값을 확인하세요",
@@ -106,8 +97,8 @@ function ProductRegister() {
       return;
     }
 
-    try {
-      await registerProduct({
+    registerProduct(
+      {
         productCd: productCd,
         styleNo: formData.styleNo,
         productNm: formData.productNm,
@@ -115,26 +106,31 @@ function ProductRegister() {
         sizeCd: formData.sizeCd,
         catCd: formData.category,
         seasonCd: formData.seasonCd,
-        inboxQty: Number(formData.inboxQty), //입수량
-        price: Number(formData.price), //단가
-        threshold: Number(formData.threshold), //임계치
-      });
+        inboxQty: Number(formData.inboxQty),
+        price: Number(formData.price),
+        threshold: Number(formData.threshold),
+      },
+      {
+        onSuccess: () => {
+          openAlert({
+            title: "Success",
+            message: "상품 등록이 완료되었습니다.",
+            onConfirm: () => {
+              //queryClient로 invaidateQueries 상품목록
+              navigate("/product/list");
+            },
+          });
 
-      openAlert({
-        title: "Success",
-        message: "상품 등록이 완료되었습니다.",
-        onConfirm: () => {
-          navigate("/product/list");
+          resetFormData();
         },
-      });
-
-      resetFormData();
-    } catch (error) {
-      openAlert({
-        title: "Again",
-        message: "입력한 정보를 확인하세요.",
-      });
-    }
+        onError: () => {
+          openAlert({
+            title: "Again",
+            message: "입력한 정보를 확인하세요.",
+          });
+        },
+      },
+    );
   }
 
   useEffect(() => {
