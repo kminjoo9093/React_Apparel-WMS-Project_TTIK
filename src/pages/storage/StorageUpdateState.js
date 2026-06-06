@@ -9,7 +9,6 @@ import { useStorageToggle } from "../../hooks/storage/useStorageToggle";
 import StorageModifyButton from "../../components/StorageModifyButton";
 import { useUpdateStorageState } from "../../hooks/mutations/useUpdateStorageState";
 import { useQueryClient } from "@tanstack/react-query";
-import { QUERY_KEYS } from "../../lib/constants";
 
 function StorageUpdateState({ setStorageMenu }) {
   const [selectedStorage, setSelectedStorage] = useState(null); //창고 일련번호
@@ -20,7 +19,6 @@ function StorageUpdateState({ setStorageMenu }) {
 
   const openAlert = useOpenAlert();
   const { mutate: updateStorageState, isPending:isUpdateStorageStatePending } = useUpdateStorageState();
-  const queryClient = useQueryClient();
 
   // 선택한 창고, 구역별 구역, 선반 옵션 리스트
   const { zoneOptions, rackOptions } = useStorageData(
@@ -107,12 +105,6 @@ function StorageUpdateState({ setStorageMenu }) {
               message: data.message,
               onConfirm: () => {
                 resetForm();
-                queryClient.invalidateQueries({
-                  queryKey: QUERY_KEYS.storage.all,
-                });
-                queryClient.invalidateQueries({
-                  queryKey: QUERY_KEYS.rack.all,
-                });
                 setStorageMenu("list");
               },
             });

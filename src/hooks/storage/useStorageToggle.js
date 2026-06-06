@@ -10,9 +10,7 @@ export const useStorageToggle = ({ resetRackInfo, resetRackState }) => {
 
   const handleToggle = (e, selectedZone = null, selectedRack = null) => {
     const { name, checked } = e.target;
-
-    console.log("change event test:", selectedZone, selectedRack);
-
+    
     if (name === "isDisabledZone" && !selectedZone) {
       openAlert({
         title: "Again",

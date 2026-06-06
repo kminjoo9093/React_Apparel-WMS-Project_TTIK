@@ -14,15 +14,16 @@ function StorageDelete({ setStorageMenu }) {
     selectedZone: null,
     selectedRack: null,
     //삭제 여부
-    isDeleteStorage: false,
-    isDeleteZone: false,
-    isDeleteRack: false,
+    deleteStorage: false,
+    deleteZone: false,
+    deleteRack: false,
   };
   const [formData, setFormData] = useState(initialFormData);
   const openAlert = useOpenAlert();
 
   const { data: storageList } = useStorage();
-  const { mutate: deleteStorage, isPending } = useDeleteStorage();
+  const { mutate: deleteStorage, isPending: isDeleteStoragePending } =
+    useDeleteStorage();
 
   //창고별 구역리스트, 구역별 선반리스트
   const { zoneOptions, rackOptions } = useStorageData(
@@ -59,9 +60,9 @@ function StorageDelete({ setStorageMenu }) {
     e.preventDefault();
 
     if (
-      !formData.isDeleteStorage &&
-      !formData.isDeleteZone &&
-      !formData.isDeleteRack
+      !formData.deleteStorage &&
+      !formData.deleteZone &&
+      !formData.deleteRack
     ) {
       openAlert({
         title: "",
@@ -79,7 +80,7 @@ function StorageDelete({ setStorageMenu }) {
       storageSn: formData.selectedStorage,
       zoneSn: formData.selectedZone,
       rackSn: formData.selectedRack,
-      storageNm: formData.isDeleteStorage ? currentStorageNm : null,
+      storageNm: formData.deleteStorage ? currentStorageNm : null,
     };
 
     openAlert({
@@ -116,7 +117,7 @@ function StorageDelete({ setStorageMenu }) {
   };
   return (
     <>
-      <form className={styleStorage.deleteForm} onSubmit={handleSubmit}>
+      <form className={styleStorage.isDeleteForm} onSubmit={handleSubmit}>
         <div className={`${styleStorage.contentRow} ${styleStorage.row1}`}>
           <h3 className={styleStorage.modifyHeading}>창고</h3>
           <StorageSelector
@@ -131,8 +132,8 @@ function StorageDelete({ setStorageMenu }) {
           <CheckButton
             type={"delete"}
             id={"deleteStorage"}
-            name={"isDeleteStorage"}
-            checked={formData.isDeleteStorage}
+            name={"deleteStorage"}
+            checked={formData.deleteStorage}
             onChange={handleCheckChange}
             label={"삭제"}
           />
@@ -146,7 +147,7 @@ function StorageDelete({ setStorageMenu }) {
                 name="zone"
                 value={formData.selectedZone}
                 className={styleStorage.modifyZoneSelect}
-                disabled={formData.isDeleteStorage}
+                disabled={formData.deleteStorage}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
@@ -164,8 +165,8 @@ function StorageDelete({ setStorageMenu }) {
               <CheckButton
                 type={"delete"}
                 id={"deleteZone"}
-                name={"isDeleteZone"}
-                checked={formData.isDeleteZone}
+                name={"deleteZone"}
+                checked={formData.deleteZone}
                 onChange={handleCheckChange}
                 label={"삭제"}
               />
@@ -178,7 +179,7 @@ function StorageDelete({ setStorageMenu }) {
                 <select
                   name="rack"
                   value={formData.selectedRack}
-                  disabled={formData.isDeleteStorage || formData.isDeleteZone}
+                  disabled={formData.deleteStorage || formData.deleteZone}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
@@ -194,11 +195,10 @@ function StorageDelete({ setStorageMenu }) {
                   ))}
                 </select>
                 <CheckButton
-                  disabled={isPending}
                   type={"delete"}
                   id={"deleteRack"}
-                  name={"isDeleteRack"}
-                  checked={formData.isDeleteRack}
+                  name={"deleteRack"}
+                  checked={formData.deleteRack}
                   onChange={handleCheckChange}
                   label={"삭제"}
                 />
@@ -206,7 +206,7 @@ function StorageDelete({ setStorageMenu }) {
             </div>
           </div>
         </div>
-        <StorageModifyButton />
+        <StorageModifyButton isPending={isDeleteStoragePending} />
       </form>
     </>
   );

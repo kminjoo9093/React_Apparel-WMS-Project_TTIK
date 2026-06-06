@@ -5,7 +5,7 @@ import { getStorageData } from "../../api/storage/fetchStorageData";
 export function useStorage(){
   return useQuery({
     queryFn: getStorageData,
-    queryKey: QUERY_KEYS.storage.all,
+    queryKey: QUERY_KEYS.storage.list,
     initialData: [],
   })
 }

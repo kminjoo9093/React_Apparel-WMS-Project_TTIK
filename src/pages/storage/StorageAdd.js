@@ -8,7 +8,6 @@ import { checkNumber } from "../../utils/validation/numbers";
 import StorageModifyButton from "../../components/StorageModifyButton";
 import { useAddStorageStructure } from "../../hooks/mutations/useAddStorageStructure";
 import { useQueryClient } from "@tanstack/react-query";
-import { QUERY_KEYS } from "../../lib/constants";
 
 function StorageAdd({ setStorageMenu }) {
   const openAlert = useOpenAlert();
@@ -34,7 +33,6 @@ function StorageAdd({ setStorageMenu }) {
   );
 
   const { mutate: addStorageStructure } = useAddStorageStructure();
-  const queryClient = useQueryClient();
 
   //추가 버튼 체크
   const handleCheckChange = (e) => {
@@ -149,12 +147,6 @@ function StorageAdd({ setStorageMenu }) {
               message: data.message,
               onConfirm: () => {
                 resetForm();
-                queryClient.invalidateQueries({
-                  queryKey: QUERY_KEYS.storage.all,
-                });
-                queryClient.invalidateQueries({
-                  queryKey: QUERY_KEYS.rack.all,
-                });
                 setStorageMenu("list");
               },
             });

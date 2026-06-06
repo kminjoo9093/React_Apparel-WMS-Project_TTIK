@@ -9,7 +9,7 @@ export function useRegisterSeason(season) {
     mutationFn: () => registerSeason(season),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.season.list,
+        queryKey: QUERY_KEYS.season.all,
       });
     },
   });

@@ -17,7 +17,7 @@ function StorageRegister() {
   ]);
   const openAlert = useOpenAlert();
 
-  const { mutate: registerStorage } = useRegisterStorage();
+  const { mutate: registerStorage, isPending: isRegisterStoragePending } = useRegisterStorage();
 
   const handleAddBtn = () => {
     setZoneList((prev) => {
@@ -200,7 +200,7 @@ function StorageRegister() {
           ></button>
         </div>
         <div className={styleStorage.btnSubmitWrap}>
-          <CommonButton variant="primary" type="submit">
+          <CommonButton variant="primary" type="submit" disable={isRegisterStoragePending}>
             등록
           </CommonButton>
         </div>
