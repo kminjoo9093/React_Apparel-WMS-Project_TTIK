@@ -6,7 +6,6 @@ import ProductSeasonModal from "./ProductSeasonModal";
 import ProductCodeModal from "./ProductCodeModal";
 import BrandSearchModal from "./BrandSearchModal";
 import { CommonButton } from "../../components/CommonButton";
-import { registerProduct } from "../../api/product/fetchProductRegisterData";
 import PageInfo from "../../components/PageInfo";
 import {
   useErrors,
@@ -36,7 +35,6 @@ function ProductRegister() {
   const openAlert = useOpenAlert();
 
   const { mutate: registerProduct } = useRegisterProduct();
-  const queryClient = useQueryClient();
 
   // 모달
   const getModalTitle = (type) => {
@@ -116,12 +114,11 @@ function ProductRegister() {
             title: "Success",
             message: "상품 등록이 완료되었습니다.",
             onConfirm: () => {
-              //queryClient로 invaidateQueries 상품목록
+              resetFormData();
               navigate("/product/list");
             },
           });
 
-          resetFormData();
         },
         onError: () => {
           openAlert({

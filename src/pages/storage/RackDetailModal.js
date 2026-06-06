@@ -3,15 +3,12 @@ import styleModal from "../../css/Modal.module.css";
 import styleStorage from "../../css/Storage.module.css";
 import { CommonButton } from "../../components/CommonButton";
 import { useOpenAlert } from "../../store/alert";
-import { QUERY_KEYS } from "../../lib/constants";
 import { useRackDetail } from "../../hooks/queries/useRackDetail";
 import { useEffect, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useMoveBoxes } from "../../hooks/mutations/useMoveBox";
 
 export default function RackDetailModal({ selectedRack, onCloseModal }) {
   const openAlert = useOpenAlert();
-  const queryClient = useQueryClient();
 
   const {
     data: rackDetailData = [],
@@ -74,9 +71,6 @@ export default function RackDetailModal({ selectedRack, onCloseModal }) {
                 message: "모든 박스의 위치 변경 및 이력 등록이 완료되었습니다.",
                 onConfirm: () => {
                   onCloseModal();
-                  queryClient.invalidateQueries({
-                    queryKey: QUERY_KEYS.rack.all,
-                  });
                 },
               });
             },
