@@ -2,14 +2,13 @@ import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
 import useStorageData from "../../hooks/storage/useStorageData";
 import { useOpenAlert } from "../../store/alert";
-import { useStorageContext } from "../../context/StorageProvider";
 import StorageSelector from "../../components/StorageSelector";
 import CheckButton from "../../components/CheckButton";
-import { deleteStorageStructure } from "../../api/storage/fetchStorageData";
 import StorageModifyButton from "../../components/StorageModifyButton";
+import { useStorage } from "../../hooks/queries/useStorage";
+import { useDeleteStorage } from "../../hooks/mutations/useDeleteStorage";
 
 function StorageDelete({ setStorageMenu }) {
-  const { storageList, fetchStorageData } = useStorageContext();
   const initialFormData = {
     selectedStorage: null,
     selectedZone: null,
@@ -21,6 +20,9 @@ function StorageDelete({ setStorageMenu }) {
   };
   const [formData, setFormData] = useState(initialFormData);
   const openAlert = useOpenAlert();
+
+  const { data: storageList } = useStorage();
+  const { mutate: deleteStorage, isPending } = useDeleteStorage();
 
   //창고별 구역리스트, 구역별 선반리스트
   const { zoneOptions, rackOptions } = useStorageData(
@@ -83,31 +85,32 @@ function StorageDelete({ setStorageMenu }) {
     openAlert({
       title: "DELETE",
       message: "삭제를 진행하시겠습니까?",
-      onConfirm: async () => {
-        try {
-          const data = await deleteStorageStructure(storageDeleteReq);
-          openAlert({
-            title: "Success",
-            message: data.message,
-            onConfirm: () => {
-              if (fetchStorageData) fetchStorageData();
-              resetForm();
-              setStorageMenu("list");
-            },
-          });
-        } catch (error) {
-          if (error.message) {
+      onConfirm: () => {
+        deleteStorage(storageDeleteReq, {
+          onSuccess: (data) => {
             openAlert({
-              title: "DELETE",
-              message: error.message,
+              title: "Success",
+              message: data.message,
+              onConfirm: () => {
+                resetForm();
+                setStorageMenu("list");
+              },
             });
-          } else {
-            openAlert({
-              title: "Error",
-              message: "서버 통신 중 에러가 발생했습니다.",
-            });
-          }
-        }
+          },
+          onError: (error) => {
+            if (error.message) {
+              openAlert({
+                title: "DELETE",
+                message: error.message,
+              });
+            } else {
+              openAlert({
+                title: "Error",
+                message: "서버 통신 중 에러가 발생했습니다.",
+              });
+            }
+          },
+        });
       },
     });
   };
@@ -191,6 +194,7 @@ function StorageDelete({ setStorageMenu }) {
                   ))}
                 </select>
                 <CheckButton
+                  disabled={isPending}
                   type={"delete"}
                   id={"deleteRack"}
                   name={"isDeleteRack"}

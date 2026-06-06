@@ -3,11 +3,13 @@ import styleProdModal from "../../css/ProductModal.module.css";
 import { CommonButton } from "../../components/CommonButton";
 import { useOpenAlert } from "../../store/alert";
 import { useRegisterSeason } from "../../hooks/mutations/useRegisterSeason";
+import { useCloseModal } from "../../store/productModal";
 
-function ProductSeasonModal({ onClose }) {
+function ProductSeasonModal() {
   const yearRef = useRef();
   const seasonRef = useRef();
   const openAlert = useOpenAlert();
+  const closeModal = useCloseModal();
 
   const { mutate: registerSeasonData } = useRegisterSeason();
 
@@ -36,7 +38,7 @@ function ProductSeasonModal({ onClose }) {
             message: `${year} ${newSeason} 시즌이 정상 등록되었습니다.`,
           });
 
-          onClose();
+          closeModal();
         },
         onError: (error) => {
           if (error.status === 404) {

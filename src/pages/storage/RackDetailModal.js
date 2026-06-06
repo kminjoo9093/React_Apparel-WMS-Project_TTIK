@@ -3,42 +3,56 @@ import styleModal from "../../css/Modal.module.css";
 import styleStorage from "../../css/Storage.module.css";
 import { CommonButton } from "../../components/CommonButton";
 import { useOpenAlert } from "../../store/alert";
-import { updateBoxLocation } from "../../api/storage/fetchBoxesData";
+import { QUERY_KEYS } from "../../lib/constants";
+import { useRackDetail } from "../../hooks/queries/useRackDetail";
+import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useMoveBoxes } from "../../hooks/mutations/useMoveBox";
 
-export default function RackDetailModal({
-  selectedRack,
-  rackDetailList,
-  setRackDetailList,
-  onCloseModal,
-  fetchRackList,
-}) {
+export default function RackDetailModal({ selectedRack, onCloseModal }) {
   const openAlert = useOpenAlert();
+  const queryClient = useQueryClient();
+
+  const {
+    data: rackDetailData = [],
+    isLoading: isRackDetailLoading,
+    isError: isRackDetailDataError,
+  } = useRackDetail(selectedRack);
+
+  const [boxSelections, setBoxSelections] = useState({});
+
+  useEffect(() => {
+    if (isRackDetailDataError) {
+      openAlert({
+        title: "Error",
+        message: "해당 선반의 상세정보를 받아오지 못했습니다.",
+      });
+    }
+  }, [isRackDetailDataError]);
 
   //위치 변경할 선반 선택
   const handleChangeRackInfo = (e, boxQr) => {
-    const selectedValue = e.target.value;
-    const selectedName = e.target.options[e.target.selectedIndex].text;
+    const selectedRackSn = e.target.value;
+    const selectedRackName = e.target.options[e.target.selectedIndex].text;
 
-    setRackDetailList((prev) => ({
+    setBoxSelections((prev) => ({
       ...prev,
-      boxes: prev?.boxes?.map((box) =>
-        box.boxQr === boxQr
-          ? { ...box, newRackSn: selectedValue, newRackNm: selectedName }
-          : box,
-      ),
+      [boxQr]: { newRackSn: selectedRackSn, newRackNm: selectedRackName },
     }));
   };
 
+  const { mutate: moveBoxes, isPending: isMoveBoxesPending } = useMoveBoxes();
+
   // 박스 이동
-  const handelMoveBoxes = async (e) => {
+  const handelMoveBoxes = (e) => {
     e.preventDefault();
 
-    // 변경 위치가 선택된 박스들만 필터링
-    const selectedBoxes = rackDetailList.boxes.filter((box) => box.newRackSn);
-    console.log(selectedBoxes);
+    // 이동할 박스들(새 선반 o)만 필터링
+    const selectedBoxes = rackDetailData.boxes.filter(
+      (box) => boxSelections[box.boxQr]?.newRackSn,
+    );
 
     if (selectedBoxes.length === 0) {
-      // 위치변경하는 박스가 없는 경우
       onCloseModal();
       return;
     }
@@ -46,37 +60,80 @@ export default function RackDetailModal({
     openAlert({
       title: "Confirm",
       message: `${selectedBoxes.length}개의 박스를 이동시키겠습니까?`,
-      onConfirm: async () => {
-        try {
-          const requests = selectedBoxes.map((box) =>
-            updateBoxLocation({
-              boxQr: box.boxQr,
-              oldRack: selectedRack,
-              newRack: box.newRackSn,
-            }),
-          );
-
-          await Promise.all(requests);
-
-          openAlert({
-            title: "Success",
-            message: "모든 박스의 위치 변경 및 이력 등록이 완료되었습니다.",
-            onConfirm: () => {
-              onCloseModal();
-              fetchRackList();
+      onConfirm: () => {
+        moveBoxes(
+          selectedBoxes.map((box) => ({
+            boxQr: box.boxQr,
+            oldRack: selectedRack,
+            newRack: boxSelections[box.boxQr].newRackSn,
+          })),
+          {
+            onSuccess: () => {
+              openAlert({
+                title: "Success",
+                message: "모든 박스의 위치 변경 및 이력 등록이 완료되었습니다.",
+                onConfirm: () => {
+                  onCloseModal();
+                  queryClient.invalidateQueries({
+                    queryKey: QUERY_KEYS.rack.all,
+                  });
+                },
+              });
             },
-          });
-        } catch (error) {
-          console.log("박스 이동 에러:", error);
-
-          openAlert({
-            isOpen: true,
-            title: "Error",
-            message: "서버 통신 중 에러가 발생했습니다.",
-          });
-        }
+            onError: () => {
+              openAlert({
+                isOpen: true,
+                title: "Error",
+                message: "서버 통신 중 에러가 발생했습니다.",
+              });
+            },
+          },
+        );
       },
     });
+  };
+
+  const renderTableBody = () => {
+    if (isRackDetailLoading) {
+      return (
+        <tr>
+          <td colSpan={5} className={styleStorage.loading}>
+            선반 정보를 불러오는 중입니다...
+          </td>
+        </tr>
+      );
+    }
+
+    if (!rackDetailData?.boxes?.length) {
+      return (
+        <tr className={styleStorage.emptyRack}>
+          <td colSpan={5}>해당 선반에 적재된 상자가 없습니다.</td>
+        </tr>
+      );
+    }
+
+    return rackDetailData.boxes.map((box, index) => (
+      <tr key={box.boxQr}>
+        <td>{index + 1}</td>
+        <td>{box.boxQr}</td>
+        <td>{box.productNm}</td>
+        <td>{box.rackNm}</td>
+        <td>
+          <select
+            name="newLoc"
+            value={boxSelections[box.boxQr]?.newRackSn || ""}
+            onChange={(e) => handleChangeRackInfo(e, box.boxQr, box.rackSn)}
+          >
+            <option value="">변경 안함</option>
+            {rackDetailData.availableRacks?.map((rack) => (
+              <option key={rack.availableRackSn} value={rack.availableRackSn}>
+                {rack.availableRackNm}
+              </option>
+            ))}
+          </select>
+        </td>
+      </tr>
+    ));
   };
 
   return (
@@ -87,8 +144,8 @@ export default function RackDetailModal({
           style={{ alignItems: "stretch" }}
         >
           <h3 className={styleStorage.rackHeading}>
-            Rack : {rackDetailList.rackNm}
-            <span> (수량 : {rackDetailList.boxQty}개) </span>
+            Rack : {rackDetailData.rackNm}
+            <span> (수량 : {rackDetailData.boxQty}개) </span>
           </h3>
           <div className={styleStorage.modalTableArea}>
             <table className={styleStorage.storageTable}>
@@ -101,43 +158,11 @@ export default function RackDetailModal({
                   <th>변경 위치</th>
                 </tr>
               </thead>
-              <tbody>
-                {rackDetailList?.boxes && rackDetailList.boxes.length > 0 ? (
-                  rackDetailList?.boxes?.map((box, index) => {
-                    return (
-                      <tr key={box.boxQr}>
-                        <td>{index + 1}</td>
-                        <td>{box.boxQr}</td>
-                        <td>{box.productNm}</td>
-                        <td>{box.rackNm}</td>
-                        <td>
-                          <select
-                            name="newLoc"
-                            value={box.newRackSn || ""}
-                            onChange={(e) =>
-                              handleChangeRackInfo(e, box.boxQr, box.rackSn)
-                            }
-                          >
-                            <option value="">변경 안함</option>
-                            {rackDetailList.availableRacks?.map((rack) => (
-                              <option value={rack.availableRackSn}>
-                                {rack.availableRackNm}
-                              </option>
-                            ))}
-                          </select>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr className={styleStorage.emptyRack}>
-                    <td colSpan={5}>해당 선반에 적재된 상자가 없습니다.</td>
-                  </tr>
-                )}
-              </tbody>
+              <tbody>{renderTableBody()}</tbody>
             </table>
           </div>
           <CommonButton
+            disabled={isMoveBoxesPending}
             variant="primary"
             type="submit"
             onClick={handelMoveBoxes}

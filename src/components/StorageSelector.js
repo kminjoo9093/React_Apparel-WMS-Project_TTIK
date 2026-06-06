@@ -1,12 +1,12 @@
 import { useEffect } from "react";
-import { useStorageContext } from "../context/StorageProvider";
 import styleStorage from "../css/Storage.module.css";
+import { useStorage } from "../hooks/queries/useStorage";
 
 export default function StorageSelector({
   selectedStorage,
   setSelectedStorage,
 }) {
-  const { storageList } = useStorageContext();
+  const {data: storageList} = useStorage();
 
   useEffect(()=>{
     if(storageList.length > 0 && !selectedStorage){

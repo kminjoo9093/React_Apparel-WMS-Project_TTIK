@@ -2,18 +2,23 @@ import styleProdModal from "../../css/ProductModal.module.css";
 import { useState } from "react";
 import { CommonButton } from "../../components/CommonButton";
 import { searchBrandData } from "../../api/brand";
+import { useCloseModal } from "../../store/productModal";
+import { useSetFormData } from "../../store/product";
 
-function BrandSearchModal({onClose, setBrandCd}){
+function BrandSearchModal(){
     const [inputVal, setInputVal] = useState("");
     const [resultList, setResultList] = useState([]);
     const [selectedBrand, setSelectedBrand] = useState(null);
+
+    const setBrandCd = useSetFormData();
+    const closeModal = useCloseModal();
 
     const confirmBrand = async (e) => {
         e.preventDefault();
 
         if(selectedBrand){
-            setBrandCd(selectedBrand.brandSn);
-            onClose();
+            setBrandCd({brandCd: selectedBrand.brandSn});
+            closeModal();
         }
     }
 

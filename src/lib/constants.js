@@ -11,4 +11,12 @@ export const QUERY_KEYS = {
   season: {
     list: ["season", "list"],
   },
+  storage: {
+    all: ["storage"],
+  },
+  rack: {
+    all: ["rack"],
+    list: (params) => ["rack", "list", params],
+    detail: (rackSn) => ["rack", "detail", rackSn],
+  },
 };

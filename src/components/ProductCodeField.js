@@ -2,8 +2,8 @@ import styleRegister from "../css/ProductRegister.module.css";
 import { CommonButton } from "./CommonButton";
 import { useFormData, useProductCd, useSetProductCd } from "../store/product";
 import { useOpenModal } from "../store/productModal";
-import { createProductCd } from "../api/product/fetchProductRegisterData";
 import { useOpenAlert } from "../store/alert";
+import { useProductCode } from "../hooks/mutations/useProductCode";
 
 export default function ProductCodeField() {
   const formData = useFormData();
@@ -12,28 +12,10 @@ export default function ProductCodeField() {
   const setProductCd = useSetProductCd();
   const openAlert = useOpenAlert();
 
-  // 상품 코드 생성 & 모달 오픈
-  async function generateProductCd() {
-    try {
-      const code = await createProductCd({
-        styleNo: formData.styleNo,
-        brandCd: formData.brandCd,
-        sizeCd: formData.sizeCd,
-        catCd: formData.category,
-        seasonCd: formData.seasonCd,
-      });
-      setProductCd(code);
-      return code;
-    } catch (error) {
-      openAlert({
-        title: "Error",
-        message: "입력한 정보를 확인하세요.",
-      });
-      return null;
-    }
-  }
+  const { mutate: createProductCode } = useProductCode();
 
-  async function handleProductCd() {
+  // 상품 코드 생성 & 모달 오픈
+  function handleProductCd() {
     if (
       !formData.brandCd ||
       !formData.seasonCd ||
@@ -48,11 +30,27 @@ export default function ProductCodeField() {
     }
 
     // 상품 코드 생성
-    const newProductCd = await generateProductCd();
-    if (!newProductCd) return;
-
-    // 모달 오픈
-    openModal("productCode", { productCd: newProductCd });
+    createProductCode(
+      {
+        styleNo: formData.styleNo,
+        brandCd: formData.brandCd,
+        sizeCd: formData.sizeCd,
+        catCd: formData.category,
+        seasonCd: formData.seasonCd,
+      },
+      {
+        onSuccess: (code) => {
+          setProductCd(code);
+          openModal("productCode", { productCd: code });
+        },
+        onError: () => {
+          openAlert({
+            title: "Error",
+            message: "입력한 정보를 확인하세요.",
+          });
+        },
+      },
+    );
   }
 
   return (
