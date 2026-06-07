@@ -1,13 +1,14 @@
 import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
-import useStorageData from "../../hooks/storage/useStorageData";
+// import useStorageData from "../../hooks/storage/useStorageData";
 import { useOpenAlert } from "../../store/alert";
 import StorageSelector from "../../components/StorageSelector";
 import CheckButton from "../../components/CheckButton";
 import { checkNumber } from "../../utils/validation/numbers";
 import StorageModifyButton from "../../components/StorageModifyButton";
 import { useAddStorageStructure } from "../../hooks/mutations/useAddStorageStructure";
-import { useQueryClient } from "@tanstack/react-query";
+import { useZonesByStorage } from "../../hooks/queries/useZonesByStorage";
+import { useRacksByZone } from "../../hooks/queries/useRacksByZone";
 
 function StorageAdd({ setStorageMenu }) {
   const openAlert = useOpenAlert();
@@ -26,11 +27,10 @@ function StorageAdd({ setStorageMenu }) {
 
   const [formData, setFormData] = useState(initialFormData);
 
-  // 선택한 창고 별 구역 옵션 리스트, 구역 별 선반 옵션 리스트
-  const { zoneOptions, rackOptions } = useStorageData(
-    formData.selectedStorage,
-    formData.selectedZone,
-  );
+  // 선택한 창고 별 구역 옵션 리스트
+  const {data: zoneOptions = []} = useZonesByStorage(formData.selectedStorage);
+  // 구역 별 선반 옵션 리스트
+  const {data: rackOptions = []} = useRacksByZone(formData.selectedZone);
 
   const { mutate: addStorageStructure } = useAddStorageStructure();
 

@@ -18,6 +18,8 @@ export const QUERY_KEYS = {
   storage: {
     all: ["storage"],
     list: ["storage", "list"],
+    zones: (storageSn) => ["storage", "zones", storageSn],
+    racks: (zoneSn) => ["storage", "racks", zoneSn],
   },
   rack: {
     all: ["rack"],
@@ -26,6 +28,6 @@ export const QUERY_KEYS = {
   },
   product: {
     all: ["product"],
-    list: ["product", "list"]
-  }
+    list: ["product", "list"],
+  },
 };
