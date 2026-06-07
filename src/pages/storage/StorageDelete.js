@@ -1,12 +1,13 @@
 import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
-import useStorageData from "../../hooks/storage/useStorageData";
 import { useOpenAlert } from "../../store/alert";
 import StorageSelector from "../../components/StorageSelector";
 import CheckButton from "../../components/CheckButton";
 import StorageModifyButton from "../../components/StorageModifyButton";
 import { useStorage } from "../../hooks/queries/useStorage";
 import { useDeleteStorage } from "../../hooks/mutations/useDeleteStorage";
+import { useZonesByStorage } from "../../hooks/queries/useZonesByStorage";
+import { useRacksByZone } from "../../hooks/queries/useRacksByZone";
 
 function StorageDelete({ setStorageMenu }) {
   const initialFormData = {
@@ -25,11 +26,10 @@ function StorageDelete({ setStorageMenu }) {
   const { mutate: deleteStorage, isPending: isDeleteStoragePending } =
     useDeleteStorage();
 
-  //창고별 구역리스트, 구역별 선반리스트
-  const { zoneOptions, rackOptions } = useStorageData(
-    formData.selectedStorage,
-    formData.selectedZone,
-  );
+  // 선택한 창고 별 구역 옵션 리스트
+  const {data: zoneOptions = []} = useZonesByStorage(formData.selectedStorage);
+  // 구역 별 선반 옵션 리스트
+  const {data: rackOptions = []} = useRacksByZone(formData.selectedZone);
 
   const handleCheckChange = (e) => {
     const { name, checked } = e.target;

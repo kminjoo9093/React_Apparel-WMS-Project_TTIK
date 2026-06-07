@@ -1,6 +1,5 @@
 import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
-import useStorageData from "../../hooks/storage/useStorageData";
 import { useOpenAlert } from "../../store/alert";
 import StorageSelector from "../../components/StorageSelector";
 import ToggleSwitch from "../../components/ToggleSwitch";
@@ -8,33 +7,31 @@ import { getCheckMessage } from "../../utils/storage/getCheckMessage";
 import { useStorageToggle } from "../../hooks/storage/useStorageToggle";
 import StorageModifyButton from "../../components/StorageModifyButton";
 import { useUpdateStorageState } from "../../hooks/mutations/useUpdateStorageState";
-import { useQueryClient } from "@tanstack/react-query";
+import { useZonesByStorage } from "../../hooks/queries/useZonesByStorage";
+import { useRacksByZone } from "../../hooks/queries/useRacksByZone";
 
 function StorageUpdateState({ setStorageMenu }) {
   const [selectedStorage, setSelectedStorage] = useState(null); //창고 일련번호
   const [selectedZone, setSelectedZone] = useState(null); //구역 일련번호
   const [selectedRack, setSelectedRack] = useState(null); //선반 일련번호
-  const [rackEnabled, setRackEnabled] = useState(""); //선반 활성(Y)/비활성(N)
   const [rackCapacity, setRackCapacity] = useState(""); //선반 여유(Y)/포화(N)
 
   const openAlert = useOpenAlert();
-  const { mutate: updateStorageState, isPending:isUpdateStorageStatePending } = useUpdateStorageState();
+  const { mutate: updateStorageState, isPending: isUpdateStorageStatePending } =
+    useUpdateStorageState();
 
-  // 선택한 창고, 구역별 구역, 선반 옵션 리스트
-  const { zoneOptions, rackOptions } = useStorageData(
-    selectedStorage,
-    selectedZone,
-  );
+  // 선택한 창고 별 구역 옵션 리스트
+  const { data: zoneOptions = [] } = useZonesByStorage(selectedStorage);
+  // 구역 별 선반 옵션 리스트
+  const { data: rackOptions = [] } = useRacksByZone(selectedZone);
 
   const resetRackInfo = () => {
     setSelectedRack("");
     setRackCapacity("");
-    setRackEnabled("");
   };
 
   const resetRackState = () => {
     setRackCapacity("");
-    setRackEnabled("");
   };
 
   const { disableValues, setDisableValues, handleToggle } = useStorageToggle({
@@ -210,7 +207,7 @@ function StorageUpdateState({ setStorageMenu }) {
             </div>
           </div>
         </div>
-        <StorageModifyButton isPending={isUpdateStorageStatePending}/>
+        <StorageModifyButton isPending={isUpdateStorageStatePending} />
       </form>
     </>
   );

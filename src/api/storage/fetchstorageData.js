@@ -19,10 +19,20 @@ export async function updateStorageState(storageModifyReq) {
 
 // 구역/선반 추가
 export async function addStorageStructure(storageAddReq) {
-  return await postData(`${STORAGE_BASE}/add`, storageAddReq)
+  return await postData(`${STORAGE_BASE}/add`, storageAddReq);
 }
 
 //창고 삭제
 export async function deleteStorageStructure(storageDeleteReq) {
   return await deleteData(STORAGE_BASE, storageDeleteReq);
+}
+
+// 선택한 창고 별 구역 옵션 리스트
+export async function getZonesByStorage(storageSn) {
+  return getData(`${STORAGE_BASE}/zones?storageSn=${storageSn}`);
+}
+
+// 선택한 구역 별 선반 옵션 리스트
+export async function getRacksByZone(zoneSn) {
+  return getData(`${STORAGE_BASE}/racks?zoneSn=${zoneSn}`);
 }
