@@ -19,10 +19,10 @@ export const useAlertStore = create((set, get) => ({
           if (onConfirm) onConfirm();
           get().closeAlert();
         },
-        onCancel: () => {
-          if (onCancel) onCancel();
+        onCancel: onCancel ? () => {
+          onCancel();
           get().closeAlert();
-        },
+        } : null,
       },
     }));
   },

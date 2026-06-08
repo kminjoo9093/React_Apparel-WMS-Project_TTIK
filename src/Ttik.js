@@ -21,14 +21,14 @@ import StockDetailOutbound from "./pages/stock/StockDetailOutbound";
 import Storage from "./pages/storage/Storage";
 import ProductDataProvider from "./context/ProductDataProvider";
 import Alert from "./components/Alert";
-import { useAlertStore } from "./store/alert";
+import { createPortal } from "react-dom";
+import RegisterModalFrame from "./components/RegisterModalFrame";
+
 
 function Ttik() {
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-
-  const { alert, closeAlert } = useAlertStore();
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -140,12 +140,13 @@ function Ttik() {
         )}
       </Routes>
 
-      {/* alert */}
-      <Alert
-        {...alert}
-        onConfirm={alert.onConfirm}
-        onCancel={alert.onCancel || closeAlert}
-      />
+      {createPortal(
+        <>
+          <Alert/>
+          <RegisterModalFrame />
+        </>,
+        document.getElementById("modal-root"),
+      )}
     </>
   );
 }

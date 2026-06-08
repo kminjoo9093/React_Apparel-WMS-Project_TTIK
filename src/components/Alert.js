@@ -1,21 +1,17 @@
 import style from "../css/Modal.module.css";
+import { useAlertState, useCloseAlert } from "../store/alert";
 
-const Alert = ({
-  isOpen,
-  title,
-  message,
-  type,
-  onConfirm = () => {},
-  onCancel = () => {},
-  onClose = () => {},
-}) => {
+const Alert = () => {
+  const { isOpen, title, message, type, onConfirm, onCancel } = useAlertState();
+  const closeAlert = useCloseAlert();
+
   if (!isOpen) return null;
 
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
       if (onCancel) onCancel();
-      else if (onClose) onClose();
       else if (onConfirm) onConfirm();
+      else closeAlert();
     }
   };
 

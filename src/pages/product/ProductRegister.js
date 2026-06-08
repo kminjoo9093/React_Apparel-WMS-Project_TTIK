@@ -1,10 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styleRegister from "../../css/ProductRegister.module.css";
-import RegistModalFrame from "../../components/RegistModalFrame";
-import ProductSeasonModal from "./ProductSeasonModal";
-import ProductCodeModal from "./ProductCodeModal";
-import BrandSearchModal from "./BrandSearchModal";
 import { CommonButton } from "../../components/CommonButton";
 import PageInfo from "../../components/PageInfo";
 import {
@@ -14,13 +10,11 @@ import {
   useResetFormData,
   useSetProductCd,
 } from "../../store/product";
-import { useCloseModal, useModalConfig } from "../../store/productModal";
 import ProductBasicInfoField from "../../components/ProductBasicInfoField";
 import ProductStockInfoField from "../../components/ProductStockInfoField";
 import ProductCodeField from "../../components/ProductCodeField";
 import { useOpenAlert } from "../../store/alert";
 import { useRegisterProduct } from "../../hooks/mutations/useRegisterProduct";
-import { useQueryClient } from "@tanstack/react-query";
 
 function ProductRegister() {
   const navigate = useNavigate();
@@ -30,38 +24,10 @@ function ProductRegister() {
   const productCd = useProductCd();
   const setProductCd = useSetProductCd();
   const resetFormData = useResetFormData();
-  const modalConfig = useModalConfig();
-  const closeModal = useCloseModal();
   const openAlert = useOpenAlert();
 
   const { mutate: registerProduct } = useRegisterProduct();
 
-  // 모달
-  const getModalTitle = (type) => {
-    switch (type) {
-      case "brand":
-        return "브랜드 검색";
-      case "season":
-        return "시즌 등록";
-      case "productCode":
-        return "상품 코드 생성";
-      default:
-        return "";
-    }
-  };
-
-  const renderModalContent = () => {
-    switch (modalConfig.type) {
-      case "brand":
-        return <BrandSearchModal />;
-      case "season":
-        return <ProductSeasonModal />;
-      case "productCode":
-        return <ProductCodeModal />;
-      default:
-        return null;
-    }
-  };
 
   // 인풋 값 변경 시 상품 코드 초기화
   useEffect(() => {
@@ -149,14 +115,6 @@ function ProductRegister() {
           </div>
         </form>
       </div>
-
-      <RegistModalFrame
-        isOpen={modalConfig.isOpen}
-        onClose={closeModal}
-        title={getModalTitle(modalConfig.type)}
-      >
-        {renderModalContent()}
-      </RegistModalFrame>
     </div>
   );
 }
