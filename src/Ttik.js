@@ -19,7 +19,6 @@ import History from "../src/pages/stock/StockHistory";
 import StockDetailInbound from "./pages/stock/StockDetailInbound";
 import StockDetailOutbound from "./pages/stock/StockDetailOutbound";
 import Storage from "./pages/storage/Storage";
-import ProductDataProvider from "./context/ProductDataProvider";
 import Alert from "./components/Alert";
 import { createPortal } from "react-dom";
 import RegisterModalFrame from "./components/RegisterModalFrame";
@@ -90,34 +89,21 @@ function Ttik() {
                   <Route path="/ttik" element={<MainDashboard user={user} />} />
                   <Route path="/brand" element={<Brand />} />
                   <Route path="/partner" element={<Partner />} />
-                  <Route path="/stock/plans" element={<Plans />} />
-                  <Route
-                    path="/stock/plans/inbound/:productCd"
-                    element={<StockDetailInbound />}
-                  />
-                  <Route
-                    path="/stock/plans/outbound/:productCd"
-                    element={<StockDetailOutbound />}
-                  />
-                  <Route path="/product" element={<ProductDataProvider />}>
+                  <Route path="/product">
                     <Route path="list" element={<ProductList />} />
                     <Route path="register" element={<ProductRegister />} />
+                    <Route path="productDetail/:gds_cd" element={<ProductDetail />} />
+                    <Route path="productModify" element={<ProductModify />} />
+                    <Route path="productArchive" element={<ProductArchive />} />
+                  </Route>
+                  <Route path="/stock">
+                    <Route path="plans" element={<Plans />} />
+                    <Route path="plans/inbound/:productCd" element={<StockDetailInbound />} />
+                    <Route path="plans/outbound/:productCd" element={<StockDetailOutbound />} />
+                    <Route path="plans/qr/print" element={<QRsave />} />
+                    <Route path="history" element={<History />} />
                   </Route>
                   <Route path="/register/admin" element={<RegisterAdmin />} />
-                  <Route
-                    path="/product/productDetail/:gds_cd"
-                    element={<ProductDetail />}
-                  />
-                  <Route
-                    path="/product/productModify"
-                    element={<ProductModify />}
-                  />
-                  <Route
-                    path="/product/productArchive"
-                    element={<ProductArchive />}
-                  />
-                  <Route path="/stock/plans/qr/print" element={<QRsave />} />
-                  <Route path="/stock/history" element={<History />} />
                   <Route path="/storage" element={<Storage />} />
 
                   <Route
