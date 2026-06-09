@@ -29,24 +29,30 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 ## 🔍 기여한 부분
 
-### **상품 등록 페이지 개발** &emsp; 
-  <img width="600" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/45274b49-593f-4809-8652-ac3cc713e45a" />
+### **상품 관리 페이지 개발** &emsp; 
+  <img width="600" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/45274b49-593f-4809-8652-ac3cc713e45a" /> <br/>
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/ab668ca0-bd7c-42c0-8fe5-da84fa1edf2f" />
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/d595d559-0334-4cc9-9e79-9dd2944db833" />
+<br>
+<div style="display: flex; align-items: flex-start; gap: 10px;">
+  <img width="450" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/a389780f-454a-411d-8376-7eb6140fddbc" />
+  <img height="350" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/8e2b8ac9-35ad-4220-b93a-c7e1d3d63427" />
+  <img height="350" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/a16b4e36-727b-4421-80e1-b75b6434b667" />
+</div>
+
+<br>
+
+- **Zustand + createPortal**로 전역 모달 시스템 구현 및 type 기반 [컨텐츠 동적 렌더링으로 재사용성 확보](./src/components/RegistModalFrame.js)
+- **TanStack Query** 도입으로 마스터 데이터(브랜드, 카테고리, 시즌) 중복 요청 및 동기화 문제 해결
+- SKU 기반 [**상품 코드 자동 생성 및 중복 검증**](./src/pages/product/ProductCodeModal.js), 성별·카테고리 조합에 따른 사이즈 옵션 동적 바인딩 구현
+- [ 디바이스 환경별 **데이터 목록 조회 전략 분리** 구현](./src/pages/product/ProductList.js) (PC: 페이지네이션 / Mobile: 무한스크롤)<br>
+- 필터링 및 상품명/상품코드 기반 상품 검색 구현
+- [상품 조회 및 재고 상태 확인](./src/components/ProductItem.js)<br>
+
 
 <br>
 <br>
 
-- **신규 상품 등록** 및 SKU 기반 **상품 코드 자동 생성 로직 설계** <br>
--  children 기반의 재사용 가능한 [**공통 Modal 컴포넌트** 설계](./src/components/RegistModalFrame.js)<br>
-    - 브랜드, 시즌, 상품코드 모달에 활용<br>
-- [Context API를 활용](./src/context/ProductDataProvider.js)하여 브랜드, 시즌, 카테고리 데이터 공유 <br>
-- 컴포넌트 간 상태 공유 및 관리 단순화를 위해 [Zustand를 활용한 상품 등록 폼 상태 관리](./src/store/product.js)<br>
-- 입력값 유효성 검증과 안내 (숫자, 자릿수, 알파벳)<br>
-- 비동기 API 요청 및 실패 응답에 대한 예외 처리 로직 구현<br>
-
-<br>
-<br>
 
 ### 창고 관리 페이지 개발  
 <img width="400" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/28fddc1a-b0a7-4e53-92b1-8f1bd2bca7c2" />
@@ -58,32 +64,12 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 <br>
 
-- 창고 정보 수정(등록, 구조 수정, 삭제) 및 선반 정보 조회와 [적재된 박스 위치 변경 기능](./src/pages/storage/RackDetailModal.js) 구현
-  - 다수의 박스 위치 변경 시 Promise.all 활용한 병렬 처리
-- 구역/선반 간 의존 관계를 고려하여 [상위 상태 변경 시 하위 상태 자동 초기화](./src/hooks/storage/useStorageToggle.js) 하는 로직 설계
-- [해당 창고의 구역/선반 정보를 실시간 조회하여 사용자 입력 가이드를 제공](./src/pages/storage/StorageAdd.js#L271-L275)하여 오류 방지
-- [선택 상태 및 비활성화 여부에 따라 입력 필드를 동적으로 제어](./src/pages/storage/StorageUpdateState.js#L176)하여 입력 오류 방지
-- 현장 상황과 데이터의 일치를 고려한 **예외 처리** ( 적재 상품 존재 시 삭제 불가/최상층 선반 삭제 불가 )
-
-<br>
-<br>
-
-
-### **상품 목록 페이지 개발**  &emsp; 
-<div style="display: flex; align-items: flex-start; gap: 10px;">
-    <img width="450" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/a389780f-454a-411d-8376-7eb6140fddbc" />
-  <img height="350" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/8e2b8ac9-35ad-4220-b93a-c7e1d3d63427" />
-  <img height="350" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/a16b4e36-727b-4421-80e1-b75b6434b667" />
-</div>
-
-<br>
-
-- [상품 조회 및 재고 상태 확인](./src/components/ProductItem.js)<br>
-  - 컬러 활용한 상태 구분으로 정보의 직관성 높임 : 입고 대기, 부족, 정상<br>
-- 필터링 및 검색어 기반 상품 검색<br>
-- [ 디바이스 환경 기반 **데이터 목록 조회 전략 분리** 구현](./src/pages/product/ProductList.js) (PC: 페이지네이션 / Mobile: 무한스크롤)<br>
-- 상품 목록 관련 데이터 처리 로직을 [커스텀 훅(useProductList)로 분리](./src/hooks/product/useProductList.js)하여 구조 개선
-
+- 창고 등록, 구조 수정(구역/선반 추가·삭제), 상태 수정 및 [선반 별 재고 위치 변경](./src/pages/storage/RackDetailModal.js) 구현
+- [**Promise.all** 병렬 처리](./src/hooks/mutations/useMoveBox.js)로 다수 박스 이동 시 순차 요청 응답 지연 문제 해결
+- **TanStack Query** 도입으로 구조 수정 후 컴포넌트별 수동 재요청 로직 제거 및 [**Query Key** 설계](./src/lib/constants.js)로 관련 데이터 자동 동기화
+- 창고의 계층 관계를 반영해 [상위 선택 변경 시 하위 상태 자동 초기화](./src/hooks/storage/useStorageToggle.js), 구역 미선택 시 선반 비활성화 등 **조건 기반 UI제어**로 잘못된 API 요청을 UI 레벨에서 사전 차단
+- 구역/선반 정보를 실시간 조회하여 수정에 필요한 정보를 제공하고 사용자 입력 가이드를 구현
+- 적재 상품 존재 시 삭제 또는 비활성화 불가, 최상층 선반 삭제 불가 등 [**현장 상황 반영**한 예외 처리](./src/pages/storage/StorageDelete.js)
 
 <br>
 <br>
@@ -96,7 +82,7 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
       속성값이 모두 동일할 경우 데이터 **고유성 확보가 불가함**을 확인
         
 - **해결**
-    - **품번(성별 식별자+3자리 숫자) 도입**으로 상품 코드 구조 재설계 <br>
+    - [**품번(성별 식별자+3자리 숫자) 도입**](./src/utils/validation/styleNo.js)으로 상품 코드 구조 재설계 <br>
       →  (브랜드 코드 + 시즌 코드) - (카테고리 코드 + 사이즈 코드) - 품번
     - 표준화가 어려운 컬러 정보를 품번 내에 반영하도록 설계하여 관리 유연성 확보
     - [ **상품 코드 중복 여부 체크**로 검증 로직 강화 ](./src/pages/product/ProductCodeModal.js)
