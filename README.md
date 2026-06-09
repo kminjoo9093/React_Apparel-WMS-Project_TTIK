@@ -29,11 +29,18 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 ## 🔍 기여한 부분
 
-### **상품 관리 페이지 개발** &emsp; 
+### **상품 등록 페이지 개발** &emsp; 
   <img width="600" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/45274b49-593f-4809-8652-ac3cc713e45a" /> <br/>
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/ab668ca0-bd7c-42c0-8fe5-da84fa1edf2f" />
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/d595d559-0334-4cc9-9e79-9dd2944db833" />
 <br>
+
+- **Zustand + createPortal**로 전역 모달 시스템 구현 및 type 기반 [컨텐츠 동적 렌더링으로 재사용성 확보](./src/components/RegistModalFrame.js)
+- **TanStack Query** 도입으로 마스터 데이터(브랜드, 카테고리, 시즌) 중복 요청 및 동기화 문제 해결
+- SKU 기반 [**상품 코드 자동 생성 및 중복 검증**](./src/pages/product/ProductCodeModal.js), 성별·카테고리 조합에 따른 사이즈 옵션 동적 바인딩 구현
+
+<br>
+
 <div style="display: flex; align-items: flex-start; gap: 10px;">
   <img width="450" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/a389780f-454a-411d-8376-7eb6140fddbc" />
   <img height="350" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/8e2b8ac9-35ad-4220-b93a-c7e1d3d63427" />
@@ -42,9 +49,6 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 <br>
 
-- **Zustand + createPortal**로 전역 모달 시스템 구현 및 type 기반 [컨텐츠 동적 렌더링으로 재사용성 확보](./src/components/RegistModalFrame.js)
-- **TanStack Query** 도입으로 마스터 데이터(브랜드, 카테고리, 시즌) 중복 요청 및 동기화 문제 해결
-- SKU 기반 [**상품 코드 자동 생성 및 중복 검증**](./src/pages/product/ProductCodeModal.js), 성별·카테고리 조합에 따른 사이즈 옵션 동적 바인딩 구현
 - [ 디바이스 환경별 **데이터 목록 조회 전략 분리** 구현](./src/pages/product/ProductList.js) (PC: 페이지네이션 / Mobile: 무한스크롤)<br>
 - 필터링 및 상품명/상품코드 기반 상품 검색 구현
 - [상품 조회 및 재고 상태 확인](./src/components/ProductItem.js)<br>
