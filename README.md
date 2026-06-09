@@ -29,7 +29,7 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 ## 🔍 기여한 부분
 
-### **상품 등록 페이지 개발** &emsp; 
+### **상품 관리 페이지 개발** &emsp; 
   <img width="600" style="vertical-align: top;" alt="image" src="https://github.com/user-attachments/assets/45274b49-593f-4809-8652-ac3cc713e45a" /> <br/>
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/ab668ca0-bd7c-42c0-8fe5-da84fa1edf2f" />
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/d595d559-0334-4cc9-9e79-9dd2944db833" />
