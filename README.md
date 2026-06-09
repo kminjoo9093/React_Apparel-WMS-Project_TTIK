@@ -49,7 +49,7 @@ QR 기반의 실시간 입출고 및 로케이션 관리 시스템으로, <br>
 
 <br>
 
-- [ 디바이스 환경별 **데이터 목록 조회 전략 분리** 구현](./src/pages/product/ProductList.js) (PC: 페이지네이션 / Mobile: 무한스크롤)<br>
+- [ 디바이스 환경별 **상품 목록 조회 전략 분리** 구현](./src/pages/product/ProductList.js) (PC: 페이지네이션 / Mobile: 무한스크롤)<br>
 - 필터링 및 상품명/상품코드 기반 상품 검색 구현
 - [상품 조회 및 재고 상태 확인](./src/components/ProductItem.js)<br>
 
