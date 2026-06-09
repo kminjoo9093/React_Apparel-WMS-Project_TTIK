@@ -1,7 +1,9 @@
 import styleRegister from "../css/ProductRegister.module.css";
-import { useContext, useState, useEffect } from "react";
-import { ProductContext } from "../context/ProductDataProvider";
+import { useState, useEffect } from "react";
 import { useFormData, useSetFormData } from "../store/product";
+import { useBrandList } from "../hooks/queries/useBrandList";
+import { useCategoryList } from "../hooks/queries/useCategoryList";
+import { useSeasonList } from "../hooks/queries/useSeasonList";
 import { CommonButton } from "./CommonButton";
 import { useOpenModal } from "../store/productModal";
 import { checkStyleNo } from "../utils/validation/styleNo";
@@ -9,7 +11,9 @@ import { useOpenAlert } from "../store/alert";
 import { useGetSizeMap } from "../hooks/queries/useGetSizeMap";
 
 export default function ProductBasicInfo() {
-  const { brandList, categoryList, seasonList } = useContext(ProductContext);
+  const { data: brandList = [] } = useBrandList();
+  const { data: categoryList = [] } = useCategoryList();
+  const { data: seasonList = [] } = useSeasonList();
 
   const formData = useFormData();
   const setFormData = useSetFormData();

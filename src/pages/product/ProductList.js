@@ -5,10 +5,12 @@ import Pagination from "../Pagination";
 import { CommonButton } from "../../components/CommonButton";
 import { CommonSelect } from "../../components/CommonSelect";
 import ProductItem from "../../components/ProductItem";
-import { ProductContext } from "../../context/ProductDataProvider";
 import PageInfo from "../../components/PageInfo";
 import { useProductList } from "../../hooks/product/useProductList";
 import { ScrollContext } from "../../context/ScrollContext";
+import { useBrandList } from "../../hooks/queries/useBrandList";
+import { useCategoryList } from "../../hooks/queries/useCategoryList";
+import { useSeasonList } from "../../hooks/queries/useSeasonList";
 
 const stkStatusConfig = [
   { value: "대기", status: "입고 대기" },
@@ -19,8 +21,10 @@ const stkStatusConfig = [
 const postsPerPagePC = 10;
 
 function ProductList() {
-  const { brandList, categoryList, seasonList } = useContext(ProductContext);
-  const location = useLocation(); 
+  const { data: brandList = [] } = useBrandList();
+  const { data: categoryList = [] } = useCategoryList();
+  const { data: seasonList = [] } = useSeasonList();
+  const location = useLocation();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const scrollRef = useContext(ScrollContext);
 
