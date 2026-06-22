@@ -21,7 +21,9 @@
 
 ### 🛠 Frontend Stack
 ![React](https://img.shields.io/badge/React-000000?style=for-the-badge&logo=react)
+![Vite](https://img.shields.io/badge/Vite-000000?style=for-the-badge)
 ![Zustand](https://img.shields.io/badge/Zustand-000000?style=for-the-badge)
+![TanStack Query](https://img.shields.io/badge/TanStack_Query-000000?style=for-the-badge)
 
 
 <br><br>
