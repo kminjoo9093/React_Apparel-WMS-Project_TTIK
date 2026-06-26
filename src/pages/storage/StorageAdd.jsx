@@ -1,6 +1,5 @@
 import { useState } from "react";
 import styleStorage from "../../css/Storage.module.css";
-// import useStorageData from "../../hooks/storage/useStorageData";
 import { useOpenAlert } from "../../store/alert";
 import StorageSelector from "../../components/StorageSelector";
 import CheckButton from "../../components/CheckButton";
@@ -26,10 +25,7 @@ function StorageAdd({ setStorageMenu }) {
   };
 
   const [formData, setFormData] = useState(initialFormData);
-
-  // 선택한 창고 별 구역 옵션 리스트
   const {data: zoneOptions = []} = useZonesByStorage(formData.selectedStorage);
-  // 구역 별 선반 옵션 리스트
   const {data: rackOptions = []} = useRacksByZone(formData.selectedZone);
 
   const { mutate: addStorageStructure } = useAddStorageStructure();
