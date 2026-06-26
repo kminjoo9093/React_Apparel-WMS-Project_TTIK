@@ -19,7 +19,6 @@ function ProductSeasonModal() {
     const year = yearRef.current.value;
     const season = seasonRef.current.value;
 
-    //유효성 검사 로직
     if (!year || year.length !== 4) {
       openAlert({
         title: "Again",

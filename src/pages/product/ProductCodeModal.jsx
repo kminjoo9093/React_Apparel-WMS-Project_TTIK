@@ -8,25 +8,22 @@ import { useCloseModal } from "../../store/productModal";
 
 function ProductCodeModal() {
   const openAlert = useOpenAlert();
-  const [isChecked, setIsChecked] = useState(false); //체크 여부
-  const [isDuplicate, setIsDuplicate] = useState(null); //중복 여부
+  const [isChecked, setIsChecked] = useState(false); 
+  const [isDuplicate, setIsDuplicate] = useState(null); 
   const productCd = useProductCd();
   const setProductCd = useSetProductCd();
   const closeModal = useCloseModal();
 
   const { mutate: checkProductCode } = useProductCodeCheck();
 
-  // 코드 중복체크
   function validateProductCd(e) {
     e.preventDefault();
 
     checkProductCode(productCd, {
       onSuccess: (isExist) => {
         if (isExist) {
-          //코드 중복
           setIsDuplicate(true);
         } else {
-          //중복 X
           setIsDuplicate(false);
           setIsChecked(true);
         }
@@ -41,11 +38,9 @@ function ProductCodeModal() {
     });
   }
 
-  // 코드 등록
   function registerProductCd(e) {
     e.preventDefault();
 
-    //코드 중복 시
     if (isDuplicate) {
       setProductCd("");
       setIsDuplicate(null);

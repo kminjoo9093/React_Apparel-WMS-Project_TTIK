@@ -9,18 +9,17 @@ import { useRackList } from "../../hooks/queries/useRackList";
 
 function RackList() {
   const location = useLocation();
-  const { data: storageList = [] } = useStorage();
   const openAlert = useOpenAlert();
   const [isOpen, setIsOpen] = useState(false);
   const [storageFilter, setStorageFilter] = useState("");
-
   const [selectedRack, setSelectedRack] = useState("");
 
-  // 페이지네이션
+  const { data: storageList = [] } = useStorage();
+
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 10;
 
-  //메인 대시보드에서 창고 적재현황 클릭시 넘어오는 페이지 - 김윤중
+  //메인 대시보드에서 창고 적재현황 클릭 후 이동 - 김윤중
   useEffect(() => {
     const state = location.state;
     if (state?.autoOpenRackSn) {
@@ -36,7 +35,6 @@ function RackList() {
           setStorageFilter(targetStorage.storageSn.toString());
         }
       }
-      // 처리가 끝난 후 state를 비워주어 새로고침 시 계속 뜨는 것을 방지
       window.history.replaceState({}, document.title);
     }
   }, [location.state, storageList]);
@@ -74,7 +72,7 @@ function RackList() {
   };
 
   const handleRackStts = (rackStts, hasBox, rackEnabled) => {
-    if (rackEnabled === "N") return { text: "비었음", color: "#333" }; //사용불가
+    if (rackEnabled === "N") return { text: "비었음", color: "#333" }; 
 
     if (rackStts === "Y") {
       //선반 사용가능 상태

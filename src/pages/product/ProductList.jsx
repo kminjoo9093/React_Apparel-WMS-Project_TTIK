@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useContext } from "react";
-import { useLocation, Link } from "react-router-dom"; // URL 파라미터 감지용
+import { useLocation, Link } from "react-router-dom"; 
 import styleList from "../../css/ProductList.module.css";
 import Pagination from "../Pagination";
 import { CommonButton } from "../../components/CommonButton";
@@ -125,11 +125,6 @@ function ProductList() {
     };
   }, [isMobile, hasMore, isLoading]);
 
-  // 인풋창 타이핑용 (서버 요청 안 보냄)
-  const handleKeywordTyping = (e) => {
-    setKeywordInput(e.target.value);
-  };
-
   // 검색 버튼 클릭 시 (실제 필터 적용)
   const handleSearchClick = () => {
     const trimmedKeyword = keywordInput.trim();
@@ -215,7 +210,7 @@ function ProductList() {
               id="searchProduct"
               name="keyword"
               value={keywordInput}
-              onChange={handleKeywordTyping}
+              onChange={(e)=>setKeywordInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearchClick()}
               type="text"
               placeholder="상품명 또는 코드 검색"

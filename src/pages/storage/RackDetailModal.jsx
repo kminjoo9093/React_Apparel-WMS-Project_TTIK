@@ -40,7 +40,6 @@ export default function RackDetailModal({ selectedRack, onCloseModal }) {
 
   const { mutate: moveBoxes, isPending: isMoveBoxesPending } = useMoveBoxes();
 
-  // 박스 이동
   const handelMoveBoxes = (e) => {
     e.preventDefault();
 
